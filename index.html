@@ -26,6 +26,17 @@
       --footer-label: #9A917E;
     }
 
+    @font-face {
+      font-family: '__marsdenWide_a499d3';
+      src: url('./74ff359dbdbce922-s.p.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     html, body {
       width: 100%;
       height: 100%;
@@ -195,7 +206,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 13px;
+      gap: 8px;
       font-family: 'Saira Condensed', sans-serif;
       text-transform: uppercase;
       z-index: 4;
@@ -219,10 +230,17 @@
     }
 
     .footer .brand {
+      font-family: '__marsdenWide_a499d3', 'Saira Condensed', sans-serif;
       font-size: 18px;
-      letter-spacing: 0.16em;
-      font-weight: 700;
-      color: var(--ink);
+      letter-spacing: 0.02em;
+      font-weight: normal;
+      color: #f1935c;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer .brand:hover {
+      color: var(--ember-deep);
     }
 
     /* ── Shared animations ── */
@@ -353,7 +371,7 @@
   <footer class="footer">
     <span class="lbl">An initiative by</span>
     <span class="sep" aria-hidden="true"></span>
-    <span class="brand">GNA Energy</span>
+    <a href="#" class="brand" aria-label="Scroll to top">GNA Energy</a>
   </footer>
 
   <script>
