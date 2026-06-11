@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BCX · Coming Soon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@900&family=Saira+Condensed:wght@500;600;700&family=Saira:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --ember:        #F1915F;
+      --ember-deep:   #DE6F38;
+      --ember-bright: #FFB683;
+      --ink:          #14110D;
+      --paper:        #F5F1E8;
+      --paper-2:      #ECE5D6;
+      --paper-line:   #D8CFBC;
+      --muted:        #5A5346;
+      --footer-label: #9A917E;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Saira', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Warm vignette ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(
+        130% 100% at 50% 28%,
+        #FBF8F1 0%,
+        var(--paper) 44%,
+        var(--paper-2) 100%
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Grid overlay ── */
+    .grid-layer {
+      position: fixed;
+      inset: 0;
+      opacity: 0.55;
+      background-image:
+        linear-gradient(var(--paper-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+      background-size: 64px 64px;
+      -webkit-mask-image: radial-gradient(130% 100% at 50% 38%, #000 6%, transparent 68%);
+              mask-image: radial-gradient(130% 100% at 50% 38%, #000 6%, transparent 68%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── Ember particles ── */
+    .embers {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .embers i {
+      position: absolute;
+      bottom: -16px;
+      border-radius: 50%;
+      background: var(--ember);
+      box-shadow: 0 0 10px 1px rgba(241, 145, 95, 0.7);
+      animation: rise linear infinite;
+      opacity: 0;
+      display: block;
+    }
+
+    @keyframes rise {
+      0%   { transform: translateY(0) translateX(0) scale(1);   opacity: 0; }
+      10%  { opacity: 0.85; }
+      85%  { opacity: 0.65; }
+      100% { transform: translateY(-96vh) translateX(var(--drift, 0px)) scale(0.35); opacity: 0; }
+    }
+
+    /* ── Main layout ── */
+    .stage {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 80px 120px;
+    }
+
+    /* ── Logo ── */
+    .logo-wrap {
+      margin-bottom: 20px;
+      animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: 0.05s;
+      filter: drop-shadow(0 8px 24px rgba(20, 17, 13, 0.07));
+    }
+
+    .logo-svg {
+      width: 320px;
+      height: auto;
+    }
+
+    /* ── Eyebrow ── */
+    .eyebrow {
+      font-family: 'Saira Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 19px;
+      letter-spacing: 0.46em;
+      text-indent: 0.46em;
+      color: var(--ember-deep);
+      text-transform: uppercase;
+      margin-bottom: 22px;
+      animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: 0.15s;
+    }
+
+    /* ── Headline ── */
+    .headline {
+      font-family: 'Archivo', sans-serif;
+      font-weight: 900;
+      font-size: clamp(52px, 9.6vw, 138px);
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      white-space: nowrap;
+      margin: 0;
+      animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: 0.25s;
+    }
+
+    .headline .soon {
+      color: var(--ember-deep);
+    }
+
+    /* ── Animated rule ── */
+    .rule {
+      display: block;
+      width: 0;
+      height: 5px;
+      background: var(--ember);
+      border-radius: 3px;
+      box-shadow: 0 0 16px rgba(241, 145, 95, 0.6);
+      margin: 34px auto 30px;
+      animation: drawRule 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.55s forwards;
+    }
+
+    @keyframes drawRule {
+      to { width: 188px; }
+    }
+
+    /* ── Subtext ── */
+    .subtext {
+      font-family: 'Saira', sans-serif;
+      font-weight: 400;
+      font-size: 21px;
+      letter-spacing: 0.01em;
+      color: var(--muted);
+      max-width: 540px;
+      line-height: 1.55;
+      animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: 0.45s;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 13px;
+      font-family: 'Saira Condensed', sans-serif;
+      text-transform: uppercase;
+      z-index: 4;
+      animation: fadeIn 1.2s ease 0.7s both;
+    }
+
+    .footer .lbl {
+      font-size: 14px;
+      letter-spacing: 0.28em;
+      color: var(--footer-label);
+      font-weight: 600;
+    }
+
+    .footer .sep {
+      width: 8px;
+      height: 8px;
+      background: var(--ember);
+      transform: rotate(45deg);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .footer .brand {
+      font-size: 18px;
+      letter-spacing: 0.16em;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    /* ── Shared animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ── Responsive: tablet ── */
+    @media (max-width: 1024px) {
+      .stage {
+        padding: 60px 40px 100px;
+      }
+      .logo-svg {
+        width: 220px;
+      }
+      .eyebrow {
+        font-size: 16px;
+      }
+      .subtext {
+        font-size: 18px;
+      }
+    }
+
+    /* ── Responsive: mobile ── */
+    @media (max-width: 640px) {
+      body {
+        overflow-y: auto;
+      }
+      .stage {
+        padding: 48px 24px 110px;
+        min-height: 100svh;
+      }
+      .logo-wrap {
+        margin-bottom: 32px;
+      }
+      .logo-svg {
+        width: 160px;
+      }
+      .eyebrow {
+        font-size: 13px;
+        letter-spacing: 0.32em;
+        margin-bottom: 16px;
+      }
+      .headline {
+        white-space: normal;
+        font-size: 52px;
+      }
+      .rule {
+        margin: 24px auto 22px;
+      }
+      .subtext {
+        font-size: 17px;
+        max-width: 340px;
+      }
+      .footer {
+        bottom: 28px;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        row-gap: 6px;
+      }
+      .footer .lbl {
+        font-size: 12px;
+        letter-spacing: 0.22em;
+      }
+      .footer .brand {
+        font-size: 15px;
+      }
+    }
+
+    /* ── Very small screens ── */
+    @media (max-width: 380px) {
+      .headline {
+        font-size: 44px;
+      }
+      .logo-svg {
+        width: 140px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grid-layer" aria-hidden="true"></div>
+
+  <!-- Ember particles (injected by JS) -->
+  <div class="embers" id="embers" aria-hidden="true"></div>
+
+  <main class="stage">
+
+    <!-- Logo -->
+    <div class="logo-wrap">
+      <svg class="logo-svg" viewBox="0 0 392 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="BCX — Bharat Coal Exchange">
+        <text
+          x="196" y="104"
+          text-anchor="middle"
+          font-family="Archivo, sans-serif"
+          font-weight="900"
+          font-size="120"
+          letter-spacing="-6"
+        >
+          <tspan fill="#F1915F">B</tspan><tspan fill="#14110D">CX</tspan>
+        </text>
+      </svg>
+    </div>
+
+    <!-- Eyebrow -->
+    <p class="eyebrow">Bharat Coal Exchange</p>
+
+    <!-- Headline -->
+    <h1 class="headline">COMING <span class="soon">SOON</span></h1>
+
+    <!-- Animated rule -->
+    <span class="rule" role="presentation"></span>
+
+    <!-- Subtext -->
+    <p class="subtext">A new national marketplace for transparent,&nbsp;efficient coal trading is on its way.</p>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <span class="lbl">An initiative by</span>
+    <span class="sep" aria-hidden="true"></span>
+    <span class="brand">GNA Energy</span>
+  </footer>
+
+  <script>
+    (function () {
+      // Deterministic PRNG — stable across renders
+      function rng(seed) {
+        let s = (seed % 2147483647);
+        if (s <= 0) s += 2147483646;
+        return function () {
+          s = (s * 16807) % 2147483647;
+          return s / 2147483647;
+        };
+      }
+
+      const rand = rng(7);
+      const container = document.getElementById('embers');
+      const count = 22;
+
+      for (let i = 0; i < count; i++) {
+        const size   = (3 + rand() * 5).toFixed(1);
+        const left   = (rand() * 100).toFixed(2);
+        const dur    = (9  + rand() * 9).toFixed(2);
+        const delay  = (-rand() * 16).toFixed(2);
+        const op     = (0.4 + rand() * 0.5).toFixed(2);
+        const drift  = ((rand() * 80) - 40).toFixed(0) + 'px';
+
+        const el = document.createElement('i');
+        el.style.cssText = [
+          'left:'   + left + '%',
+          'width:'  + size + 'px',
+          'height:' + size + 'px',
+          'animation-duration:'  + dur   + 's',
+          'animation-delay:'     + delay + 's',
+          'opacity:' + op,
+          '--drift:' + drift,
+        ].join(';');
+        container.appendChild(el);
+      }
+    })();
+  </script>
+
+</body>
+</html>
