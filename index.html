@@ -1,28 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BCX · Coming Soon</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@900&family=Saira+Condensed:wght@500;600;700&family=Saira:wght@400;500&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@900&family=Saira+Condensed:wght@500;600;700&family=Saira:wght@400;500&display=swap"
+    rel="stylesheet" />
   <style>
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
     :root {
-      --ember:        #F1915F;
-      --ember-deep:   #DE6F38;
+      --ember: #F1915F;
+      --ember-deep: #DE6F38;
       --ember-bright: #FFB683;
-      --ink:          #14110D;
-      --paper:        #F5F1E8;
-      --paper-2:      #ECE5D6;
-      --paper-line:   #D8CFBC;
-      --muted:        #5A5346;
+      --ink: #14110D;
+      --paper: #F5F1E8;
+      --paper-2: #ECE5D6;
+      --paper-line: #D8CFBC;
+      --muted: #5A5346;
       --footer-label: #9A917E;
     }
 
@@ -37,7 +42,8 @@
       scroll-behavior: smooth;
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
     }
@@ -57,12 +63,10 @@
       content: '';
       position: fixed;
       inset: 0;
-      background: radial-gradient(
-        130% 100% at 50% 28%,
-        #FBF8F1 0%,
-        var(--paper) 44%,
-        var(--paper-2) 100%
-      );
+      background: radial-gradient(130% 100% at 50% 28%,
+          #FBF8F1 0%,
+          var(--paper) 44%,
+          var(--paper-2) 100%);
       pointer-events: none;
       z-index: 0;
     }
@@ -77,7 +81,7 @@
         linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
       background-size: 64px 64px;
       -webkit-mask-image: radial-gradient(130% 100% at 50% 38%, #000 6%, transparent 68%);
-              mask-image: radial-gradient(130% 100% at 50% 38%, #000 6%, transparent 68%);
+      mask-image: radial-gradient(130% 100% at 50% 38%, #000 6%, transparent 68%);
       pointer-events: none;
       z-index: 1;
     }
@@ -103,10 +107,23 @@
     }
 
     @keyframes rise {
-      0%   { transform: translateY(0) translateX(0) scale(1);   opacity: 0; }
-      10%  { opacity: 0.85; }
-      85%  { opacity: 0.65; }
-      100% { transform: translateY(-96vh) translateX(var(--drift, 0px)) scale(0.35); opacity: 0; }
+      0% {
+        transform: translateY(0) translateX(0) scale(1);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 0.85;
+      }
+
+      85% {
+        opacity: 0.65;
+      }
+
+      100% {
+        transform: translateY(-96vh) translateX(var(--drift, 0px)) scale(0.35);
+        opacity: 0;
+      }
     }
 
     /* ── Main layout ── */
@@ -125,14 +142,14 @@
 
     /* ── Logo ── */
     .logo-wrap {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
       animation-delay: 0.05s;
       filter: drop-shadow(0 8px 24px rgba(20, 17, 13, 0.07));
     }
 
     .logo-svg {
-      width: 320px;
+      width: 400px;
       height: auto;
     }
 
@@ -165,7 +182,7 @@
     }
 
     .headline .soon {
-      color: var(--ember-deep);
+      color: #F1885B;
     }
 
     /* ── Animated rule ── */
@@ -181,7 +198,9 @@
     }
 
     @keyframes drawRule {
-      to { width: 188px; }
+      to {
+        width: 188px;
+      }
     }
 
     /* ── Subtext ── */
@@ -206,7 +225,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       font-family: 'Saira Condensed', sans-serif;
       text-transform: uppercase;
       z-index: 4;
@@ -245,13 +264,25 @@
 
     /* ── Shared animations ── */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(22px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(22px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
 
     /* ── Responsive: tablet ── */
@@ -259,12 +290,15 @@
       .stage {
         padding: 60px 40px 100px;
       }
+
       .logo-svg {
-        width: 220px;
+        width: 300px;
       }
+
       .eyebrow {
         font-size: 16px;
       }
+
       .subtext {
         font-size: 18px;
       }
@@ -275,43 +309,53 @@
       body {
         overflow-y: auto;
       }
+
       .stage {
         padding: 48px 24px 110px;
         min-height: 100svh;
       }
+
       .logo-wrap {
         margin-bottom: 32px;
       }
+
       .logo-svg {
-        width: 160px;
+        width: 240px;
       }
+
       .eyebrow {
         font-size: 13px;
         letter-spacing: 0.32em;
         margin-bottom: 16px;
       }
+
       .headline {
         white-space: normal;
         font-size: 52px;
       }
+
       .rule {
         margin: 24px auto 22px;
       }
+
       .subtext {
         font-size: 17px;
         max-width: 340px;
       }
+
       .footer {
         bottom: 28px;
-        gap: 10px;
+        gap: 4px;
         flex-wrap: wrap;
         justify-content: center;
         row-gap: 6px;
       }
+
       .footer .lbl {
         font-size: 12px;
         letter-spacing: 0.22em;
       }
+
       .footer .brand {
         font-size: 15px;
       }
@@ -322,12 +366,14 @@
       .headline {
         font-size: 44px;
       }
+
       .logo-svg {
-        width: 140px;
+        width: 220px;
       }
     }
   </style>
 </head>
+
 <body>
 
   <div class="grid-layer" aria-hidden="true"></div>
@@ -339,22 +385,8 @@
 
     <!-- Logo -->
     <div class="logo-wrap">
-      <svg class="logo-svg" viewBox="0 0 392 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="BCX — Bharat Coal Exchange">
-        <text
-          x="196" y="104"
-          text-anchor="middle"
-          font-family="Archivo, sans-serif"
-          font-weight="900"
-          font-size="120"
-          letter-spacing="-6"
-        >
-          <tspan fill="#F1915F">B</tspan><tspan fill="#14110D">CX</tspan>
-        </text>
-      </svg>
+      <img src="./BCX-logo-vector.svg" class="logo-svg" alt="BCX Logo" />
     </div>
-
-    <!-- Eyebrow -->
-    <p class="eyebrow">Bharat Coal Exchange</p>
 
     <!-- Headline -->
     <h1 class="headline">COMING <span class="soon">SOON</span></h1>
@@ -370,8 +402,8 @@
   <!-- Footer -->
   <footer class="footer">
     <span class="lbl">An initiative by</span>
-    <span class="sep" aria-hidden="true"></span>
-    <a href="#" class="brand" aria-label="Scroll to top">GNA Energy</a>
+    <!-- <span class="sep" aria-hidden="true"></span> -->
+    <a href="https://gna.energy" class="brand">GNA Energy</a>
   </footer>
 
   <script>
@@ -391,20 +423,20 @@
       const count = 22;
 
       for (let i = 0; i < count; i++) {
-        const size   = (3 + rand() * 5).toFixed(1);
-        const left   = (rand() * 100).toFixed(2);
-        const dur    = (9  + rand() * 9).toFixed(2);
-        const delay  = (-rand() * 16).toFixed(2);
-        const op     = (0.4 + rand() * 0.5).toFixed(2);
-        const drift  = ((rand() * 80) - 40).toFixed(0) + 'px';
+        const size = (3 + rand() * 5).toFixed(1);
+        const left = (rand() * 100).toFixed(2);
+        const dur = (9 + rand() * 9).toFixed(2);
+        const delay = (-rand() * 16).toFixed(2);
+        const op = (0.4 + rand() * 0.5).toFixed(2);
+        const drift = ((rand() * 80) - 40).toFixed(0) + 'px';
 
         const el = document.createElement('i');
         el.style.cssText = [
-          'left:'   + left + '%',
-          'width:'  + size + 'px',
+          'left:' + left + '%',
+          'width:' + size + 'px',
           'height:' + size + 'px',
-          'animation-duration:'  + dur   + 's',
-          'animation-delay:'     + delay + 's',
+          'animation-duration:' + dur + 's',
+          'animation-delay:' + delay + 's',
           'opacity:' + op,
           '--drift:' + drift,
         ].join(';');
@@ -414,4 +446,5 @@
   </script>
 
 </body>
+
 </html>
