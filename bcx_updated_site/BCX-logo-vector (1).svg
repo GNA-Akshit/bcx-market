@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 250" width="100%" height="100%">
+  <defs>
+    <style>
+      .bcx-text {
+        font-family: 'Montserrat', 'Gotham', 'Proxima Nova', 'Helvetica Neue', Arial, sans-serif;
+        font-size: 170px;
+        font-weight: 900;
+        letter-spacing: -4px;
+      }
+      .brand-orange {
+        fill: #F1885B;
+      }
+      .brand-black {
+        fill: #1A1A18;
+      }
+      .side-text {
+        font-family: 'Montserrat', 'Gotham', 'Proxima Nova', 'Helvetica Neue', Arial, sans-serif;
+        font-size: 42px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+      }
+      .divider {
+        stroke: #1A1A18;
+        stroke-width: 6px;
+        stroke-linecap: square;
+      }
+    </style>
+  </defs>
+
+  <text x="30" y="195" class="bcx-text">
+    <tspan class="brand-orange">B</tspan><tspan class="brand-black">CX</tspan>
+  </text>
+
+  <line x1="450" y1="55" x2="450" y2="198" class="divider" />
+
+  <text x="480" y="88" class="side-text brand-orange">BHARAT</text>
+  <text x="480" y="142" class="side-text brand-black">COAL</text>
+  <text x="480" y="196" class="side-text brand-black">EXCHANGE</text>
+</svg>
