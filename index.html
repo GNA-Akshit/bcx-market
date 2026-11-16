@@ -1,336 +1,38 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Bharat Coal Exchange - Powering the Next Generation of Coal Trading">
-  <title>Bharat Coal Exchange (BCX)</title>
-
-  <!-- Modern Google Fonts: Outfit (Headings) & Plus Jakarta Sans (Body) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet">
-
-  <!-- Phosphor Icons (Real Icon Library) -->
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-  <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-  <!-- Navigation -->
-  <nav id="navbar" class="navbar">
-    <div class="nav-container">
-      <a href="#" class="logo">
-        <img src="BCX-logo-vector (1).svg" alt="Bharat Coal Exchange Logo">
-      </a>
-      <div class="menu-toggle" id="mobile-menu">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- viewport-fit=cover: without it every env(safe-area-inset-*) in website.css is 0 on a notched phone -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- THE PUBLIC WEBSITE (ADR-0045). Its own page, so it can be served without the
+         console's login: no auth gate is installed here, and it carries no ULIP data. -->
+    <title>Bharat Coal Exchange — India's coal market, measured every morning</title>
+    <meta name="description" content="Coal production and despatch, rail, power prices and world coal benchmarks from 15 official sources — each compared like for like with last year — and the daily India Coal Market and India Power Market newsletters." />
+    <meta name="theme-color" content="#F1885B" />
+    <meta name="color-scheme" content="light" />
+    <!-- indexed on bcx.market (.env.production); the dev server keeps crawlers out (.env) -->
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="Bharat Coal Exchange — India's coal market, measured every morning" />
+    <meta property="og:description" content="The coal market in numbers, and the daily letters that read it." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/site/img/hero-mine.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/site/favicon.svg" type="image/svg+xml" /><!-- the site's own: bcx.market's orange (27 Oct'26); the studio keeps /favicon.svg -->
+    <!-- the desktop's full-bleed hero photograph; a phone's banner picks its own smaller file from the srcset (Hero.jsx) -->
+    <link rel="preload" as="image" href="/site/img/hero-mine.webp" media="(min-width: 601px)" />
+    <!-- THE SITE OPENS DARK; light is a visitor's choice, kept in this browser (flags.THEME). Paint the page
+         dark before anything loads — unless this reader chose light — so a dark reader never sees a white flash -->
+    <script>(function(){var q=location.search,light=false;try{light=/[?&]theme=light/.test(q)||(localStorage.getItem('bx-theme')==='light'&&!/[?&]theme=dark/.test(q))}catch(e){}if(!light){var d=document.documentElement;d.style.background='#0f1114';d.style.colorScheme='dark'}})()</script>
+    <script type="module" crossorigin src="/assets/index-DsDBK5_i.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DVi4lIPn.css">
+  </head>
+  <body style="margin:0">
+    <div id="root"></div>
+    <noscript>
+      <div style="font: 15px/1.6 system-ui, sans-serif; max-width: 46ch; margin: 12vh auto; padding: 0 24px; color: #0f1b2d;">
+        <h1 style="font-size: 20px; margin: 0 0 8px;">JavaScript is required</h1>
+        <p style="color:#66748a; margin:0;">This site draws its charts in the browser. Enable JavaScript, then reload.</p>
       </div>
-      <ul class="nav-links">
-        <li><a href="#about">About Us</a></li>
-        <li><a href="#careers">Careers</a></li>
-        <li><a href="#news">News & Media</a></li>
-        <li><a href="#contact" class="btn btn-nav">Contact Us</a></li>
-      </ul>
-    </div>
-  </nav>
-
-  <!-- Hero Section -->
-  <header class="hero" id="home">
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <div class="hero-badge">
-        <i class="ph-bold ph-lightning"></i>
-        <span>An initiative by <a href="https://gna.energy" target="_blank" rel="noopener" class="badge-highlight">GNA
-            Energy</a></span>
-      </div>
-      <h1 class="hero-title">Powering the <span class="highlight">Next Generation</span> of Coal Trading</h1>
-      <p class="hero-subtitle">Bharat Coal Exchange (BCX) is building India's next-generation digital marketplace for
-        coal trading.</p>
-      <div class="hero-cta">
-        <a href="#about" class="btn btn-primary">Discover BCX <i class="ph ph-arrow-right"></i></a>
-        <a href="#news" class="btn btn-secondary">Latest News</a>
-      </div>
-    </div>
-    <div class="scroll-indicator">
-      <div class="mouse">
-        <div class="wheel"></div>
-      </div>
-    </div>
-  </header>
-
-  <!-- About Section -->
-  <section id="about" class="section about-section">
-    <div class="container">
-
-      <!-- Redesigned About Intro: Split Layout -->
-      <div class="about-intro-split reveal">
-        <div class="about-intro-left">
-          <h2 class="section-title">Redefining the <br><span class="highlight">Coal Ecosystem</span></h2>
-
-          <div class="about-highlights">
-            <div class="highlight-item">
-              <div class="h-number">₹50 Cr+</div>
-              <div class="h-text">Initial Investment</div>
-            </div>
-            <div class="highlight-item">
-              <div class="h-number">Screen-Based</div>
-              <div class="h-text">Digital Marketplace</div>
-            </div>
-          </div>
-        </div>
-        <div class="about-intro-right">
-          <p class="large-text">Designed as a technology-first platform, BCX aims to bring transparency, efficiency, and
-            reliable price discovery to the coal ecosystem by enabling seamless interaction between buyers and sellers
-            through a secure, screen-based trading platform.</p>
-
-          <div class="about-divider"></div>
-
-          <p>As an initiative of <strong>GNA Energy</strong>, BCX combines deep expertise in energy markets with
-            advanced digital infrastructure to create a marketplace that is transparent, accessible, and built for
-            scale.</p>
-        </div>
-      </div>
-
-      <!-- Vision & Mission Redesign -->
-      <div class="vision-mission-wrapper reveal">
-        <div class="card vision-box">
-          <div class="vision-header">
-            <div class="card-icon-large"><i class="ph ph-eye"></i></div>
-            <h3>Our Vision</h3>
-          </div>
-          <p class="vision-desc">To become India's most trusted digital marketplace for coal, setting new standards in
-            transparency, efficiency, and market integrity.</p>
-
-          <div class="vision-pillars">
-            <div class="v-pillar">
-              <i class="ph-bold ph-shield-check"></i>
-              <div>
-                <strong>Market Integrity</strong>
-                <span>Transparent & compliant operations</span>
-              </div>
-            </div>
-            <div class="v-pillar">
-              <i class="ph-bold ph-lightning"></i>
-              <div>
-                <strong>Digital Infrastructure</strong>
-                <span>Advanced screen-based platform</span>
-              </div>
-            </div>
-            <div class="v-pillar">
-              <i class="ph-bold ph-globe"></i>
-              <div>
-                <strong>National Impact</strong>
-                <span>Powering India's energy ecosystem</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card mission-box">
-          <div class="mission-header">
-            <div class="card-icon-large"><i class="ph ph-rocket-launch"></i></div>
-            <h3>Our Mission</h3>
-          </div>
-          <div class="mission-grid">
-            <div class="m-item"><i class="ph-fill ph-check-circle"></i> <span>Build a state-of-the-art, screen-based
-                marketplace for coal trading</span></div>
-            <div class="m-item"><i class="ph-fill ph-check-circle"></i> <span>Drive fair, competitive, and reliable
-                price discovery across the ecosystem</span></div>
-            <div class="m-item"><i class="ph-fill ph-check-circle"></i> <span>Streamline procurement workflows and
-                minimize transaction friction</span></div>
-            <div class="m-item"><i class="ph-fill ph-check-circle"></i> <span>Connect buyers, sellers, and traders
-                through a unified digital platform</span></div>
-            <div class="m-item"><i class="ph-fill ph-check-circle"></i> <span>Ensure secure, compliant, and reliable
-                end-to-end transactions</span></div>
-            <div class="m-item"><i class="ph-fill ph-check-circle"></i> <span>Support India's energy security and the
-                vision of a Viksit Bharat through modern market infrastructure</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Core Principles -->
-      <div class="core-principles reveal">
-        <div class="section-header-center">
-          <h2>Our Core Principles</h2>
-        </div>
-        <div class="principles-grid">
-          <div class="principle-card">
-            <div class="p-icon"><i class="ph ph-arrows-out-line-horizontal"></i></div>
-            <h4>Transparency</h4>
-            <p>Open marketplace where prices are determined through fair market participation.</p>
-          </div>
-          <div class="principle-card">
-            <div class="p-icon"><i class="ph ph-lightning"></i></div>
-            <h4>Efficiency</h4>
-            <p>Simplifying coal transactions through digital processes and streamlined workflows.</p>
-          </div>
-          <div class="principle-card">
-            <div class="p-icon"><i class="ph ph-cpu"></i></div>
-            <h4>Innovation</h4>
-            <p>Leveraging technology to transform traditional coal trading into a modern digital experience.</p>
-          </div>
-          <div class="principle-card">
-            <div class="p-icon"><i class="ph ph-shield-check"></i></div>
-            <h4>Trust</h4>
-            <p>Building a reliable marketplace backed by secure infrastructure and strong governance.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Careers Section -->
-  <section id="careers" class="section careers-section">
-    <div class="container">
-      <div class="section-header reveal text-center">
-        <h2>Build What's Next</h2>
-        <p>At Bharat Coal Exchange, we're building more than a digital platform - we're shaping the future of coal
-          markets in India.</p>
-      </div>
-
-      <div class="careers-content reveal">
-        <div class="careers-why">
-          <h3>Why Join BCX?</h3>
-          <ul class="feature-list">
-            <li>
-              <i class="ph-fill ph-check-circle check-icon"></i>
-              Work on one of India's most ambitious commodity market platforms
-            </li>
-            <li>
-              <i class="ph-fill ph-check-circle check-icon"></i>
-              Solve real-world challenges at the intersection of technology and energy
-            </li>
-            <li>
-              <i class="ph-fill ph-check-circle check-icon"></i>
-              Collaborate with experts across technology and energy markets
-            </li>
-            <li>
-              <i class="ph-fill ph-check-circle check-icon"></i>
-              Grow in an environment that values innovation, ownership, and continuous learning
-            </li>
-          </ul>
-          <div class="careers-notice">
-            <i class="ph ph-info"></i>
-            <p>As we continue to build our platform, new career opportunities will be posted here</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- News & Media Section -->
-  <section id="news" class="section news-section">
-    <div class="container">
-      <div class="section-header reveal text-center">
-        <h2>News & Media</h2>
-        <p>Stay informed with the latest announcements, milestones, and media coverage from Bharat Coal Exchange.</p>
-      </div>
-
-      <div class="news-grid reveal">
-        <a href="https://www.moneycontrol.com/news/business/gna-energy-to-invest-rs-100-crore-in-coal-exchange-venture-sets-up-new-subsidiary-13891530.html"
-          class="news-card" target="_blank" rel="noopener">
-          <div class="news-source">Moneycontrol</div>
-          <h4>GNA Energy to invest Rs 100 crore in coal exchange venture, sets up new subsidiary</h4>
-          <p>GNA Energy has set up a wholly owned subsidiary, Bharat Coal Exchange, to enter India's coal trading
-            sector. The Gurugram-based power trading firm will commit an initial ₹100 crore to build the exchange.</p>
-          <span class="read-more">Read on Moneycontrol <i class="ph ph-arrow-right"></i></span>
-        </a>
-
-        <a href="https://energy.economictimes.indiatimes.com/news/coal/gna-energy-invests-100-crore-in-bharat-coal-exchange/130324060"
-          class="news-card" target="_blank" rel="noopener">
-          <div class="news-source">ET EnergyWorld</div>
-          <h4>GNA Energy Invests ₹100 Crore in Bharat Coal Exchange</h4>
-          <p>The company confirms MCA approval for its new coal exchange entity and outlines plans for a transparent,
-            technology-driven marketplace. BCX marks GNA Energy's expansion into commodity market infrastructure.</p>
-          <span class="read-more">Read on ET EnergyWorld <i class="ph ph-arrow-right"></i></span>
-        </a>
-
-        <a href="https://www.energetica-india.net/news/gna-energy-enters-coal-exchange-market-commits-inr-100-crore-to-bcx-launch"
-          class="news-card" target="_blank" rel="noopener">
-          <div class="news-source">Energetica India</div>
-          <h4>GNA Energy Enters Coal Exchange Market, Commits INR 100 Crore to BCX Launch</h4>
-          <p>GNA Energy enters the coal exchange segment through its subsidiary BCX, aiming to enhance transparency and
-            digital trading in India's coal market. The launch signals its broader ambition in India's evolving energy
-            ecosystem.</p>
-          <span class="read-more">Read on Energetica India <i class="ph ph-arrow-right"></i></span>
-        </a>
-
-        <a href="https://www.fintechbiznews.com/exchanges-capital/gna-energy-launches-bcx" class="news-card"
-          target="_blank" rel="noopener">
-          <div class="news-source">FinTech BizNews</div>
-          <h4>GNA Energy Launches BCX</h4>
-          <p>BCX is being built to create the infrastructure, technology, and institutional partnerships for a coal
-            exchange serving domestic and global participants. It will seek the necessary licences from the Coal
-            Controller of India.</p>
-          <span class="read-more">Read on FinTech BizNews <i class="ph ph-arrow-right"></i></span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact Section -->
-  <section id="contact" class="section contact-section">
-    <div class="container">
-      <div class="contact-card reveal">
-        <div class="contact-intro">
-          <h2>We'd love to hear from you.</h2>
-          <p>Reach out to us for any inquiries regarding partnerships or platform access.</p>
-        </div>
-
-        <div class="contact-divider"></div>
-
-        <div class="contact-item">
-          <div class="icon"><i class="ph ph-map-pin"></i></div>
-          <div>
-            <strong>Bharat Coal Exchange Private Limited</strong>
-            <span>Palm Spring Plaza, Golf Course Road, Sector 54, Gurugram, Haryana - 122009</span>
-          </div>
-        </div>
-
-        <div class="contact-item">
-          <div class="icon"><i class="ph ph-envelope-simple"></i></div>
-          <div>
-            <strong>Enquiries</strong>
-            <a href="mailto:info@bcx.market">info@bcx.market</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-logo">
-          <img src="BCX-logo-vector (1).svg" alt="BCX Logo" style="height: 80px;">
-          <p class="footer-tagline">Powering the Next Generation of Coal Trading</p>
-        </div>
-        <div class="footer-links">
-          <h4>Quick Links</h4>
-          <ul>
-            <li><a href="#about">About Us</a></li>
-            <li><a href="#careers">Careers</a></li>
-            <li><a href="#news">News & Media</a></li>
-            <li><a href="#contact">Contact</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 Bharat Coal Exchange Private Limited. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
-
-  <script src="script.js"></script>
-</body>
-
+    </noscript>
+  </body>
 </html>

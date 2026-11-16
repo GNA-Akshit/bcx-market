@@ -1,0 +1,5 @@
+# the source's own files; the BUILT site at the root is committed on purpose (GitHub Pages serves it)
+web/node_modules/
+web/dist/
+*.log
+.DS_Store

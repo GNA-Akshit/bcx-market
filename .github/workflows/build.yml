@@ -1,0 +1,64 @@
+# bcx.market — rebuild the site whenever its SOURCE (web/) changes on main, and publish the build at the repository
+# ROOT, which is what GitHub Pages serves (Settings → Pages: "Deploy from a branch", main, / (root) — unchanged).
+# So: edit web/, push main → this builds, checks, commits the build to the root, and asks Pages to publish it.
+# The root's index.html, assets/, site/, CNAME, robots.txt and .nojekyll are GENERATED: never edit them by hand.
+name: Build bcx.market
+
+on:
+  push:
+    branches: [main]
+    paths: ['web/**', '.github/workflows/build.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write        # to commit the build to the root
+  pages: write           # to ask Pages to publish it
+
+concurrency:
+  group: build-bcx-market
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      # `npm run build` runs scripts/check.mjs first: the newsletter, the API, secrets, indexing, the domain
+      - run: npm run build
+        working-directory: web
+        env:
+          # an unset repository variable would arrive as "" and outrank .env.production: the fallback is spelt out
+          VITE_API_BASE: ${{ vars.API_BASE || 'https://bcx-newsletter.gna.energy' }}
+      - name: The site's API answers (a broken API address fails the build, not the visitor)
+        env:
+          API: ${{ vars.API_BASE || 'https://bcx-newsletter.gna.energy' }}
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' -H 'Origin: https://bcx.market' "$API/api/website/market")
+          echo "$API/api/website/market -> HTTP $code"
+          test "$code" = 200
+      - name: Publish the build at the repository root
+        run: |
+          # the previous build out (everything at the root but the source, the workflows and the docs), the new one in
+          find . -mindepth 1 -maxdepth 1 ! -name web ! -name .git ! -name .github ! -name README.md ! -name CLAUDE.md \
+            ! -name .gitignore -exec rm -rf {} +
+          cp -r web/dist/. .
+          touch .nojekyll
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "the build is unchanged"; exit 0; fi
+          git commit -m "build: bcx.market from ${GITHUB_SHA::7}"
+          git push
+      - name: Ask GitHub Pages to publish the new build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl -s -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages/builds" | head -c 300 || true

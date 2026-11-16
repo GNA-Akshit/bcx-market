@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- viewport-fit=cover: without it every env(safe-area-inset-*) in website.css is 0 on a notched phone -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- THE PUBLIC WEBSITE (ADR-0045). Its own page, so it can be served without the
+         console's login: no auth gate is installed here, and it carries no ULIP data. -->
+    <title>Bharat Coal Exchange — India's coal market, measured every morning</title>
+    <meta name="description" content="Coal production and despatch, rail, power prices and world coal benchmarks from 15 official sources — each compared like for like with last year — and the daily India Coal Market and India Power Market newsletters." />
+    <meta name="theme-color" content="#F1885B" />
+    <meta name="color-scheme" content="light" />
+    <!-- indexed on bcx.market (.env.production); the dev server keeps crawlers out (.env) -->
+    <meta name="robots" content="%VITE_ROBOTS%" />
+    <meta property="og:title" content="Bharat Coal Exchange — India's coal market, measured every morning" />
+    <meta property="og:description" content="The coal market in numbers, and the daily letters that read it." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/site/img/hero-mine.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/site/favicon.svg" type="image/svg+xml" /><!-- the site's own: bcx.market's orange (27 Oct'26); the studio keeps /favicon.svg -->
+    <!-- the desktop's full-bleed hero photograph; a phone's banner picks its own smaller file from the srcset (Hero.jsx) -->
+    <link rel="preload" as="image" href="/site/img/hero-mine.webp" media="(min-width: 601px)" />
+    <!-- THE SITE OPENS DARK; light is a visitor's choice, kept in this browser (flags.THEME). Paint the page
+         dark before anything loads — unless this reader chose light — so a dark reader never sees a white flash -->
+    <script>(function(){var q=location.search,light=false;try{light=/[?&]theme=light/.test(q)||(localStorage.getItem('bx-theme')==='light'&&!/[?&]theme=dark/.test(q))}catch(e){}if(!light){var d=document.documentElement;d.style.background='#0f1114';d.style.colorScheme='dark'}})()</script>
+  </head>
+  <body style="margin:0">
+    <div id="root"></div>
+    <noscript>
+      <div style="font: 15px/1.6 system-ui, sans-serif; max-width: 46ch; margin: 12vh auto; padding: 0 24px; color: #0f1b2d;">
+        <h1 style="font-size: 20px; margin: 0 0 8px;">JavaScript is required</h1>
+        <p style="color:#66748a; margin:0;">This site draws its charts in the browser. Enable JavaScript, then reload.</p>
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

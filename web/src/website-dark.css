@@ -1,0 +1,396 @@
+/* ==========================================================================
+   THE DARK THEME — the hand-written layer (5 Nov'26, LOCAL ONLY — flags.THEME)
+
+   Three rounds, the same day:
+   * v1 — linear.app's MEASURED dark (scratch/dev/_study_linear.py): #08090a ground, white-8% lines, five
+     greys. "Black bhot zyada dominant", and no colour balance.
+   * v2 — "navy night": everything tinted navy, the light site's navy bands kept. "Blue utna achha nahi
+     lag raha."
+   * v3 (this) — SIMPLE CONTRAST: "light mode me black ka contrast se, dark mode me light ke contrast se".
+     A LIFTED, neutral charcoal (#0f1114 — not Linear's near-black), the greys doing the balancing, white
+     for the words, BCX's orange the one colour, and every place the light site uses navy turned to LIGHT
+     contrast (a light grey), never a blue. The page heads follow the theme: light with black words on
+     the light site (website-bands.css, `.is-light`), dark with light words here.
+   The logo's "CX" is white (permission given for the dark theme). Loads AFTER website-dark.gen.css
+   (scripts/website/gen_dark_css.mjs), which re-maps every colour of the light stylesheets under `.dk`.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- the tokens */
+.bx.dk, .bx.dk.nb {
+  color-scheme: dark;
+  --bg: #0f1114;
+  --bg-soft: #14161a;
+  --bg-warm: #151311;
+  --ink: #f5f6f7;
+  /* the greys, LIFTED TWICE. 10 Nov'26 ("As of 8 Nov'26 … dikh nahi raha"): 5.6:1 and 3.1:1 -> about 8:1 and 5:1.
+     13 Nov'26 (the user: the header's links not selected and the About paragraph "very grey, make it more
+     white"): every step up again, the order kept — white headings, then three greys a clear step apart */
+  --ink-2: #e4e7eb;
+  --ink-3: #cdd2d9;
+  --ink-4: #a6acb5;
+  --line: rgba(255, 255, 255, .09);
+  --line-2: rgba(255, 255, 255, .06);
+  --brand: #F1885B;
+  --brand-strong: #f59d76;            /* a hover on dark goes LIGHTER */
+  --brand-ink: #f6a985;               /* small orange text on the charcoal, 8.4:1 */
+  --brand-wash: rgba(241, 136, 91, .12);
+  --brand-soft: rgba(241, 136, 91, .28);
+  --navy: #d0d6e0;                    /* navy, as LIGHT contrast — never a blue */
+  --navy-wash: rgba(255, 255, 255, .06);
+  --up: #4cc38a;
+  --up-wash: rgba(76, 195, 138, .13);
+  --down: #ff7b72;
+  --down-wash: rgba(255, 123, 114, .13);
+  --warn-ink: #f0bf60;
+  --warn-wash: rgba(240, 191, 96, .13);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, .45);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .03);
+  --shadow-md: 0 16px 40px -16px rgba(0, 0, 0, .8), 0 4px 12px -4px rgba(0, 0, 0, .5);
+  --shadow-lg: 0 36px 80px -30px rgba(0, 0, 0, .9);
+  /* the vision band and the footer draw with these (website-bands.css): charcoal, a step above the ground */
+  --navy-top: #121418;
+  --navy-foot: #191c21;
+  --band-ink: rgba(207, 211, 218, .82);
+  --slate-top: #121418;
+  --slate-mid: #14161a;
+  --slate-foot: #181b20;
+  --card: #171a1f;
+  --sk-grey: #1d2025;                 /* the skeletons' grey (Skeleton.jsx) */
+  /* Market Snapshot's own blue, the same way: light contrast */
+  --ind: #d0d6e0;
+  --ind-2: #8d939c;
+  --ind-ink: #e2e4e7;
+  --ind-wash: rgba(255, 255, 255, .07);
+  /* the light that makes it "lunar": a soft white falling from above the page */
+  background:
+    radial-gradient(1100px 520px at 50% -240px, rgba(255, 255, 255, .06), rgba(255, 255, 255, 0) 70%),
+    var(--bg);
+}
+html:has(.bx.dk), html:has(.bx.dk) body { background: #0f1114; color-scheme: dark; }
+.bx.dk ::selection { background: rgba(241, 136, 91, .34); color: #fff; }
+
+/* ---------------------------------------------------------------- type: headings fade into the dark */
+.bx.dk :is(.bx-hero h1, .h-sec, .bx-band h1, .bx-industry h2) {
+  background: linear-gradient(180deg, #f7f8f8 35%, rgba(247, 248, 248, .66) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.bx.dk :is(.bx-hero h1, .h-sec, .bx-band h1, .bx-industry h2) em { -webkit-text-fill-color: currentColor; color: var(--brand); }
+
+/* ---------------------------------------------------------------- the header: solid */
+/* SOLID: on a dark ground the large light headings showed through even a 96%-opaque header
+   (_probe_head_solid.py) */
+.bx.dk .bx-head:not(.over) { background: #0f1114; border-bottom-color: rgba(255, 255, 255, .07); box-shadow: 0 10px 30px -20px rgba(0, 0, 0, .9); }
+.bx.dk .bx-nav button { color: var(--ink-3); }
+.bx.dk .bx-nav button:hover { color: var(--ink); background: rgba(255, 255, 255, .06); }
+.bx.dk .bx-nav button.on { color: #fff; }
+.bx.dk .bx-nav .rail { background: rgba(255, 255, 255, .07); }
+
+/* ---------------------------------------------------------------- buttons */
+.bx.dk .bx-btn.primary { box-shadow: 0 10px 28px -12px rgba(241, 136, 91, .55), inset 0 1px 0 rgba(255, 255, 255, .22); }
+.bx.dk .bx-btn.secondary { background: rgba(255, 255, 255, .05); border-color: rgba(255, 255, 255, .12); color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 1px 2px rgba(0, 0, 0, .5); }
+.bx.dk .bx-btn.secondary:hover { background: rgba(255, 255, 255, .09); border-color: rgba(255, 255, 255, .2); }
+.bx.dk .bx-btn.white { background: #eceef1; color: #0f1114; }
+.bx.dk .bx-btn.white:hover { background: #fff; }
+/* the hero's Market Insights card (flags.HERO_CTA) */
+.bx.dk.nb .bx-btn.cta-card { background: rgba(255, 255, 255, .05); border-color: rgba(255, 255, 255, .12); color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 14px 30px -18px rgba(0, 0, 0, .9); }
+.bx.dk.nb .bx-btn.cta-card:hover { background: rgba(255, 255, 255, .09); border-color: rgba(241, 136, 91, .45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 14px 34px -16px rgba(241, 136, 91, .35); }
+.bx.dk.nb .bx-btn.cta-card .tile { background: rgba(241, 136, 91, .15); color: #f7a988; }
+.bx.dk.nb .bx-btn.cta-card:hover .tile { background: var(--brand); color: #fff; }
+.bx.dk.nb .bx-btn.cta-outline { background: transparent; }
+.bx.dk.nb .bx-btn.cta-ink { background: #eceef1; border-color: #eceef1; color: #0f1114; }
+.bx.dk.nb .bx-btn.cta-ink svg { color: var(--brand-strong); }
+.bx.dk .bx-pill { background: rgba(255, 255, 255, .05); border-color: rgba(241, 136, 91, .32); }
+/* grounds the light site draws in navy with white words are LIGHT here, so their words are dark */
+.bx.dk :is(.cm-btn, .cm-crumb .x) { color: #0f1114; }
+.bx.dk .cm-btn:hover { background: #eceef1; }
+.bx.dk .bx-cov-grid a:hover .ic { color: #0f1114; }
+
+/* ---------------------------------------------------------------- the hero: the mine at night */
+.bx.dk .bx-hero-bg { background: #0f1114; }
+.bx.dk .bx-hero-bg img { filter: saturate(.55) brightness(.66) contrast(1.06); }
+.bx.dk .bx-hero::after {
+  background:
+    linear-gradient(90deg, rgba(15, 17, 20, .97) 0%, rgba(15, 17, 20, .88) 30%, rgba(15, 17, 20, .5) 52%, rgba(15, 17, 20, .14) 74%),
+    linear-gradient(0deg, #0f1114 0%, rgba(15, 17, 20, 0) 24%),
+    linear-gradient(180deg, rgba(15, 17, 20, .85) 0%, rgba(15, 17, 20, 0) 18%);
+}
+.bx.dk .bx-hero .bx-photo-credit { color: rgba(255, 255, 255, .38); }
+
+/* ---------------------------------------------------------------- the page bands: LIGHT, with black words */
+/* THE BAND CONTRASTS WITH ITS PAGE (the user, 5 Nov'26: "light mode me ye dark ho and dark mode me ye
+   light"): charcoal on the light site (website-bands.css), so here the page's photograph under a WHITE
+   wash with black words. Literal colours: inside .dk the tokens are the dark theme's. */
+.bx.dk.nb .bx-band.is-photo { color: #364357; background: linear-gradient(180deg, #f4f6f9 0%, #eceff3 100%); }
+.bx.dk.nb .bx-band.is-photo::before { opacity: 0; }
+.bx.dk.nb .bx-band.is-photo .bx-band-bg { background: #eceff3; }
+.bx.dk.nb .bx-band.is-photo .bx-band-bg img { filter: grayscale(.3) contrast(1.04); }
+.bx.dk.nb .bx-band.is-photo .bx-band-bg::after {
+  background:
+    radial-gradient(56% 78% at 50% 46%, rgba(255, 255, 255, .92) 0%, rgba(255, 255, 255, .8) 55%, rgba(255, 255, 255, .62) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, .4) 0%, rgba(255, 255, 255, .15) 60%, rgba(255, 255, 255, .55) 100%);
+}
+.bx.dk.nb .is-photo h1 { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: #0f1b2d; -webkit-text-fill-color: #0f1b2d; }
+.bx.dk.nb .is-photo h1 em { color: #F1885B; -webkit-text-fill-color: #F1885B; }
+.bx.dk.nb .is-photo .bx-crumbs, .bx.dk.nb .is-photo .bx-crumbs a { color: #64728a; }
+.bx.dk.nb .is-photo .bx-crumbs a:hover { color: #0f1b2d; }
+.bx.dk.nb .is-photo .bx-crumbs span { color: #364357; }
+.bx.dk.nb .is-photo .bx-crumbs svg { color: #98a3b4; }
+.bx.dk.nb .is-photo .bx-band-sub { color: #364357; }
+.bx.dk.nb .is-photo .bx-band-pill { background: rgba(255, 255, 255, .85); border-color: #dfe3e9; color: #64728a; }
+.bx.dk.nb .is-photo .bx-band-pill b { color: #0f1b2d; }
+.bx.dk.nb .is-photo .bx-band-meta { color: #64728a; }
+.bx.dk.nb .is-photo .bx-band-meta svg { color: #d66c3c; }
+.bx.dk.nb .is-photo .bx-band-credit { color: rgba(15, 27, 45, .5); }
+.bx.dk.nb .is-photo a.bx-band-credit:hover { color: #0f1b2d; }
+
+/* ---------------------------------------------------------------- the home page: one rhythm of greys */
+/* about (ground) · VISION (a raised charcoal band) · principles (a lighter ground) · coverage (ground,
+   raised panel) · careers (a lighter ground) · MARKET SNAPSHOT (its photo under charcoal) · the chain +
+   letter (a lifted zone) · contact (ground) · footer (lighter) — and a hairline wherever two meet */
+.bx.dk #principles, .bx.dk #careers { background: var(--bg-soft); border-block: 1px solid rgba(255, 255, 255, .06); }
+.bx.dk #about { border-bottom: 1px solid rgba(255, 255, 255, .05); }
+.bx.dk.nb .bx-zone {
+  background: linear-gradient(180deg, #181b20 0, #15171b 320px, #121418 100%);
+  border-top: 1px solid rgba(255, 255, 255, .07);
+}
+.bx.dk.nb .bx-zone > .bx-sec + .bx-sec { border-top-color: rgba(255, 255, 255, .07); }
+.bx.dk #contact { background: var(--bg); }
+
+/* THE VISION, IN LIGHT GREY (the user, 5 Nov'26: no blue; "dark mode me grey, light mode me black, ki
+   contrast create ho") — black on the light site (website-bands.css), a light grey here, black words */
+.bx.dk.nb .bx-sec.navy {
+  color: #364357;
+  background:
+    radial-gradient(55% 80% at 6% 0%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(40% 60% at 100% 100%, rgba(241, 136, 91, .14), rgba(241, 136, 91, 0) 70%),
+    linear-gradient(180deg, #e3e6ea, #d6dae0);
+  border-block: 0;
+}
+.bx.dk.nb .bx-sec.navy::before { opacity: .08; }
+.bx.dk.nb .bx-sec.navy .eyebrow.light { color: #b9572c; }
+.bx.dk.nb .bx-sec.navy .eyebrow.light::before { background: #F1885B; }
+.bx.dk.nb .bx-sec.navy .bx-vision blockquote { color: #0f1b2d; }
+.bx.dk.nb .bx-sec.navy .bx-vision blockquote::before { color: #F1885B; }
+.bx.dk.nb .bx-sec.navy .bx-vision .pillars { border-top-color: rgba(15, 27, 45, .14); }
+.bx.dk.nb .bx-sec.navy .bx-vision .pillars b { color: #0f1b2d; }
+.bx.dk.nb .bx-sec.navy .bx-vision .pillars span { color: #4a5568; }
+.bx.dk.nb .bx-sec.navy .bx-vision .pillars .ic { background: rgba(255, 255, 255, .6); border-color: rgba(15, 27, 45, .12); color: #d66c3c; }
+/* the mission card: a panel a step up, its seven aims scrolling with a thumb that SHOWS on dark (it was
+   the light site's #d3dae3, mapped to near-invisible) */
+.bx.dk.nb .bx-sec.navy .bx-mission { background: #1b1e24; border: 1px solid rgba(255, 255, 255, .1); box-shadow: 0 30px 70px -30px rgba(0, 0, 0, .75); }
+.bx.dk .bx-mscroll { scrollbar-color: rgba(255, 255, 255, .34) rgba(255, 255, 255, .05); }
+.bx.dk .bx-mscroll::-webkit-scrollbar-track { background: rgba(255, 255, 255, .05); border-radius: 6px; }
+.bx.dk .bx-mscroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .34); }
+
+/* MARKET SNAPSHOT IN GREY (5 Nov'26: no blue; "dark mode me grey jo more leaning towards black ho") — a step
+   lighter than the page, over the same photo; the light site's grey version (website-bands.css) is
+   overridden property for property, its base rules apply here too */
+.bx.dk.nb .bx-industry { color: var(--ink-2); border-block: 1px solid rgba(255, 255, 255, .08); }
+.bx.dk.nb .bx-industry .bg { background: #2b2f35; }
+.bx.dk.nb .bx-industry .bg img { opacity: .35; filter: grayscale(.6) brightness(.8); }
+/* a step lighter than first tried — "pura hi blend in ho raha hai" */
+.bx.dk.nb .bx-industry::before { background: linear-gradient(100deg, rgba(43, 47, 53, .97) 0%, rgba(45, 49, 55, .9) 44%, rgba(49, 53, 60, .68) 100%); }
+/* the SAME orange and white as every other heading on the dark theme (the user: it read different) */
+.bx.dk.nb .bx-industry h2 em { color: var(--brand); -webkit-text-fill-color: var(--brand); }
+.bx.dk.nb .bx-industry .says { color: var(--ink-2); }
+.bx.dk.nb .bx-industry .facts { color: var(--ink-3); }
+.bx.dk.nb .bx-industry .facts b { color: var(--ink); }
+.bx.dk.nb .bx-industry .facts i { background: rgba(255, 255, 255, .3); }
+.bx.dk.nb .bx-industry .bx-badge { color: var(--brand-ink); }   /* as the other sections' eyebrows */
+.bx.dk.nb .bx-industry .bx-btn.white { border-color: transparent; }
+.bx.dk.nb .bx-industry .bx-credit.on-dark { color: rgba(255, 255, 255, .45); }
+.bx.dk.nb .bx-industry a.bx-credit.on-dark:hover { color: #fff; }
+.bx.dk.nb .bx-mcard { background: #15171b; border-color: rgba(255, 255, 255, .1); }
+@media (max-width: 600px) { .bx.dk.nb .bx-industry .facts span { background: rgba(255, 255, 255, .06); border-color: rgba(255, 255, 255, .1); } }
+
+/* CONTACT: ORANGE ON DARK TOO (10 Nov'26, pass 71 — the user: "agar mai iska color orange hi rakhu and bas andar ke
+   white blocks dark karu toh?"). The light site's orange panel kept as it is — its photo under the same orange, its
+   glow — where the charcoal panel used to sit; only what is INSIDE it follows the theme. */
+.bx.dk .bx-contact { border: 0; box-shadow: 0 40px 90px -40px rgba(241, 136, 91, .42); }
+.bx.dk .bx-contact > img { filter: none; }
+.bx.dk .bx-contact::before { background: linear-gradient(105deg, rgba(214, 108, 60, .97) 0%, rgba(241, 136, 91, .9) 50%, rgba(241, 136, 91, .62) 100%); }
+.bx.dk .bx-contact p { color: rgba(255, 255, 255, .92); }
+/* the "Contact" label white, as on the light site (the dark theme paints every eyebrow orange) */
+.bx.dk .bx-contact .eyebrow.light { color: rgba(255, 255, 255, .92); }
+.bx.dk .bx-contact .eyebrow.light::before { background: #fff; }
+/* the blocks: a frosted DARK glass over the orange — the dark blocks the charcoal panel had (light words, a grey
+   address, the icons orange in a dark-orange tile, a faint hairline), see-through enough for the orange to tint
+   them; the light site's frosted LIGHT glass is website.css v71 */
+.bx.dk .bx-contact .cc { background: rgba(15, 17, 20, .7); border: 1px solid rgba(255, 255, 255, .1); color: #aab0b9;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 16px 36px -22px rgba(0, 0, 0, .7); }
+.bx.dk .bx-contact .cc b { color: #f5f6f7; }
+.bx.dk .bx-contact .cc .ic { background: rgba(241, 136, 91, .16); color: #f7a988; }
+.bx.dk .bx-contact .cc .go { color: #f7a988; }
+.bx.dk .bx-contact a.cc:hover { border-color: rgba(241, 136, 91, .45); background: rgba(15, 17, 20, .78); }
+/* the mail button: SOLID, in the dark page's own ground (--bg, #0f1114 — the user: "jaisa base dark mode background
+   color hai, wo karo"), as the light site's button is the light page's white; its words and icon ORANGE, as there */
+.bx.dk .bx-contact .bx-btn.white { background: var(--bg); color: #F1885B; border: 0; box-shadow: 0 10px 24px -14px rgba(0, 0, 0, .6); }
+.bx.dk .bx-contact .bx-btn.white:hover { background: var(--bg-soft); }
+
+/* THE COVERAGE PANEL IN GREY, leaning to black — the same step as Market Snapshot; its icons light on dark */
+@media (min-width: 761px) {
+  /* a step lighter than first tried — "pura hi blend in ho raha hai" */
+  .bx.dk.nb #coverage .bx-cov { background: radial-gradient(60% 90% at 100% 0%, rgba(255, 255, 255, .06), rgba(255, 255, 255, 0) 70%), #2b2f35;
+    border: 1px solid rgba(255, 255, 255, .1); }
+  .bx.dk.nb #coverage .bx-cov-grid { background: #181a1e; border-color: rgba(255, 255, 255, .1); }
+  .bx.dk.nb #coverage .bx-cov-grid li { border-color: rgba(255, 255, 255, .08); }
+}
+@media (max-width: 760px) { .bx.dk.nb #coverage { background: #2b2f35; } }
+.bx.dk.nb #coverage :is(.bx-cov-grid, .bx-cov-card) .ic { background: rgba(255, 255, 255, .07); color: var(--ink-2); }
+.bx.dk.nb #coverage .bx-cov-grid a:hover .ic { background: #eceef1; color: #0f1114; }
+
+/* the footer: a lighter charcoal, lit from a corner */
+.bx.dk.nb .bx-foot { border-top-color: rgba(255, 255, 255, .08);
+  background: radial-gradient(46% 120% at 100% 115%, rgba(255, 255, 255, .05), rgba(255, 255, 255, 0) 70%), linear-gradient(180deg, #131519, #16191d); }
+
+/* ---------------------------------------------------------------- cards: a white edge inside, a deep shadow under */
+.bx.dk :is(.bx-in-card, .bx-in-tabs, .cm-card, .bx-panel, .bx-kpi, .bx-nw-card, .bx-lg-card, .bx-chain-card, .bx-cov-card, .bx-sheet-panel, .bx-cmd-box) {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045), 0 18px 44px -26px rgba(0, 0, 0, .9);
+}
+
+/* ---------------------------------------------------------------- charts and the coal map */
+/* rings that separate a dot from its card were white; they are the card's colour now (the logo's rule is
+   white on purpose and is left alone); navy marks are light contrast */
+.bx.dk svg:not(.bcx-logo) [stroke="#fff"], .bx.dk svg:not(.bcx-logo) [stroke="#ffffff"] { stroke: #171a1f; }
+/* THE CHARTS' COLOURS (pass 64): charts.jsx always draws its LIGHT colours as SVG attributes, and a legend
+   swatch carries its colour in data-c; each is repainted here, so a theme switch is instant and no chart
+   re-renders. Navy is light contrast; the years before are darker, so they recede; the categorical colours
+   take their dark steps (charts.CAT_DARK). A colour added to charts.jsx needs its line here. */
+/* the light site's navy series, as near-WHITE on the dark (13 Nov'26, the user: the year-by-year chart's light bars
+   "more white" — they were a grey #d0d6e0 beside the orange) */
+.bx.dk svg [fill="#1b3a63"] { fill: #f1f3f6; }
+.bx.dk svg [stroke="#1b3a63"] { stroke: #f1f3f6; }
+.bx.dk svg [stop-color="#1b3a63"] { stop-color: #f1f3f6; }
+.bx.dk [data-c="#1b3a63"] { background-color: #f1f3f6 !important; color: #f1f3f6 !important; }
+.bx.dk svg [fill="#8fa0b5"] { fill: #6b7380; }
+.bx.dk svg [stroke="#8fa0b5"] { stroke: #6b7380; }
+.bx.dk svg [stop-color="#8fa0b5"] { stop-color: #6b7380; }
+.bx.dk [data-c="#8fa0b5"] { background-color: #6b7380 !important; color: #6b7380 !important; }
+.bx.dk svg [fill="#cdd5df"] { fill: #3c4149; }
+.bx.dk svg [stroke="#cdd5df"] { stroke: #3c4149; }
+.bx.dk [data-c="#cdd5df"] { background-color: #3c4149 !important; color: #3c4149 !important; }
+.bx.dk svg [fill="#2a78d6"] { fill: #3987e5; }
+.bx.dk svg [stroke="#2a78d6"] { stroke: #3987e5; }
+.bx.dk [data-c="#2a78d6"] { background-color: #3987e5 !important; color: #3987e5 !important; }
+.bx.dk svg [fill="#eb6834"] { fill: #d95926; }
+.bx.dk svg [stroke="#eb6834"] { stroke: #d95926; }
+.bx.dk [data-c="#eb6834"] { background-color: #d95926 !important; color: #d95926 !important; }
+.bx.dk svg [fill="#1baf7a"] { fill: #199e70; }
+.bx.dk svg [stroke="#1baf7a"] { stroke: #199e70; }
+.bx.dk [data-c="#1baf7a"] { background-color: #199e70 !important; color: #199e70 !important; }
+.bx.dk svg [fill="#eda100"] { fill: #c98500; }
+.bx.dk svg [stroke="#eda100"] { stroke: #c98500; }
+.bx.dk [data-c="#eda100"] { background-color: #c98500 !important; color: #c98500 !important; }
+.bx.dk svg [fill="#e87ba4"] { fill: #d55181; }
+.bx.dk svg [stroke="#e87ba4"] { stroke: #d55181; }
+.bx.dk [data-c="#e87ba4"] { background-color: #d55181 !important; color: #d55181 !important; }
+.bx.dk svg [fill="#4a3aa7"] { fill: #9085e9; }
+.bx.dk svg [stroke="#4a3aa7"] { stroke: #9085e9; }
+.bx.dk [data-c="#4a3aa7"] { background-color: #9085e9 !important; color: #9085e9 !important; }
+.bx.dk svg [fill="#e34948"] { fill: #e66767; }
+.bx.dk svg [stroke="#e34948"] { stroke: #e66767; }
+.bx.dk [data-c="#e34948"] { background-color: #e66767 !important; color: #e66767 !important; }
+/* THE GENERATION CHART (pass 78): thermal is a SLATE here, not the near-white the navy repaint gives every other
+   chart — a white slab under the day's mix glared and drowned the colours above it; its bands' gradient stops take
+   the categorical dark steps */
+.bx.dk .bx-stack [stop-color="#1b3a63"] { stop-color: #7a8aa4; }
+.bx.dk .bx-stack [stroke="#1b3a63"] { stroke: #b6c1d2; }
+.bx.dk .bx-stack circle[fill="#1b3a63"] { fill: #b6c1d2; }
+.bx.dk :is(.bx-stack, .bx-legend.tog) [data-c="#1b3a63"] { background-color: #8e9db5 !important; color: #8e9db5 !important; }
+.bx.dk .bx-stack [stop-color="#2a78d6"] { stop-color: #3987e5; }
+.bx.dk .bx-stack [stop-color="#1baf7a"] { stop-color: #199e70; }
+.bx.dk .bx-stack [stop-color="#eda100"] { stop-color: #c98500; }
+.bx.dk .bx-stack [stop-color="#e87ba4"] { stop-color: #d55181; }
+.bx.dk .cm-state { stroke: rgba(15, 17, 20, .9); }
+.bx.dk .cm-state:not([style*="fill"]) { fill: #1a1d22; }
+.bx.dk #cm-hatch rect { fill: #15171b; }
+.bx.dk #cm-hatch line { stroke: #2a2e35; }
+.bx.dk :is(.cm-sel, .cm-hl) { stroke: #f5f6f7; }
+.bx.dk :is(.cm-sel-halo, .cm-hl-halo) { stroke: #fff; fill: #fff; }
+.bx.dk .cm-coast { stroke: #d0d6e0; stroke-opacity: .34; }
+.bx.dk .leaflet-container { background: transparent; }
+
+/* ---------------------------------------------------------------- a NATIVE select's open list */
+/* the browser draws a <select>'s list itself: the options inherited the page's light text and the list
+   kept its white ground — light on white (10 Nov'26). Its options are given the dark ground. */
+.bx.dk select { color-scheme: dark; }
+.bx.dk select option, .bx.dk select optgroup { background-color: #1d2025; color: #f5f6f7; }
+
+/* ---------------------------------------------------------------- the coal map's land, lifted by a glow */
+.bx.dk .cm-map .leaflet-states-pane { filter: drop-shadow(0 0 26px rgba(255, 255, 255, .12)); }
+.bx.dk .cm-map.zooming .leaflet-states-pane { filter: none; }
+
+/* ---------------------------------------------------------------- THE COAL MAP'S GROUNDS STEP APART (pass 79)
+   The user: "the coal map background is black, then the side panel is black, then the base background is also
+   black, it looks like it lacks contrast". Four grounds now, each a step from the next:
+     the page #0f1114 · the module's card #15181d · the SEA under India a cool slate #121a24 with a faint grid ·
+     the side panel its own raised surface #1c2028, bordered —
+   and land with no figure is a mid grey with a visible hatch (#2a3039 / #3d4651), never the near-black it was,
+   so it reads as land, apart from the sea and apart from the dimmest coloured state. */
+.bx.dk .cm-module:not(.is-full) .cm { background: #15181d; }
+.bx.dk .cm-module:not(.is-full) .cm-stage, .bx.dk .cm-module.is-full .cm-stage { background-color: #121a24; border-color: rgba(150, 180, 220, .14);
+  background-image: radial-gradient(rgba(170, 195, 230, .08) 1px, transparent 1.3px); }
+.bx.dk .cm-module:not(.is-full) .cm-stage::after, .bx.dk .cm-module.is-full .cm-stage::after {
+  background: radial-gradient(120% 92% at 50% 50%, rgba(18, 26, 36, 0) 60%, rgba(18, 26, 36, .95) 100%); }
+.bx.dk .cm-state { stroke: #121a24; }
+.bx.dk .cm-state:not([style*="fill"]) { fill: #2a3039; }
+.bx.dk #cm-hatch rect { fill: #262c35; }
+.bx.dk #cm-hatch line { stroke: #3d4651; }
+.bx.dk .cm-state.dim { fill-opacity: .38; }
+.bx.dk .cm-rail { background: #1c2028; }
+@media (min-width: 1021px) {
+  .bx.dk .cm-module:not(.is-full) .cm-rail { margin-left: 16px; padding-left: 20px; border: 1px solid rgba(255, 255, 255, .07); border-radius: 14px; background: #1c2028; }
+  .bx.dk .cm-module:not(.is-full) .cm-rh { margin-left: -20px; padding-left: 20px; border-radius: 14px 14px 0 0; background: #1c2028; }
+  .bx.dk .cm-module:not(.is-full) .cm-rail::after { background: linear-gradient(to bottom, transparent, #1c2028 85%); }
+}
+@media (max-width: 1020px) {
+  .bx.dk .cm-module:not(.is-full) .cm-rail { border-radius: 14px; background: #1c2028; }
+  .bx.dk .cm-module:not(.is-full) .cm-rh { background: #1c2028; }
+}
+/* the map's key: "no mines here" and the mine dot were dark-on-dark — given a lit swatch on a ring */
+.bx.dk .cm-legend .keys i.hatch, .bx.dk .cm-rtable .sw:not([style*="background"]) {
+  background: repeating-linear-gradient(45deg, #2a3039 0 2px, #5a6472 2px 3.2px); box-shadow: 0 0 0 1px rgba(255, 255, 255, .22); }
+.bx.dk .cm-legend .keys i.mk { background: #b3c0d1; box-shadow: 0 0 0 1px rgba(0, 0, 0, .5); }
+.bx.dk .cm-d { background: #a9b7c9; box-shadow: 0 0 0 1.5px #121a24; }
+.bx.dk .cm-d.st-closing { background: #7c8796; }
+.bx.dk .cm-crumb .bk { background: rgba(255, 255, 255, .08); color: #f5f6f7; }
+
+/* ---------------------------------------------------------------- a sheet's grab bar, seen on dark (it mapped to near-invisible) */
+.bx.dk .bx-sheet-grab::before { background: rgba(255, 255, 255, .34); }
+
+/* ---------------------------------------------------------------- the light / dark switch (its base: website-bands.css) */
+.bx.dk .bx-theme-sw { background: #1f2227; color: var(--ink); border-color: rgba(255, 255, 255, .14); }
+.bx.dk .bx-theme-sw:hover { border-color: rgba(255, 255, 255, .24); }
+.bx.dk .bx-theme-sw svg { color: #f7a988; }
+
+
+/* ---------------------------------------------------------------- the phone's hero banner (website.css v70): the picture dimmed, the header its solid bar */
+.bx.dk .bx-hero-ph.banner img { filter: saturate(.6) brightness(.62); }
+.bx.dk:has(.bx-hero.ph-banner) .bx-head.over { background: #0f1114; border-bottom-color: rgba(255, 255, 255, .07); box-shadow: 0 10px 30px -20px rgba(0, 0, 0, .9); }
+/* pass 80: the land's glow stays away while a state is open, and eases back to all of India */
+.bx.dk .cm-map .leaflet-states-pane { transition: filter .9s ease .1s; }
+.bx.dk .cm-map.has-sel .leaflet-states-pane { filter: none; }
+.bx.dk .cm-crumb .bk { background: #f1f3f6; color: #0f1114; }
+.bx.dk .cm-crumb .bk:hover:not(:disabled) { background: #fff; }
+.bx.dk .cm-crumb.deep > button.bk:first-child { color: #0f1114; }
+/* pass 80: the panel's tables and the mine list's tiles on the dark site */
+.bx.dk .cm-dt button.rw:hover { background: rgba(255, 255, 255, .05); }
+.bx.dk .cm-dt .fg .tr { background: rgba(255, 255, 255, .08); }
+.bx.dk .cm-dt .fg .tr i:not([style*="background"]) { background: #c9d2de; }
+.bx.dk .cm-dt .nm .sw:not([style*="background"]) { background: repeating-linear-gradient(45deg, #2a3039 0 2px, #5a6472 2px 3.2px); }
+.bx.dk .cm-mlist .bar i.operating, .bx.dk .cm-mlist .t.operating { --st: #c9d2de; }
+.bx.dk .cm-mlist .bar i.closed, .bx.dk .cm-mlist .t.closed { --st: #5d6673; }
+.bx.dk .cm-mlist .t { border-color: rgba(255, 255, 255, .08); background: rgba(255, 255, 255, .02); }
+
+/* pass 84b — the way back (website/ReturnTrail.jsx) on the dark site is the page's opposite: a near-white toast with dark
+   words, the arrow in the deeper orange (website.css explains why it is a toast) */
+.bx.dk .bx-ret { background: #f2f4f7; border-color: rgba(0, 0, 0, .06); box-shadow: 0 22px 44px -12px rgba(0, 0, 0, .75), 0 3px 10px rgba(0, 0, 0, .35); }
+.bx.dk .bx-ret .go { color: #4b5563; }
+.bx.dk .bx-ret .go b { color: #0f141b; }
+.bx.dk .bx-ret .go svg { color: #d66c3c; }
+.bx.dk .bx-ret .go:hover { background: rgba(0, 0, 0, .05); }
+.bx.dk .bx-ret .x { color: #6b7280; }
+.bx.dk .bx-ret .x:hover { background: rgba(0, 0, 0, .07); color: #0f141b; }

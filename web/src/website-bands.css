@@ -1,0 +1,377 @@
+/* ==========================================================================
+   THE PAGE BANDS AND THE HOME PAGE'S COLOUR RHYTHM (5 Nov'26, LOCAL — flags.BANDS)
+
+   After globalCOAL's site, at the user's ask: "hamari website bilkul white white lag ti hai", and the
+   page heads — Market Insights, News, Regulations, the Newsletter — "dekh ke achhe nahi lagte". What
+   it takes from that site is the DISTRIBUTION of colour and the composition, not its palette.
+
+   ONE BAND, THREE LOOKS (flags.BAND; the dev server tries them with ?band=photo|navy|slate):
+   * 'photo' — the page's own photograph under a deep navy wash, the header solid white above it;
+   * 'navy'  — the same navy, no photograph;
+   * 'slate' — a light cool blue-grey band the transparent header sits on.
+   The BCX logo is always orange and black (the user's call, 5 Nov'26), so a dark band never runs
+   under the header. The warm orange band was turned down the same day ("ye orange background achha
+   nahi lag raha") — no orange background is left anywhere; orange stays an accent.
+   Each band: a large centred title, and the page rising over the band's foot as a sheet with
+   rounded top corners. THE HOME PAGE: the vision is a navy band whose statement fills in word by
+   word as it scrolls (ui.FillText); the coverage list sits on a pale panel; Careers is white so two
+   tints never touch; the footer is a light cool tint.
+   Everything here is scoped to `.bx.nb`, which exists only while the flag is on: on the dev server
+   `?before` (…/site/?before#/news) takes the class away and the site is exactly what it was.
+   ========================================================================== */
+
+.bx.nb {
+  --navy-top: #06142d;
+  --navy-foot: #0c2a54;
+  --band-ink: rgba(232, 234, 238, .8);
+  --slate-top: #f7f9fc;
+  --slate-mid: #edf2f8;
+  --slate-foot: #dfe8f3;
+  /* a fine grain, so a large flat colour reads as a surface and not as a fill */
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* ---------------------------------------------------------------- the band: its structure */
+/* ONE HEIGHT ON EVERY PAGE (the user's call, 5 Nov'26: "har ko same karo, news tab jitni"): News's
+   352px on a desktop, whatever the page holds — the title and one line, centred in the band above the
+   sheet's lip. A phone wraps the longer titles onto two lines, so its one height fits the tallest. */
+.bx.nb .bx-band {
+  --lip: 40px;
+  --band-h: 352px;
+  position: relative; isolation: isolate; overflow: hidden;
+  box-sizing: border-box; height: var(--band-h);
+  display: grid; align-content: center;
+  padding: 0 0 calc(var(--lip) + 8px);
+  text-align: center;
+}
+/* the sheet's lip: the page's own colour, drawn by the band, so band and page meet in one curve */
+.bx.nb .bx-band::after { content: ''; position: absolute; z-index: 2; left: 0; right: 0; bottom: -1px; height: var(--lip);
+  background: var(--sheet, #fff); border-radius: var(--lip) var(--lip) 0 0; }
+.bx.nb .bx-band-in { position: relative; z-index: 1; display: grid; justify-items: center; gap: 16px; width: 100%; }
+.bx.nb .bx-band-in > * { animation: bx-rise .7s cubic-bezier(.2, .75, .25, 1) both; }
+.bx.nb .bx-band-in > :nth-child(2) { animation-delay: .06s; }
+.bx.nb .bx-band-in > :nth-child(3) { animation-delay: .14s; }
+.bx.nb .bx-band-in > :nth-child(n + 4) { animation-delay: .2s; }
+.bx.nb .bx-band h1 { max-width: 18ch; font-size: clamp(42px, 5.6vw, 76px); font-weight: 650; line-height: 1.02; letter-spacing: -.04em; text-wrap: balance; }
+.bx.nb .bx-band h1 em { font-style: normal; }
+.bx.nb .bx-band .bx-crumbs { justify-content: center; margin: 0; }
+/* one line on a desktop, the longest (Regulations') included */
+.bx.nb .bx-band-sub { max-width: min(100%, 980px); margin: 2px 0 0; font-size: 17px; line-height: 1.6; }
+/* as tall as one line of the others' sub-line (27px), so Market Insights' title sits where News's does */
+.bx.nb .bx-band-pill { display: inline-flex; align-items: center; gap: 6px; box-sizing: border-box; height: 27px; margin-top: 2px; padding: 0 14px;
+  border-radius: 999px; font-size: 13px; line-height: 1; }
+.bx.nb .bx-band-pill b { font-weight: 600; }
+.bx.nb .bx-band-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; font-size: 13.5px; }
+.bx.nb .bx-band-meta span { display: inline-flex; align-items: center; gap: 7px; }
+.bx.nb .bx-band-meta svg { width: 15px; height: 15px; }
+.bx.nb .bx-band .bx-btn { margin-top: 6px; }
+@media (max-width: 760px) {
+  .bx.nb .bx-band { --lip: 26px; --band-h: 296px; padding: 0 0 calc(var(--lip) + 6px); }
+  .bx.nb .bx-band h1 { font-size: 38px; letter-spacing: -.035em; }
+  .bx.nb .bx-band-sub { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) { .bx.nb .bx-band-in > * { animation: none; } }
+
+/* ---------------------------------------------------------------- the dark looks: photo and navy */
+/* NO BLUE (5 Nov'26, the user: "blue utna achha nahi lag raha"): the band is CHARCOAL on the light site —
+   dark against a light page; the dark theme turns it LIGHT against its dark page (website-dark.css) */
+.bx.nb .bx-band.is-photo, .bx.nb .bx-band.is-navy { color: #fff;
+  background:
+    radial-gradient(70% 95% at 50% 120%, rgba(255, 255, 255, .08), rgba(255, 255, 255, 0) 68%),
+    radial-gradient(42% 70% at 94% -12%, rgba(241, 136, 91, .14), rgba(241, 136, 91, 0) 70%),
+    linear-gradient(180deg, #0f1114 0%, #191c21 100%); }
+/* the grain over the navy, under the words */
+.bx.nb .bx-band.is-photo::before, .bx.nb .bx-band.is-navy::before { content: ''; position: absolute; inset: 0; z-index: 0;
+  background-image: var(--grain); opacity: .2; mix-blend-mode: overlay; pointer-events: none; }
+/* THE PHOTOGRAPH: under a navy wash, so every page's picture reads as one set and the white title on
+   it as easily as on plain navy; a little of the photograph's own colour comes through */
+.bx.nb .bx-band-bg { position: absolute; inset: 0; z-index: -1; background: #0f1114; }
+.bx.nb .bx-band-bg img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.7) contrast(1.05); }
+.bx.nb .bx-band-bg::after { content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(70% 95% at 50% 125%, rgba(255, 255, 255, .07), rgba(255, 255, 255, 0) 68%),
+    linear-gradient(180deg, rgba(12, 13, 16, .86) 0%, rgba(14, 16, 19, .72) 55%, rgba(18, 20, 24, .84) 100%); }
+.bx.nb .bx-band.is-photo, .bx.nb .bx-band.is-navy { --c-ink: #fff; }
+.bx.nb :is(.is-photo, .is-navy) h1 { color: #fff; }
+.bx.nb :is(.is-photo, .is-navy) h1 em { color: var(--brand); }
+.bx.nb :is(.is-photo, .is-navy) .bx-crumbs { color: rgba(255, 255, 255, .55); }
+.bx.nb :is(.is-photo, .is-navy) .bx-crumbs a { color: rgba(255, 255, 255, .66); }
+.bx.nb :is(.is-photo, .is-navy) .bx-crumbs a:hover { color: #fff; }
+.bx.nb :is(.is-photo, .is-navy) .bx-crumbs svg { color: rgba(255, 255, 255, .38); }
+.bx.nb :is(.is-photo, .is-navy) .bx-crumbs span { color: rgba(255, 255, 255, .85); }
+.bx.nb :is(.is-photo, .is-navy) .bx-band-sub { color: var(--band-ink); }
+.bx.nb :is(.is-photo, .is-navy) .bx-band-pill { background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .16); color: var(--band-ink); }
+.bx.nb :is(.is-photo, .is-navy) .bx-band-pill b { color: #fff; }
+.bx.nb :is(.is-photo, .is-navy) .bx-band-meta { color: var(--band-ink); }
+.bx.nb :is(.is-photo, .is-navy) .bx-band-meta svg { color: #f7a988; }
+/* the photograph's credit (its licence asks for it), on the photograph, clear of the sheet's lip */
+/* (the site's `.bx-credit` sits top-right on a dark chip; with a bottom as well it stretched into a
+   tall box — so the top, the chip and its padding are cleared here) */
+.bx.nb .bx-band-credit { position: absolute; z-index: 1; top: auto; right: 18px; bottom: calc(var(--lip) + 10px); padding: 0;
+  background: none; font-size: 11px; color: rgba(255, 255, 255, .5); text-decoration: none; }
+.bx.nb a.bx-band-credit:hover { background: none; color: rgba(255, 255, 255, .9); text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 760px) { .bx.nb .bx-band-credit { right: 12px; left: 12px; text-align: right; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
+
+/* ---------------------------------------------------------------- the light look: the photograph under WHITE */
+/* flags.BAND 'light', the default since 5 Nov'26 (the user: "blue utna achha nahi lag raha … light mode me
+   black ka contrast se, dark mode me light ke contrast se"). The page heads follow the THEME and carry no
+   blue: on the light site the page's own photograph under a white wash with BLACK words — the home hero's
+   way — and on the dark theme the same band turned dark with light words (website-dark.css). */
+.bx.nb .bx-band.is-light { color: var(--ink-2); background: linear-gradient(180deg, #f4f6f9 0%, #eef1f5 100%); }
+.bx.nb .bx-band.is-light .bx-band-bg { background: #eef1f5; }
+.bx.nb .bx-band.is-light .bx-band-bg img { filter: grayscale(.3) contrast(1.04); }
+.bx.nb .bx-band.is-light .bx-band-bg::after {
+  background:
+    radial-gradient(56% 78% at 50% 46%, rgba(255, 255, 255, .92) 0%, rgba(255, 255, 255, .8) 55%, rgba(255, 255, 255, .62) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, .4) 0%, rgba(255, 255, 255, .15) 60%, rgba(255, 255, 255, .55) 100%);
+}
+.bx.nb .is-light h1 { color: var(--ink); }
+.bx.nb .is-light h1 em { color: var(--brand); }
+.bx.nb .is-light .bx-crumbs { color: var(--ink-3); }
+.bx.nb .is-light .bx-crumbs a { color: var(--ink-3); }
+.bx.nb .is-light .bx-crumbs a:hover { color: var(--ink); }
+.bx.nb .is-light .bx-crumbs svg { color: var(--ink-4); }
+.bx.nb .is-light .bx-crumbs span { color: var(--ink-2); }
+.bx.nb .is-light .bx-band-sub { color: var(--ink-2); }
+.bx.nb .is-light .bx-band-pill { background: rgba(255, 255, 255, .82); border: 1px solid var(--line); color: var(--ink-3); box-shadow: var(--shadow-xs); }
+.bx.nb .is-light .bx-band-pill b { color: var(--ink); }
+.bx.nb .is-light .bx-band-meta { color: var(--ink-3); }
+.bx.nb .is-light .bx-band-meta svg { color: var(--brand-strong); }
+.bx.nb .is-light .bx-band-credit { color: rgba(15, 27, 45, .5); }
+.bx.nb .is-light a.bx-band-credit:hover { color: var(--ink); }
+.bx.nb .bx-band.is-light { border-bottom: 1px solid var(--line-2); }
+
+/* ---------------------------------------------------------------- the light look: slate */
+.bx.nb .bx-band.is-slate {
+  margin-top: calc(-1 * var(--head-h));                       /* the transparent header sits on it */
+  height: calc(var(--band-h) + var(--head-h)); padding-top: var(--head-h);
+  color: var(--ink-2);
+  background:
+    radial-gradient(72% 100% at 50% 125%, rgba(27, 58, 99, .2), rgba(27, 58, 99, 0) 68%),
+    radial-gradient(38% 70% at 96% 12%, rgba(91, 141, 214, .16), rgba(91, 141, 214, 0) 70%),
+    linear-gradient(180deg, var(--slate-top) 0%, var(--slate-mid) 50%, var(--slate-foot) 100%);
+}
+/* a fine dot grid, fading out from the title — globalCOAL's texture, in ink */
+.bx.nb .bx-band.is-slate::before { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: radial-gradient(rgba(27, 58, 99, .16) 1px, transparent 1.3px); background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(60% 75% at 50% 40%, #000, transparent 75%); mask-image: radial-gradient(60% 75% at 50% 40%, #000, transparent 75%); }
+.bx.nb .is-slate h1 { color: var(--ink); }
+.bx.nb .is-slate h1 em { color: var(--brand-strong); }
+.bx.nb .is-slate .bx-crumbs { color: var(--ink-3); }
+.bx.nb .is-slate .bx-crumbs span { color: var(--ink-2); }
+.bx.nb .is-slate .bx-band-sub { color: var(--ink-2); }
+.bx.nb .is-slate .bx-band-pill { background: rgba(255, 255, 255, .75); border: 1px solid var(--line); color: var(--ink-3); }
+.bx.nb .is-slate .bx-band-pill b { color: var(--ink); }
+.bx.nb .is-slate .bx-band-meta { color: var(--ink-3); }
+.bx.nb .is-slate .bx-band-meta svg { color: var(--brand-strong); }
+.bx.nb .bx-head.band .bx-cmd-btn, .bx.nb .bx-head.band .bx-menu-btn { background: rgba(255, 255, 255, .78); }
+
+/* ---------------------------------------------------------------- the top bar, spread out */
+/* as globalCOAL sets it (5 Nov'26, the user's call): the links beside the logo, Search + Contact us at
+   the far right. Desktop only — at ≤1200px the links fold into the menu. */
+@media (min-width: 1201px) {
+  .bx.nb .bx-nav { margin-left: 0; }
+  .bx.nb .bx-head-cta { margin-left: auto; }
+}
+/* EDGE TO EDGE: the bar was held inside the 1400px page column, so on a wide screen (the user's is
+   ~1900px) the logo, links and buttons floated together in the middle. globalCOAL's bar spans the
+   whole screen, the page beneath it keeps its column. Only where there is room: between 1201 and
+   1440px the row is full and any extra margin pushed Contact us past the edge (_probe_header.py). */
+@media (min-width: 1441px) {
+  .bx.nb .bx-nav { margin-left: 24px; }
+  .bx.nb .bx-head .wrap { max-width: none; padding-left: clamp(40px, 3.4vw, 72px); padding-right: clamp(40px, 3.4vw, 72px); }
+}
+
+/* ---------------------------------------------------------------- Market Insights' module bar */
+/* the modules' card rides the sheet's lip instead of rising out of a photo */
+.bx.nb .v-band .bx-in-nav { margin-top: -30px; }        /* stays sticky (website.css), above the lip */
+.bx.nb .v-band .bx-in-tabs { box-shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 18px 40px -22px rgba(6, 20, 45, .45); }
+@media (max-width: 760px) { .bx.nb .v-band .bx-in-nav { margin-top: -20px; } }
+/* Seven tabs spread across the whole card; no hairline dividers; the open module carries ONE warm
+   highlight that slides from tab to tab (Insights.jsx measures the open tab into --ix / --iw).
+   The phone keeps its own bar (≤760px). */
+@media (min-width: 761px) {
+  .bx.nb .bx-in-tabs { position: relative; gap: 4px; padding: 6px; border-radius: 16px; }
+  .bx.nb .bx-in-nav .bx-in-tabs a { flex: 1 1 auto; justify-content: center; z-index: 1; border-radius: 11px; background: transparent; transition: color .25s; }
+  .bx.nb .bx-in-tabs a + a::before { display: none; }
+  .bx.nb .bx-in-tabs a:hover { background: var(--bg-soft); color: var(--ink); }
+  .bx.nb .bx-in-nav .bx-in-tabs a.on { background: transparent; color: var(--ink); }
+  .bx.nb .bx-in-nav .bx-in-tabs a.on:hover { background: transparent; }
+  .bx.nb .bx-in-nav .bx-in-tabs a.on::after { display: none; }
+  .bx.nb .bx-in-tabs a.on svg { color: var(--brand-strong); }
+  .bx.nb .bx-in-ind { display: block; position: absolute; z-index: 0; top: 6px; bottom: 6px; left: 0; pointer-events: none;
+    width: var(--iw, 0); transform: translateX(var(--ix, 0)); border-radius: 11px;
+    background: linear-gradient(180deg, #fff5ef, #fde8dc);
+    box-shadow: inset 0 0 0 1px rgba(241, 136, 91, .3), 0 8px 18px -12px rgba(214, 108, 60, .5);
+    transition: transform .5s cubic-bezier(.22, 1, .36, 1), width .5s cubic-bezier(.22, 1, .36, 1); }
+  /* a short brand line under the open module's name */
+  .bx.nb .bx-in-ind::before { content: ''; position: absolute; left: 50%; bottom: 5px; width: 26px; height: 3px; margin-left: -13px; border-radius: 3px; background: var(--brand); }
+}
+@media (prefers-reduced-motion: reduce) { .bx.nb .bx-in-ind { transition: none; } }
+
+/* ---------------------------------------------------------------- News, Regulations, the Newsletter */
+.bx.nb .v-band .bx-nw-list { padding-top: 18px; }
+/* the media card after the stories, as one row: what it is on the left, the address on the right */
+@media (min-width: 761px) {
+  .bx.nb .v-band .bx-nw-list .bx-nw-media { margin-top: 40px; display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "k btn" "p btn"; align-items: center; gap: 4px 32px; box-shadow: none; background: var(--bg-soft); border-color: var(--line-2); }
+  .bx.nb .v-band .bx-nw-media .k { grid-area: k; }
+  .bx.nb .v-band .bx-nw-media p { grid-area: p; }
+  .bx.nb .v-band .bx-nw-media .bx-btn { grid-area: btn; margin: 0; }
+}
+.bx.nb .v-band .bx-lg-bar { border-bottom-color: var(--line-2); }
+/* the issue's own sheets lie on the soft ground straight after the band; the meta and the e-mail
+   button (out of the band, so it is News's height) open the page as one row */
+.bx.nb .bx-reader.v-band { background: var(--bg-soft); }
+.bx.nb .bx-reader.v-band .bx-rbody { padding-top: 8px; }
+.bx.nb .bx-reader-intro { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px;
+  margin: 0 0 22px; padding: 0 0 18px; border-bottom: 1px solid var(--line); }
+.bx.nb .bx-reader-intro .bx-band-meta { justify-content: flex-start; color: var(--ink-3); }
+.bx.nb .bx-reader-intro .bx-band-meta svg { color: var(--brand-strong); }
+@media (max-width: 760px) { .bx.nb .bx-reader-intro { justify-content: center; } .bx.nb .bx-reader-intro .bx-band-meta { justify-content: center; } }
+
+/* ---------------------------------------------------------------- the home page: the vision, in navy */
+/* NO BLUE (5 Nov'26): BLACK on the light site, for contrast with the white page; the dark theme makes it a
+   light GREY (website-dark.css) */
+.bx.nb .bx-sec.navy {
+  position: relative; isolation: isolate; color: var(--band-ink);
+  background:
+    radial-gradient(55% 80% at 6% 0%, rgba(255, 255, 255, .07), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(40% 60% at 100% 100%, rgba(241, 136, 91, .12), rgba(241, 136, 91, 0) 70%),
+    linear-gradient(180deg, #111316, #1a1d22);
+}
+.bx.nb .bx-sec.navy::before { content: ''; position: absolute; inset: 0; z-index: -1; background-image: var(--grain); opacity: .2; mix-blend-mode: overlay; pointer-events: none; }
+.bx.nb .bx-sec.navy .eyebrow.light { color: #f7a988; }
+.bx.nb .bx-sec.navy .eyebrow.light::before { background: var(--brand); }
+.bx.nb .bx-sec.navy .bx-vision blockquote { color: #fff; }
+.bx.nb .bx-sec.navy .bx-vision blockquote::before { color: var(--brand); opacity: .9; }
+/* THE FILL: every word starts faint and takes full white as the reading line passes it (ui.FillText
+   writes --p, the number of words filled; --i is each word's place) */
+.bx.nb .bx-fill span { opacity: clamp(.24, calc(var(--p, 0) - var(--i)), 1); transition: opacity .18s linear; }
+@media (prefers-reduced-motion: reduce) { .bx.nb .bx-fill span { opacity: 1; transition: none; } }
+.bx.nb .bx-sec.navy .bx-vision .pillars { border-top-color: rgba(255, 255, 255, .14); }
+.bx.nb .bx-sec.navy .bx-vision .pillars b { color: #fff; }
+.bx.nb .bx-sec.navy .bx-vision .pillars span { color: rgba(214, 224, 240, .72); }
+.bx.nb .bx-sec.navy .bx-vision .pillars .ic { background: rgba(255, 255, 255, .06); border-color: rgba(255, 255, 255, .16); color: #f7a988; }
+.bx.nb .bx-sec.navy .bx-mission { border-color: transparent; box-shadow: 0 30px 70px -30px rgba(0, 0, 0, .55); }
+
+/* ---------------------------------------------------------------- the home page: coverage on a pale GREY panel */
+/* NO BLUE (5 Nov'26, the user: these sections kept the blue): a grey a step off the white page, leaning to
+   white; the icons in ink. The dark theme makes it a grey leaning to black (website-dark.css). */
+@media (min-width: 761px) {
+  .bx.nb #coverage { border-top: 0; }
+  /* a step darker than first tried — "pura hi blend in ho raha hai" */
+  .bx.nb #coverage .bx-cov { padding: 60px 56px; border-radius: 32px; background: linear-gradient(180deg, #e7e9ed, #dee1e6); }
+  .bx.nb #coverage .bx-cov-grid { background: #fff; border-radius: 16px; overflow: hidden; border-color: #d9dde2; }
+  .bx.nb #coverage .bx-cov-grid li { border-color: #e4e7eb; }
+}
+@media (max-width: 760px) { .bx.nb #coverage { border-top: 0; background: linear-gradient(180deg, #e7e9ed, #dee1e6); } }
+.bx.nb #coverage :is(.bx-cov-grid, .bx-cov-card) .ic { background: #f1f2f4; color: var(--ink); }
+.bx.nb #coverage .bx-cov-grid a:hover .ic { background: var(--ink); color: #fff; }
+
+/* ---------------------------------------------------------------- the home page: Market Snapshot in GREY */
+/* NO BLUE: the band was navy over its photo; it is a grey leaning to white over the same photo, black words,
+   the card white — a step off the page, never a hard contrast. (The dark theme: a grey leaning to black.) */
+.bx.nb .bx-industry { color: var(--ink-2); border-block: 1px solid #d6dae0; }
+.bx.nb .bx-industry .bg { background: #dfe2e7; }
+.bx.nb .bx-industry .bg img { opacity: .55; filter: grayscale(.6) contrast(1.02); }
+/* a step darker than first tried — "pura hi blend in ho raha hai" */
+.bx.nb .bx-industry::before { background: linear-gradient(100deg, rgba(226, 229, 234, .97) 0%, rgba(222, 225, 230, .9) 44%, rgba(217, 221, 227, .64) 100%); }
+.bx.nb .bx-industry h2 { color: var(--ink); }
+.bx.nb .bx-industry h2 em { color: var(--brand); }
+.bx.nb .bx-industry .says { color: var(--ink-2); }
+.bx.nb .bx-industry .facts { color: var(--ink-3); }
+.bx.nb .bx-industry .facts b { color: var(--ink); }
+.bx.nb .bx-industry .facts i { background: rgba(15, 27, 45, .25); }
+.bx.nb .bx-industry .bx-badge { color: var(--brand-ink); }
+.bx.nb .bx-industry .bx-btn.white { border-color: var(--line); box-shadow: var(--shadow-sm); }
+.bx.nb .bx-industry .bx-credit.on-dark { color: rgba(15, 27, 45, .5); }
+.bx.nb .bx-industry a.bx-credit.on-dark:hover { color: var(--ink); }
+.bx.nb .bx-mcard { border-color: var(--line); }
+@media (max-width: 600px) { .bx.nb .bx-industry .facts span { background: rgba(255, 255, 255, .7); border-color: var(--line); } }
+/* the chain and the letter below it: the same neutral grey (it was a cool blue tint) */
+.bx.nb .bx-zone { background: linear-gradient(180deg, #f1f2f4 0, #f5f6f7 300px, #f8f9fa 100%); }
+.bx.nb .bx-zone > .bx-sec + .bx-sec { border-top-color: rgba(15, 27, 45, .07); }
+/* Market Snapshot's own accent (the header's progress over part two, the phone's doors): a slate grey, not blue */
+.bx.nb { --ind: #475467; --ind-2: #98a2b3; --ind-ink: #344054; --ind-wash: #f2f4f7; }
+
+/* ---------------------------------------------------------------- the hero's Market Insights button */
+/* (5 Nov'26, the user: "kuch toh aisa karo ki ye alag se clickable dikhe, ki log ko click karke dekhne
+   ka man ho" — colour optional.) Solid navy ("bhot zyada hi blue") and a pale cool tint ("ye bhi achha
+   nahi") were both turned down the same day. Three looks, flags.HERO_CTA (dev: ?cta=):
+   * card    — white; the chart icon in an ORANGE TILE whose line draws itself in as the hero arrives; an
+               arrow that moves on hover, the tile filling orange and the border warming to it;
+   * outline — white with the brand orange as its outline and its words;
+   * ink     — the headline's own ink, white words, the light orange on its icon and arrow.
+   `?before` drops .nb: the plain white button, exactly, so its arrow is hidden there. */
+.bx:not(.nb) .bx-hero-ctas .go { display: none; }
+.bx.nb .bx-hero-ctas .tile { display: grid; place-items: center; flex-shrink: 0; }
+.bx-hero-ctas .lb { white-space: nowrap; }              /* the words never wrap under the tile */
+.bx.nb .bx-hero-ctas .bx-btn .go { width: 17px; height: 17px; transition: transform .22s cubic-bezier(.2, .75, .25, 1); }
+.bx.nb .bx-hero-ctas .bx-btn:hover .go { transform: translateX(3px); }
+
+.bx.nb .bx-btn.cta-card {
+  padding: 0 18px 0 8px; gap: 10px; color: var(--ink); background: #fff; border-color: var(--line);
+  box-shadow: 0 10px 26px -16px rgba(16, 24, 40, .35), var(--shadow-xs);
+}
+.bx.nb .bx-btn.cta-card .tile { width: 32px; height: 32px; border-radius: 9px; background: var(--brand-wash); color: var(--brand-ink);
+  transition: background .2s ease, color .2s ease; }
+.bx.nb .bx-btn.cta-card .tile svg { width: 18px; height: 18px; }
+.bx.nb .bx-btn.cta-card .go { color: var(--brand-ink); }
+.bx.nb .bx-btn.cta-card:hover { background: #fff; border-color: var(--brand-soft); transform: translateY(-1px);
+  box-shadow: 0 14px 30px -16px rgba(241, 136, 91, .6), var(--shadow-xs); }
+.bx.nb .bx-btn.cta-card:hover .tile { background: var(--brand); color: #fff; }
+/* the chart's line (lucide's second path, ~17 units long) draws itself in once, after the hero's words */
+.bx.nb .bx-btn.cta-card .tile path:last-child { stroke-dasharray: 18; stroke-dashoffset: 0; animation: bx-cta-draw 1s .9s cubic-bezier(.4, 0, .2, 1) both; }
+@keyframes bx-cta-draw { from { stroke-dashoffset: 18; } to { stroke-dashoffset: 0; } }
+
+.bx.nb .bx-btn.cta-outline { gap: 9px; color: var(--brand-ink); background: #fff; border: 1.5px solid var(--brand); box-shadow: var(--shadow-xs); }
+.bx.nb .bx-btn.cta-outline svg { color: var(--brand-ink); }
+.bx.nb .bx-btn.cta-outline:hover { background: var(--brand-wash); border-color: var(--brand-strong); transform: translateY(-1px); }
+
+.bx.nb .bx-btn.cta-ink { gap: 9px; color: #fff; background: var(--ink); border-color: var(--ink); box-shadow: 0 10px 24px -12px rgba(15, 27, 45, .55); }
+.bx.nb .bx-btn.cta-ink svg { color: #f7a988; }
+.bx.nb .bx-btn.cta-ink:hover { background: #1d2b42; border-color: #1d2b42; transform: translateY(-1px); }
+
+/* A PHONE: two buttons side by side leave each 157–172 px, and tile + words + arrow do not fit — the
+   tile was squeezed and clipped, the arrow cut off. The arrow goes (a phone has no hover to move it),
+   the tile is smaller and can never shrink, the spacing tighter. */
+@media (max-width: 600px) {
+  .bx.nb .bx-hero-ctas .bx-btn .go { display: none; }
+  .bx.nb .bx-btn.cta-card { padding: 0 8px 0 5px; gap: 7px; }
+  .bx.nb .bx-btn.cta-card .tile { width: 28px; height: 28px; border-radius: 8px; }
+  .bx.nb .bx-btn.cta-card .tile svg { width: 16px; height: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bx.nb .bx-hero-ctas .bx-btn:hover, .bx.nb .bx-hero-ctas .bx-btn:hover .go { transform: none; }
+  .bx.nb .bx-btn.cta-card .tile path:last-child { animation: none; }
+}
+
+/* ---------------------------------------------------------------- the light / dark switch (bottom left) */
+/* (website/ThemeSwitch.jsx, a visitor's choice since pass 62; its dark look is in website-dark.css). In the
+   page's corner, as on the dev server — a header button "looked AI generated" (the user, 5 Nov'26). On a
+   phone it steps aside while Market Insights' period dock is up, which sits at the same foot. */
+.bx-theme-sw { position: fixed; left: 18px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 46; display: inline-flex; align-items: center; gap: 7px;
+  height: 36px; padding: 0 14px 0 11px; border-radius: 999px; cursor: pointer; font: 600 13px var(--f-text);
+  background: #fff; color: var(--ink); border: 1px solid var(--line); box-shadow: var(--shadow-md); transition: opacity .2s, transform .2s; }
+.bx-theme-sw svg { width: 16px; height: 16px; color: var(--brand-ink); }
+.bx-theme-sw:hover { border-color: #c9d2de; }
+@media (max-width: 600px) {
+  .bx-theme-sw { left: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); height: 34px; }
+  .bx:has(.bx-dock.show) .bx-theme-sw { opacity: 0; transform: translateY(8px); pointer-events: none; }
+}
+@media print { .bx-theme-sw { display: none; } }
+/* THE SWITCH IS A CROSS-FADE (pass 64, website/theme.js): the View Transitions API fades the old page into
+   the new; where it is missing, colours fade for a moment instead. Nothing moves under reduced motion. */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .4s; animation-timing-function: cubic-bezier(.4, 0, .2, 1); }
+.bx.bx-theming, .bx.bx-theming * { transition: background-color .32s ease, color .32s ease, border-color .32s ease, fill .32s ease, stroke .32s ease, box-shadow .32s ease !important; }
+@media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none; } }
+
+/* ---------------------------------------------------------------- the footer, in a light cool tint */
+/* light enough for the logo's black; the cool tint of the coverage panel and the slate band */
+.bx.nb .bx-foot {
+  border-top: 1px solid #dfe6ef;
+  background:
+    radial-gradient(46% 120% at 100% 115%, rgba(91, 141, 214, .16), rgba(91, 141, 214, 0) 70%),
+    linear-gradient(180deg, var(--slate-top), var(--slate-mid));
+}
