@@ -55,6 +55,7 @@ import { BAND, BANDS, DATA_CENTRE, NEWSLETTER, PHONE_COMPACT } from './website/f
 import { useTheme } from './website/theme.js'               // the live theme (pass 64): a switch re-renders the root, no reload
 import ThemeSwitch from './website/ThemeSwitch.jsx'      // the visitor's light / dark switch, bottom left (flags.THEME)
 import { ReturnPill, pageOf, useReturnTrail } from './website/ReturnTrail.jsx'   // the way back after a card's link (pass 84)
+import { addressOf, adoptAddress, cleanLinks, here as addressNow, nameOfHref } from './website/route.js'   // '#/…' names ↔ the address bar (path on bcx.market)
 import Legal from './website/Legal.jsx'
 import NewsPage from './website/NewsPage.jsx'
 import Insights from './website/Insights.jsx'
@@ -80,7 +81,7 @@ const PARENT = { about: 'top', vision: 'top', principles: 'top', chain: 'industr
 // the pages that are industry data: the reading line is industry blue on them
 const INDUSTRY_VIEWS = ['insights', 'explorer', 'letter', 'research', 'resources']
 
-function parse(hash = window.location.hash) {
+function parse(hash = addressNow()) {
   const p = (hash || '').replace(/^#\/?/, '').split('/').filter(Boolean)
   if (p[0] === 'site') p.shift()
   // the newsletter is switched off (flags.NEWSLETTER): its addresses open the home page
@@ -107,6 +108,8 @@ function parse(hash = window.location.hash) {
 // set while the module loads, before the browser's own restore runs at the load event: set
 // later (in an effect), a refresh had already been scrolled back to wherever the reader was
 if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) window.history.scrollRestoration = 'manual'
+// bcx.market: an old '/#/…' link becomes its path, a trailing slash goes — before the first parse() reads the address
+adoptAddress()
 
 // pages with a sticky bar of their own (modules, tabs): moving within one keeps the bar in
 // view — [the element the bar sits above, the header + bar height to leave above it]
@@ -187,7 +190,7 @@ export default function Website() {
   const by = useMemo(() => indexSeries(data), [data])
   const issueList = issues.data?.issues
   const pageGroup = useRef(null)                           // the nav's own-sections group
-  const here = useRef(window.location.hash || '#/')       // the hash on screen now
+  const here = useRef(addressNow())                        // the page on screen now, by its '#/…' name
   const scrolls = useRef(new Map())                        // hash -> where the reader left it
   const routeRef = useRef(route)
   routeRef.current = route
@@ -229,12 +232,12 @@ export default function Website() {
     const within = routeRef.current.view === next.view && next.view in WITHIN
     const light = quickHop() || LIGHT_NAV
     if (light) {
-      if (replace) window.history.replaceState(null, '', hash); else window.history.pushState(null, '', hash)
+      if (replace) window.history.replaceState(null, '', addressOf(hash)); else window.history.pushState(null, '', addressOf(hash))
       show(hash, next, false, within, true)
       return
     }
     fade(() => {
-      if (replace) window.history.replaceState(null, '', hash); else window.history.pushState(null, '', hash)
+      if (replace) window.history.replaceState(null, '', addressOf(hash)); else window.history.pushState(null, '', addressOf(hash))
       show(hash, next, false, within)
     }, animate && !sameRoute(routeRef.current, next))
   }, [show])
@@ -243,7 +246,7 @@ export default function Website() {
     window.history.scrollRestoration = 'manual'
     // Back / Forward / an edited address: restore where the reader was on that page
     const onPop = () => {
-      const hash = window.location.hash || '#/'
+      const hash = addressNow()
       if (hash === here.current) return             // a panel's own history entry, or the twin event
       scrolls.current.set(here.current, window.scrollY)
       const next = parse(hash)
@@ -251,13 +254,18 @@ export default function Website() {
       fade(() => show(hash, next, true), !sameRoute(routeRef.current, next))
     }
     // every in-site link goes through navigate(); a modified click still opens a new tab
+    // a link is the site's own when it names a page: '#/insights', or on bcx.market its clean '/insights'
+    // (website/route.js — cleanLinks() rewrites every '#/…' href to its path as it is drawn)
     const onClick = (e) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-      const a = e.target.closest?.('a[href^="#/"]')
-      if (!a || a.target === '_blank') return
+      const a = e.target.closest?.('a[href]')
+      if (!a || a.target === '_blank' || a.hasAttribute('download')) return
+      const name = nameOfHref(a.getAttribute('href'))
+      if (!name) return
       e.preventDefault()
-      navigate(a.getAttribute('href'))
+      navigate(name)
     }
+    cleanLinks()
     window.addEventListener('popstate', onPop)
     window.addEventListener('hashchange', onPop)
     document.addEventListener('click', onClick)
@@ -271,7 +279,7 @@ export default function Website() {
   useEffect(() => {                                    // a retired address says where it went
     if (route.retired) {
       const to = typeof route.retired === 'string' ? route.retired : '#/insights'
-      window.history.replaceState(null, '', to); here.current = to
+      window.history.replaceState(null, '', addressOf(to)); here.current = to
     }
   }, [route])
   useEffect(() => {                                    // page identity
@@ -294,7 +302,7 @@ export default function Website() {
     const r = routeRef.current
     if (r.view !== 'home' || !r.section || !data) return
     if (isReload()) {
-      window.history.replaceState(null, '', '#/')
+      window.history.replaceState(null, '', addressOf('#/'))
       here.current = '#/'
       setRoute({ view: 'home', section: null })
       window.scrollTo(0, 0)
@@ -320,7 +328,7 @@ export default function Website() {
     setMenu(false)
     const to = id === 'top' ? '#/' : `#/${id}`          // Home is the page's top, at its own address
     if (routeRef.current.view !== 'home') { navigate(to); return }
-    window.history.replaceState(null, '', to)
+    window.history.replaceState(null, '', addressOf(to))
     here.current = to
     if (id === 'top') window.scrollTo({ top: 0, behavior: calm() ? 'auto' : 'smooth' })
     else document.getElementById(id)?.scrollIntoView({ behavior: calm() ? 'auto' : 'smooth', block: 'start' })
@@ -332,7 +340,7 @@ export default function Website() {
   const goTop = () => {
     if (routeRef.current.view !== 'home') { navigate('#/'); return }
     setMenu(false)
-    window.history.replaceState(null, '', '#/')
+    window.history.replaceState(null, '', addressOf('#/'))
     here.current = '#/'
     window.scrollTo({ top: 0, behavior: calm() ? 'auto' : 'smooth' })
   }

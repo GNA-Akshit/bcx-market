@@ -2,6 +2,7 @@
 //   /api/website/market  — every series, tile and board (libs/website/payload.py)
 //   /api/website/issues  — the newsletter archive (libs/website/archive.py)
 import { useCallback, useEffect, useState } from 'react'
+import { here } from './route.js'
 
 // STALE-WHILE-REVALIDATE (2 Nov'26). A return visit used to wait on a ~1 MB payload before showing a
 // single figure. The last good answer of each endpoint is now kept in the browser's Cache Storage:
@@ -109,7 +110,7 @@ export function sendVisit() {
   try {
     visitSent = fetch(apiUrl('/api/website/visit'), {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true, credentials: 'same-origin',
-      body: JSON.stringify({ visitor, path: window.location.hash || '#/', ref: document.referrer || '' }),
+      body: JSON.stringify({ visitor, path: here(), ref: document.referrer || '' }),
     }).catch(() => {})
   } catch { /* never let counting break the page */ }
   return visitSent

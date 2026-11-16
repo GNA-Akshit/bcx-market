@@ -16,6 +16,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronLeft, X } from 'lucide-react'
+import { here, nameOfHref } from './route.js'
 
 const WAIT = 1100
 const LIFE = 9000
@@ -61,10 +62,13 @@ export function useReturnTrail(routeKey) {
   useEffect(() => {
     const onClick = (e) => {
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-      const a = e.target.closest?.('a[href^="#/"]')
+      const a = e.target.closest?.('a[href]')
       if (!a || a.target === '_blank') return
-      const from = pageOf(window.location.hash || '#/')
-      const to = pageOf(a.getAttribute('href'))
+      // '#/insights' or, on bcx.market, its clean '/insights' (website/route.js)
+      const page = nameOfHref(a.getAttribute('href'))
+      if (!page) return
+      const from = pageOf(here())
+      const to = pageOf(page)
       if (to === from) return
       const name = originOf(a, from)
       if (name) pending.current = { name, to, t: performance.now() }

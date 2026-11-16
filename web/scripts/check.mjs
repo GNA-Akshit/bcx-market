@@ -50,6 +50,10 @@ if (/^\s*Disallow:\s*\/\s*$/m.test(read('public/robots.txt'))) fail.push('public
 // 5. the domain
 if (read('public/CNAME').trim() !== 'bcx.market') fail.push('public/CNAME must be bcx.market')
 
+// 6. clean addresses (bcx.market/insights, not /#/insights — src/website/route.js + scripts/routes.mjs)
+if (!/^\s*VITE_ROUTES\s*=\s*path\s*$/m.test(read('.env.production'))) fail.push('.env.production must set VITE_ROUTES=path (clean addresses)')
+if (!read('src/website/route.js').includes('export function cleanLinks')) fail.push('src/website/route.js is missing — the address bar would show #/…')
+
 if (fail.length) {
   console.error(`\n✗ ${fail.length} rule${fail.length > 1 ? 's' : ''} broken (scripts/check.mjs):\n  - ${fail.join('\n  - ')}\n`)
   process.exit(1)

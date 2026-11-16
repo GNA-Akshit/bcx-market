@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/check.mjs && vite build",
+    "build": "node scripts/check.mjs && vite build && node scripts/routes.mjs",
     "preview": "vite preview",
     "check": "node scripts/check.mjs",
     "dark-css": "node scripts/gen_dark_css.mjs"

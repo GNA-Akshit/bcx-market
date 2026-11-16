@@ -16,6 +16,9 @@ export const DATA_CENTRE = false
 // newsletter section on the home page; the coverage card points at Regulations; and an old
 // #/newsletter address opens the home page. The code (Newsletters.jsx, the reader, the covers) stays.
 export const NEWSLETTER = import.meta.env.DEV || import.meta.env.VITE_NEWSLETTER === '1'
+// PATH ADDRESSES — bcx.market/insights, not bcx.market/#/insights (16 Nov'26, website/route.js): on for the
+// bcx-website build (VITE_ROUTES=path); off here, where the site is ONE file (/site/index.html) and keeps '#/…'
+export const PATH_ROUTES = import.meta.env.VITE_ROUTES === 'path'
 // BANDS — one page band for every inner page and the home page's colour rhythm (5 Nov'26, after
 // globalCOAL's site; ADR-0045 passes 59–60): Market Insights, News, Regulations and the Newsletter
 // reader open on ONE band of one height (352 px, phone 296) with the title on it (its look: BAND,
