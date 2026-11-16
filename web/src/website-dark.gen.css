@@ -1624,6 +1624,11 @@
 @media (hover: hover) { .dk .cm-mk.is-dim:hover { filter: none; } }
 .dk .cm-map .cm-mk.cm-mine.is-sel { filter: none; }
 @media (pointer: coarse) { .dk .cm-mk.is-dim, .bx.dk.dk .cm-mk.is-dim, .dk .dk .cm-mk.is-dim { filter: none; } }
+@media (pointer: coarse) {
+  .bx.dk .cm-map .cm-mine:not(.is-sel) .cm-f { box-shadow: 0 0 0 1.5px #171a1f; }
+  .bx.dk .cm-map .cm-mine .cm-c { box-shadow: 0 0 0 2px #171a1f; }
+  .bx.dk .cm-map.has-pick .cm-mine.cm-flag:not(.is-dim):not(.is-sel) .cm-f { box-shadow: 0 0 0 2px #171a1f; }
+}
 @media (min-width: 1141px) {
   .dk .cm-module:has(.cm-br) { --cm-bar: 108px; }
 }

@@ -33,15 +33,37 @@ const esc = s => String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 // A LABEL'S WIDTH, MEASURED AS TEXT (v88): the label's own font (read once, from the first label) on a canvas, plus its
 // 6 px padding each side — what offsetWidth gave, without asking the page for a layout. The font is read again once
 // the web fonts have loaded, so names measured against a fallback are not kept.
-let labelCtx = null, labelFont = null
-if (typeof document !== 'undefined') document.fonts?.ready?.then(() => { labelFont = null })
+// A name is measured once (v89: kept by its text, and the canvas's font set only when it changes — setting it on
+// every call was 40 ms a tap on a phone at CPU 6x, the font parsed again each time).
+let labelCtx = null, labelFont = null, labelFontSet = null
+const labelWidths = new Map()
+if (typeof document !== 'undefined') document.fonts?.ready?.then(() => { labelFont = null; labelWidths.clear() })
 function labelWidth(el) {
   if (!el) return 60
+  const text = el.textContent || ''
+  const known = labelWidths.get(text)
+  if (known != null) return known
   if (!labelCtx) labelCtx = document.createElement('canvas').getContext('2d')
   if (!labelFont) { const cs = getComputedStyle(el); labelFont = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}` }
-  labelCtx.font = labelFont
-  return Math.ceil(labelCtx.measureText(el.textContent || '').width) + 12
+  if (labelFontSet !== labelFont) { labelCtx.font = labelFont; labelFontSet = labelFont }
+  const w = Math.ceil(labelCtx.measureText(text).width) + 12
+  labelWidths.set(text, w)
+  return w
 }
+
+// A MARKER'S STACKING NEVER CHANGES WHILE THE MAP MOVES (v89, the iPhone: "the zoom in and out is laggy … for Super 75
+// even more"). Leaflet stacks markers by their SCREEN y, so it rewrote every marker's z-index on every frame of a
+// glide or a pinch — with 75+ rings a style change and a re-layering of the whole map, each frame
+// (scratch/dev/_cm_zoom_prof_v89.py). Stacked by LATITUDE instead — south over north, the order it always had — the
+// z-index is written when the marker is placed or its offset changes, and never again while the map moves.
+const Marker = L.Marker.extend({
+  _setPos(pos) {
+    if (this._icon) L.DomUtil.setPosition(this._icon, pos)
+    if (this._shadow) L.DomUtil.setPosition(this._shadow, pos)
+    const z = Math.round((90 - this._latlng.lat) * 100) + this.options.zIndexOffset
+    if (z !== this._zIndex || (this._icon && !this._icon.style.zIndex)) { this._zIndex = z; this._resetZIndex() }
+  },
+})
 // a fit's margins — `inset` more at the foot where something covers the map there (the phone's sheet, 10 Nov'26)
 let inset = 0
 const fitPad = (p = 28) => ({ paddingTopLeft: [p, p], paddingBottomRight: [p, p + inset] })
@@ -94,6 +116,7 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
   const coMk = useRef(new Map())
   const last = useRef({})
   const openRef = useRef(null)            // a clicked mine cluster: {ids opened, frozen: the other clusters as they stood}
+  const layoutRef = useRef(null)          // the mines laid out for one zoom: { key, all, pts, spread, groups } (drawMines)
   const clickZoom = useRef(false)         // the zoom under way is a cluster click's own flight
   const clickZoomT = useRef(0)
   const live = useRef({})
@@ -130,7 +153,11 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
     // dark slivers and doubled, jagged edges between them, worst once zoomed in. The 1 px a desktop uses keeps them shared.
     // (Was: a phone draws the outlines simplified to 2 px (Leaflet's default 1): invisible on its small, dense screen, and
     // every re-projection and repaint of a glide is that much cheaper (pass 82).)
-    const simplify = 1
+    // NO SIMPLIFICATION AT ALL (v89, 16 Nov'26, the user on an iPhone: "the zoom in and out is laggy"). The outlines
+    // are ~8,000 points for the states and ~3,600 for the coast — little enough to draw as they are — and Leaflet
+    // simplified EVERY shape again on EVERY redraw of a glide (_simplifyDP: 20–25 ms a zoom at CPU 6x). As they are,
+    // the redraw is cheaper and two neighbours' shared border is the same line by construction: crisp, no slivers.
+    const simplify = 0
     const makeRenderer = m._createRenderer.bind(m)
     m._createRenderer = o => makeRenderer({ ...o, padding: coarse ? 0.35 : 0.5 })
     // states 300 · the hover and selection outlines 340 (never catch the pointer) · coast 360
@@ -534,7 +561,7 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       cancelAnimationFrame(redraw); clearTimeout(redrawT); cancelAnimationFrame(panT)
       m.off(); m.remove(); map.current = null
       stateLayers.current = new Map(); plantMk.current = new Map(); mineLive.current = new Map(); coMk.current = new Map()
-      last.current = {}; L_.current = {}; openRef.current = null; clearTimeout(clickZoomT.current)
+      last.current = {}; L_.current = {}; openRef.current = null; layoutRef.current = null; clearTimeout(clickZoomT.current); clearTimeout(prepT.current)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -656,7 +683,7 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
         className: `cm-mk cm-plant${live.current.selected?.kind === 'plant' && live.current.selected.id === p.id ? ' is-sel' : ''}`, iconSize: [0, 0], iconAnchor: [0, 0],
         html: `<span class="cm-in" style="--dl:${dl}ms"><span class="${cls}" style="--s:${s}px"></span><em class="cm-label" style="--off:${s / 2 + 5}px">${esc(p.short)}</em></span>`,
       })
-      const mk = L.marker(ll, { icon, keyboard: true, alt: p.name, zIndexOffset: 500 + s, bubblingMouseEvents: false })
+      const mk = new Marker(ll, { icon, keyboard: true, alt: p.name, zIndexOffset: 500 + s, bubblingMouseEvents: false })
       mk.on('click', () => live.current.onSelect({ kind: 'plant', id: p.id }))
       const hov = intent(() => {
         const pt = m.latLngToContainerPoint(mk.getLatLng())
@@ -742,23 +769,20 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
   }
 
   // ------------------------------------------------------------------ coal mines (clusters)
-  // `zAt`: lay the rings out for that zoom instead of the map's own — api.focus, for the zoom its glide lands at;
-  // `ms`: how long a ring slides to its new place (a glide's length). Returns the groups as laid out.
-  function drawMines(zAt = null, ms = 420) {
+  // THE LAYOUT IS WORKED OUT ONCE PER ZOOM (v89): grouping, fanning and pushing apart ~650 mines depends only on the
+  // zoom, the list and the open clusters — not on where the map is panned. It used to be done again after every pan,
+  // and twice for a chosen mine (api.focus laid out for the landing zoom, and the landing did the same again); the
+  // last few are kept, so a pan or a landing only places the markers — and the zoom a tap on a mine glides to is
+  // worked out AHEAD, while the map is idle (prepareFocus), so the tap itself only moves markers.
+  function layoutFor(z) {
     const m = map.current
-    if (!m) return null
-    const z = zAt ?? m.getZoom()
-    const motion = !reduced()
     const all = live.current.mines
-    // a set chosen (some mines dimmed): a class, not `.cm-map:has(.cm-mk.is-dim)` — a :has() over the markers was
-    // re-tested on every marker's class change
-    m.getContainer().classList.toggle('has-pick', all.some(p => p.dim))
-    const allPts = all.map(p => { const xy = m.project([p.lat, p.lon], z); return { ...p, x: xy.x, y: xy.y, flag: !!p.flagship, px: minePx(p, z) } })
-    // A CLICKED CLUSTER OPENS ALONE. After a cluster click, only the mines of the clusters
-    // clicked are regrouped for the new zoom; every other cluster is drawn as it stood when the
-    // first one was clicked (its members' centre, its count). A zoom the reader makes
-    // themselves — wheel, buttons, "All India" — lets go of that (openRef is cleared).
     const open = openRef.current
+    const key = `${z}|${open ? `${open.frozen.length}:${[...open.ids].join(',')}` : '-'}`
+    const cache = layoutRef.current?.all === all ? layoutRef.current : (layoutRef.current = { all, by: new Map() })
+    const hit = cache.by.get(key)
+    if (hit) return hit
+    const allPts = all.map(p => { const xy = m.project([p.lat, p.lon], z); return { ...p, x: xy.x, y: xy.y, flag: !!p.flagship, px: minePx(p, z) } })
     const pts = open ? allPts.filter(p => open.ids.has(p.id)) : allPts
     const localZ = z >= Z_LOCAL
     const spread = !pts.length ? null : localZ ? fan(pts) : z >= Z_NATIONAL ? fan(pts.filter(p => p.flag)) : null
@@ -774,6 +798,45 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       }
     }
     relax(groups.map(g => Object.assign(g, { r: (g.members.length > 1 ? groupSize(g.members.length) : g.members[0].px) / 2 })))
+    const lay = { pts, spread, groups }
+    cache.by.set(key, lay)
+    if (cache.by.size > 6) cache.by.delete(cache.by.keys().next().value)   // the oldest goes
+    return lay
+  }
+  // the zoom api.focus would glide to from here, laid out while the map is idle (a tap then only moves markers)
+  const prepT = useRef(0)
+  function prepareFocus() {
+    const m = map.current
+    clearTimeout(prepT.current)
+    if (!m || !live.current.mines?.length) return
+    const L0 = L_.current
+    if (!L0.indiaView) return
+    const z = m.getZoom()
+    if (z >= L0.indiaView().zoom + 1.2) return                // zoomed in: a tap does not zoom
+    const target = Math.min(m.getMaxZoom(), z + 1.5)
+    prepT.current = setTimeout(() => {
+      if (map.current !== m || Math.abs(m.getZoom() - z) > 1e-6 || L0.gliding?.()) return
+      layoutFor(target)
+    }, 350)
+  }
+
+  // `zAt`: lay the rings out for that zoom instead of the map's own — api.focus, for the zoom its glide lands at;
+  // `ms`: how long a ring slides to its new place (a glide's length). Returns the groups as laid out.
+  function drawMines(zAt = null, ms = 420) {
+    const m = map.current
+    if (!m) return null
+    const z = zAt ?? m.getZoom()
+    const motion = !reduced()
+    const all = live.current.mines
+    // a set chosen (some mines dimmed): a class, not `.cm-map:has(.cm-mk.is-dim)` — a :has() over the markers was
+    // re-tested on every marker's class change
+    m.getContainer().classList.toggle('has-pick', all.some(p => p.dim))
+    // A CLICKED CLUSTER OPENS ALONE. After a cluster click, only the mines of the clusters
+    // clicked are regrouped for the new zoom; every other cluster is drawn as it stood when the
+    // first one was clicked (its members' centre, its count). A zoom the reader makes
+    // themselves — wheel, buttons, "All India" — lets go of that (openRef is cleared).
+    const open = openRef.current
+    const { pts, spread, groups } = layoutFor(z)
     const selState = live.current.selected?.kind === 'state' ? live.current.selected.id : null
     const at = g => m.unproject([g.x, g.y], z)
     const before = new Map()
@@ -797,7 +860,8 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       if (node?.animate && motion && dest) {
         // (the Web Animations API with the numbers written in: the GPU runs it — a CSS keyframe built on var() did not)
         const a = m.latLngToLayerPoint(v.latlng), b = m.latLngToLayerPoint(at(dest))
-        node.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translate(${b.x - a.x}px, ${b.y - a.y}px) scale(.6)` }],
+        // (only the END is given: it leaves from its own look — a dull mine never flashes full colour on its way out)
+        node.animate([{ opacity: 0, transform: `translate(${b.x - a.x}px, ${b.y - a.y}px) scale(.6)`, offset: 1 }],
           { duration: 190, easing: 'ease-in', fill: 'forwards' })
         setTimeout(() => v.marker.remove(), 200)
       } else v.marker.remove()
@@ -854,7 +918,7 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
         className: `cm-mk cm-mine${kind}${isSel ? ' is-sel' : ''}${dim ? ' is-dim' : ''}${out ? ' is-out' : ''}`, iconSize: [h.size, h.size], iconAnchor: [h.size / 2, h.size / 2],
         html: `<span class="cm-in">${h.body}</span>`,
       })
-      const mk = L.marker(ll, { icon, keyboard: true, alt: g.members.length > 1 ? `${g.members.length} mines` : g.members[0].name,
+      const mk = new Marker(ll, { icon, keyboard: true, alt: g.members.length > 1 ? `${g.members.length} mines` : g.members[0].name,
         zIndexOffset: g.members.length > 1 ? 300 : g.members[0].flagship ? 200 + h.size : 0, bubblingMouseEvents: false })
       mk.on('click', () => {
         if (g.members.length > 1) {
@@ -914,7 +978,11 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       // the numbers written in, so the GPU runs it (the CSS keyframe built on var(--fx) ran on the main thread)
       const inner = mk.getElement()?.firstElementChild
       if (motion && inner?.animate) {
-        inner.animate([{ opacity: 0, transform: `translate(${fx}px, ${fy}px) scale(.6)` }, { opacity: 1, transform: 'none' }],
+        // ONLY THE START IS GIVEN (offset 0): it fades IN TO ITS OWN LOOK — a mine outside a chosen state, or beside a
+        // chosen mine, arrives dull. With an explicit `opacity: 1` end (v88) it arrived in full colour and snapped dull
+        // half a second later (the user, 16 Nov'26: "for a brief moment all the mines are normal coloured … looks
+        // laggy"). The offset matters: a lone keyframe WITHOUT one is the END, and the mine faded out instead.
+        inner.animate([{ opacity: 0, transform: `translate(${fx}px, ${fy}px) scale(.6)`, offset: 0 }],
           { duration: 500, easing: 'cubic-bezier(.22, 1, .36, 1)' })
       }
       mineLive.current.set(g.id, { marker: mk, members: new Set(g.members.map(p => p.id)), latlng: ll, size: h.size, sts })
@@ -942,6 +1010,7 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       if (lines.length) L.polyline(lines, { pane: 'spokes', weight: 1, interactive: false, className: 'cm-spoke' }).addTo(L_.current.spokes)
     }
     placeLabels()
+    if (zAt == null) prepareFocus()
     return groups
   }
 
@@ -983,7 +1052,7 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       if (was) { const n = was.marker.getElement()?.querySelector('.cm-in'); if (n && n.innerHTML !== body) { n.innerHTML = body; was.w = null } continue }
       const icon = L.divIcon({ className: `cm-mk cm-company${live.current.selected?.kind === 'company' && live.current.selected.id === c.id ? ' is-sel' : ''}`,
         iconSize: [0, 0], iconAnchor: [0, 0], html: `<span class="cm-in">${body}</span>` })
-      const mk = L.marker([c.lat, c.lon], { icon, keyboard: true, alt: c.name || c.code, zIndexOffset: 900, bubblingMouseEvents: false })
+      const mk = new Marker([c.lat, c.lon], { icon, keyboard: true, alt: c.name || c.code, zIndexOffset: 900, bubblingMouseEvents: false })
       mk.on('click', () => live.current.onSelect({ kind: 'company', id: c.id }))
       // A COMPANY'S CARD NEVER COVERS THE OTHERS (pass 79, "when i hover on it it blocks the other companies, the hover
       // comes instantly"). The seven labels share the coal belt, and the card opened 140 ms after the pointer

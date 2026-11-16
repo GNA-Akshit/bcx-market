@@ -4432,6 +4432,15 @@ a.bx-credit.on-dark:hover { background: none; color: #fff; text-decoration: unde
 /* a phone dims a mine outside a chosen set by opacity alone: saturate() on each of up to a few hundred markers was a
    repaint of every one whenever the map moved or a set was chosen (v88) */
 @media (pointer: coarse) { .cm-mk.is-dim, .bx.dk .cm-mk.is-dim, .dk .cm-mk.is-dim { filter: none; opacity: .24; } }
+/* v89 (the iPhone: "the zoom in and out is laggy … Super 75 even more"): ON A PHONE NO RING OR CLUSTER CASTS A SOFT
+   SHADOW — a blurred shadow under each of 75+ discs is painted again at the phone's 3x pixels whenever they move or are
+   drawn; a crisp edge of the ground's colour keeps them separate from the map at a fraction of the cost. The chosen
+   ring keeps its own outline (.is-sel). The dark theme's edge comes from gen_dark_css. */
+@media (pointer: coarse) {
+  .bx .cm-map .cm-mine:not(.is-sel) .cm-f { box-shadow: 0 0 0 1.5px #fff; }
+  .bx .cm-map .cm-mine .cm-c { box-shadow: 0 0 0 2px #fff; }
+  .bx .cm-map.has-pick .cm-mine.cm-flag:not(.is-dim):not(.is-sel) .cm-f { box-shadow: 0 0 0 2px #fff; }
+}
 /* the spokes (a spread ring back to its own place) are one path for all of them: with a state or a mine chosen they
    step back with the rings they belong to */
 .cm-spoke, .cm-hub { transition: opacity .3s var(--cm-ease); }
@@ -4998,4 +5007,6 @@ html { touch-action: manipulation; }
   .bx.mc .cm-selcard .go { flex-direction: column; justify-content: center; gap: 1px; width: 58px; height: 44px; padding: 0; font-size: 11px; }
   .bx.mc .cm-selcard .go svg { width: 15px; height: 15px; }
   .bx:has(.cm-selcard) .bx-theme-sw { opacity: 0; transform: translateY(8px); pointer-events: none; }
+  /* v89: and whenever the map itself is on screen — the button sat on the map's key (CoalMap, IntersectionObserver) */
+  .bx.map-on .bx-theme-sw { opacity: 0; transform: translateY(8px); pointer-events: none; }
 }

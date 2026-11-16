@@ -1577,6 +1577,15 @@ export default function CoalMap() {
     const t = setTimeout(() => api.current?.focus?.(p.lat, p.lon, keyInset ? { top: 56, bottom: 96, mine } : { top: 56, mine }), 60)
     return () => clearTimeout(t)
   }, [sel, keyInset, minesById, plantsById])
+  // THE THEME BUTTON STEPS ASIDE FOR THE MAP ON A PHONE (v89): it floats at the page's bottom-left, and with the map on
+  // screen it sat on the map's key ("…ing mines, by") — the same step aside it already took for the selection card
+  useEffect(() => {
+    const el = stage.current, root = el?.closest('.bx')
+    if (!phone || !el || !root || typeof IntersectionObserver === 'undefined') return undefined
+    const io = new IntersectionObserver(([e]) => root.classList.toggle('map-on', e.isIntersecting), { threshold: 0.25 })
+    io.observe(el)
+    return () => { io.disconnect(); root.classList.remove('map-on') }
+  }, [phone])
   const toDetails = () => {
     const el = railBox.current
     if (!el) return
