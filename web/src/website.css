@@ -4912,3 +4912,9 @@ html { touch-action: manipulation; }
   .bx-swap, .bx-swap-rows td, .bx-pulse, .bx-chart path.bgrow, .bx-chart text.blab, .bx-gbars .tr i, .bx-gbars .v { animation: none; }
   .bx-seg.ready > .bx-seg-ind { transition: none; }
 }
+
+/* v85b (16 Nov'26, the user: "whichever we have selected becomes orangish, not white"): a switch's chosen option is
+   an ORANGE pill with white words — the brand's deeper orange (--brand-strong), so the white type stays readable —
+   sliding as before; the others keep their quiet grey */
+.bx-seg > .bx-seg-ind { background: var(--brand-strong); box-shadow: 0 6px 14px -6px rgba(214, 108, 60, .6); }
+.bx .bx-seg.has-ind > button.on, .bx .bx-seg.has-ind > button.on:hover { color: #fff; }

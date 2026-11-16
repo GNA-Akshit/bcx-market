@@ -176,30 +176,11 @@ const phoneLabel = l => PHONE_LABEL[l] ?? l
 const emWidth = s => [...s].reduce((w, ch) => w + (/[0-9]/.test(ch) ? 0.66 : /[A-Za-z%—₹]/.test(ch) ? 0.7 : 0.34), 0)
 
 // A SWITCH SHOWS WHAT IT CHANGED (16 Nov'26, the user: "when we click the toggles … the transition needs to be better,
-// so that something changed is reflected better"). A figure whose value changes COUNTS from the old value to the new
-// (~0.55 s, easing out) and its tile glows once in the accent; a figure the switch does not change (the plants' stock
-// levels on the Overview) stays still — so the eye goes to what moved. The number's element persists across the
-// switch (no remount), so the old value is there to count from. Nothing moves: text and an absolutely-placed glow.
+// so that something changed is reflected better"). A figure whose value changes shows its new value AT ONCE and its
+// tile glows once in the accent; a figure the switch does not change (the plants' stock levels on the Overview) stays
+// still — so the eye goes to what moved. (The number counted from the old value to the new for a day; the user, the
+// same day: "the number should not go up in the increasing fashion, it should just switch".) Nothing moves.
 const calm = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-function CountUp({ value, dec = 0 }) {
-  const [v, setV] = useState(value)
-  const last = useRef(value)
-  useEffect(() => {
-    const from = last.current
-    last.current = value
-    if (value == null || from == null || from === value || calm()) { setV(value); return undefined }
-    let raf = 0, t0 = 0
-    const step = t => {
-      if (!t0) t0 = t
-      const k = Math.min(1, (t - t0) / 560)
-      setV(k < 1 ? from + (value - from) * (1 - Math.pow(1 - k, 3)) : value)
-      if (k < 1) raf = requestAnimationFrame(step)
-    }
-    raf = requestAnimationFrame(step)
-    return () => cancelAnimationFrame(raf)
-  }, [value])
-  return v == null ? '—' : num(v, dec)
-}
 /** A number that bumps each time `value` changes (never on the first draw): the key of the tile's one-off glow. */
 function usePulse(value) {
   const [n, setN] = useState(0)
@@ -224,7 +205,7 @@ function KpiCompact({ fig, open }) {
     <button type="button" className="bx-kpi bx-kc" onClick={() => open(fig)} aria-haspopup="dialog">
       <span className="lbl" title={label}>{phoneLabel(label)}</span>
       {pulse > 0 && <i key={pulse} className="bx-pulse" aria-hidden="true" />}
-      <span className="val" style={fit} title={`${txt} ${unitLabel(unit)}`}><b><CountUp value={value} dec={dec} /></b><small>{u}</small></span>
+      <span className="val" style={fit} title={`${txt} ${unitLabel(unit)}`}><b>{value == null ? '—' : num(value, dec)}</b><small>{u}</small></span>
       {bare && keepSub && <span className="sub" aria-hidden="true" />}
       {!bare && <span key={`c${swap}`} className={`sub${sw}`}>
         {plain ? plain : <><ChangeMark change={change} changeUnit={changeUnit} note={note} />{changeLabel && <> {changeLabel}</>}</>}
@@ -344,7 +325,7 @@ function Kpi(fig) {
     <>
       {pulse > 0 && <i key={pulse} className="bx-pulse" aria-hidden="true" />}
       <span className="hd"><span className="lbl">{label}</span>{when && <span key={`w${swap}`} className={`when${sw}`}>{when}</span>}</span>
-      <span className="val"><b><CountUp value={value} dec={dec} /></b><small>{unitLabel(unit)}</small>
+      <span className="val"><b>{value == null ? '—' : num(value, dec)}</b><small>{unitLabel(unit)}</small>
         {/* inline, the comparison's label loses its ", same days" (kept in the title) so it fits one line */}
         {inline && !plain && <span key={`vc${swap}`} className={`vchg${sw}`} title={changeLabel || undefined}><ChangeMark change={change} changeUnit={changeUnit} note={note} />{changeLabel && <small>{shortCmp(changeLabel)}</small>}</span>}</span>
       {/* a figure its source publishes with no comparison says what it covers, in the same

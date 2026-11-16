@@ -1732,6 +1732,8 @@
 .bx.dk .bx-seg.has-ind > button.on { background: transparent; box-shadow: none; }
 .dk .bx-pulse {
   box-shadow: inset 0 0 0 1.5px var(--brand); background: color-mix(in srgb, var(--brand) 7%, transparent); }
+.dk .bx-seg > .bx-seg-ind { background: var(--brand-strong); box-shadow: 0 6px 14px -6px rgba(214, 108, 60, 0.33); }
+.bx.dk .bx-seg.has-ind > button.on, .bx.dk .bx-seg.has-ind > button.on:hover { color: #ffffff; }
 /*  ---- from frontend/src/website-bands.css  */
 .bx.dk.nb .bx-band {
   --lip: 40px;
