@@ -165,7 +165,6 @@ export function Footer({ data, onNav, onLetters, onExplore, showVisits = false }
               {[['about', 'About us'], ['vision', 'Vision & mission'], ['coverage', 'About BCX'],
                 ['careers', 'Careers'], ['contact', 'Contact']].map(([k, l]) => <li key={k}><button className="lnk" onClick={() => onNav(k)}>{l}</button></li>)}
               <li><a href="#/news">News &amp; media</a></li>
-              <li><a href="https://gna.energy/" target="_blank" rel="noreferrer">GNA Energy <ArrowUpRight size={12} /></a></li>
             </ul>
           </div>
           <div>

@@ -68,7 +68,9 @@ export default function Hero({ onGo }) {
       )}
       <div className="wrap bx-hero-in">
         <div className="bx-hero-copy">
-          <a className="bx-pill" href={HERO.orgUrl} target="_blank" rel="noreferrer"><span className="ic"><Zap /></span>{HERO.pill} <b>{HERO.org}</b></a>
+          {/* the "An initiative by GNA Energy" pill is OFF (16 Nov'26, the user: remove the GNA Energy details from the
+              home page) — it comes back if content.HERO.org is set again */}
+          {HERO.org && <a className="bx-pill" href={HERO.orgUrl} target="_blank" rel="noreferrer"><span className="ic"><Zap /></span>{HERO.pill} <b>{HERO.org}</b></a>}
           <h1>{HERO.title[0]}<em>{HERO.title[1]}</em></h1>
           <p className="lede">{HERO.lede}</p>
           <div className="bx-hero-ctas">

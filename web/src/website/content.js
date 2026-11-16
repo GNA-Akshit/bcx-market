@@ -10,9 +10,11 @@
 // line for line from BCX's own "BCX_webpage changes" document (language before → after).
 // Headings keep the site's sentence case; the words are the document's.
 export const HERO = {
+  // NO PARENT COMPANY ON THE SITE (16 Nov'26, the user: "remove the details about gna energy … from the home page and
+  // the link of gna energy in the footer"): the hero's "An initiative by GNA Energy" pill is off while org is null
   pill: 'An initiative by',
-  org: 'GNA Energy',
-  orgUrl: 'https://gna.energy/',
+  org: null,
+  orgUrl: null,
   title: ['Shaping the future of ', 'coal trading in India'],
   lede: 'Bharat Coal Exchange (BCX) is shaping the future of coal trading in India through a transparent, efficient and technology-driven marketplace.',
 }
@@ -22,7 +24,8 @@ export const ABOUT = {
   stats: [['₹50 Cr+', 'Initial investment'], ['Screen-based', 'Digital marketplace']],
   body: [
     'Designed as a technology-driven marketplace, Bharat Coal Exchange (BCX) aims to introduce greater transparency, efficiency and credible price discovery to India’s coal market by bringing buyers and sellers together through a secure, screen-based trading platform.',
-    'As an initiative of GNA Energy, Bharat Coal Exchange (BCX) draws on extensive expertise in energy markets and technology-driven solutions to develop a transparent, accessible and scalable digital marketplace for coal trading in India.',
+    // "As an initiative of GNA Energy," dropped (16 Nov'26, the user) — the rest of the document's sentence stands
+    'Bharat Coal Exchange (BCX) draws on extensive expertise in energy markets and technology-driven solutions to develop a transparent, accessible and scalable digital marketplace for coal trading in India.',
   ],
 }
 
@@ -139,7 +142,8 @@ export const CONTACT = {
   title: 'We’d love to hear from you.',
   lede: 'Reach out to us for any inquiries regarding partnerships or platform access.',
   company: 'Bharat Coal Exchange Private Limited',
-  address: 'Palm Spring Plaza, Golf Course Road, Sector 54, Gurugram, Haryana 122009',
+  // the office, in full (16 Nov'26, the user's)
+  address: '7007, The Palm Spring Plaza, Golf Course Rd, DLF Phase 5, Sector 54, Gurugram, Haryana 122009',
   email: 'info@bcx.market',
   // 16 Nov'26, the user's: the phone is a card of the Contact section (a tap dials it on a phone), and connect@ is the
   // footer's address — info@ stays the address for enquiries (the section's button and its Enquiries card)
