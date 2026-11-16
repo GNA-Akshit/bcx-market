@@ -141,6 +141,11 @@ export const CONTACT = {
   company: 'Bharat Coal Exchange Private Limited',
   address: 'Palm Spring Plaza, Golf Course Road, Sector 54, Gurugram, Haryana 122009',
   email: 'info@bcx.market',
+  // 16 Nov'26, the user's: the phone is a card of the Contact section (a tap dials it on a phone), and connect@ is the
+  // footer's address — info@ stays the address for enquiries (the section's button and its Enquiries card)
+  phone: '+91 97737 93575',
+  phoneHref: 'tel:+919773793575',
+  connect: 'connect@bcx.market',
   tagline: 'Shaping the future of coal trading in India',
   // BCX's company page (27 Oct'26, the user's link, its tracking parameter dropped)
   linkedin: 'https://www.linkedin.com/company/bharat-coal-exchange-bcx/',

@@ -14,7 +14,7 @@
 // (Since 22 Oct'26 the site shows neither — management asked for no methodology and no
 // registration talk until registration is done.)
 import { ArrowRight, ArrowUpRight, BarChart3, BookOpen, CircleCheck, Clock3, FileText, Gavel, IndianRupee, Info, Layers, Lock,
-         Mail, MapPin, Scale, Sigma, TrainFront, Truck, Warehouse, Zap } from 'lucide-react'
+         Mail, MapPin, Phone, Scale, Sigma, TrainFront, Truck, Warehouse, Zap } from 'lucide-react'
 import BcxLogo from './BrandLogo.jsx'      // the bcx.market logo (27 Oct'26)
 import { CONTACT } from './content.js'
 import { LEGAL, SHOW_REGISTER } from './Legal.jsx'
@@ -153,7 +153,10 @@ export function Footer({ data, onNav, onLetters, onExplore, showVisits = false }
             <BcxLogo />
             <p className="tag">{CONTACT.tagline}.</p>
             <p className="ln"><MapPin size={16} /><span>{CONTACT.company}<br />{CONTACT.address}</span></p>
-            <p className="ln"><Mail size={16} /><a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></p>
+            {/* the footer's address is connect@ (16 Nov'26) — info@ is the Contact section's, for enquiries — and the
+                phone beside it */}
+            <p className="ln"><Mail size={16} /><a href={`mailto:${CONTACT.connect || CONTACT.email}`}>{CONTACT.connect || CONTACT.email}</a></p>
+            {CONTACT.phone && <p className="ln"><Phone size={16} /><a href={CONTACT.phoneHref}>{CONTACT.phone}</a></p>}
             {CONTACT.linkedin && <p className="ln"><LinkedInIcon size={16} /><a href={CONTACT.linkedin} target="_blank" rel="noreferrer">BCX on LinkedIn</a></p>}
           </div>
           <div>

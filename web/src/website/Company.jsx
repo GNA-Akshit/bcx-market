@@ -8,7 +8,7 @@
 // must say something), a quoted statement, an open row, a typographic careers block, a
 // closing band.
 import { useEffect, useRef, useState } from 'react'
-import { ArrowRight, ArrowUpRight, Check, Cpu, Globe2, Mail, MapPin, Scale, ShieldCheck, Sparkles, Zap } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Check, Cpu, Globe2, Mail, MapPin, Phone, Scale, ShieldCheck, Sparkles, Zap } from 'lucide-react'
 import { Credit, PHOTOS, Photo } from './media.jsx'
 import LinkedInIcon from './LinkedIn.jsx'
 import { ABOUT, CAREERS, CONTACT, MISSION, PRINCIPLES, VISION } from './content.js'
@@ -381,6 +381,12 @@ export function Contact() {
           <div className="cards">
             <div className="cc"><span className="ic"><MapPin /></span><span><b>{CONTACT.company}</b>{CONTACT.address}</span></div>
             <a className="cc" href={`mailto:${CONTACT.email}`}><span className="ic"><Mail /></span><span><b>Enquiries</b>{CONTACT.email}</span><ArrowRight className="go" /></a>
+            {/* the phone (16 Nov'26) — its own card; a tap dials it on a phone */}
+            {CONTACT.phone && (
+              <a className="cc" href={CONTACT.phoneHref}>
+                <span className="ic"><Phone /></span><span><b>Call us</b>{CONTACT.phone}</span><ArrowRight className="go" />
+              </a>
+            )}
             {/* BCX on LinkedIn (27 Oct'26) — the company page, in a new tab */}
             {CONTACT.linkedin && (
               <a className="cc" href={CONTACT.linkedin} target="_blank" rel="noreferrer">
