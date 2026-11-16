@@ -2,6 +2,8 @@
 <html lang="en-IN">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-qAz+1YkYGjnFlPFSqi5R6KweC/u9KfmgX58LoWy+D3U='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://bcx-newsletter.gna.energy; frame-src 'self' https://bcx-newsletter.gna.energy; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <!-- viewport-fit=cover: without it every env(safe-area-inset-*) in website.css is 0 on a notched phone -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <!-- THE PUBLIC WEBSITE (ADR-0045). Its own page, so it can be served without the
@@ -23,8 +25,8 @@
     <!-- THE SITE OPENS DARK; light is a visitor's choice, kept in this browser (flags.THEME). Paint the page
          dark before anything loads — unless this reader chose light — so a dark reader never sees a white flash -->
     <script>(function(){var q=location.search,light=false;try{light=/[?&]theme=light/.test(q)||(localStorage.getItem('bx-theme')==='light'&&!/[?&]theme=dark/.test(q))}catch(e){}if(!light){var d=document.documentElement;d.style.background='#0f1114';d.style.colorScheme='dark'}})()</script>
-    <script type="module" crossorigin src="/assets/index-Bn3SmG8w.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BA_AvTuy.css">
+    <script type="module" crossorigin src="/assets/index-CCYyXckb.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CikB1xnj.css">
   </head>
   <body style="margin:0">
     <div id="root"></div>

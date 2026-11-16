@@ -136,7 +136,15 @@ function rampAt(t, dark = false) {
 }
 const lastIdx = arr => { for (let i = arr.length - 1; i >= 0; i--) if (arr[i]) return i; return -1 }
 const shortDay = iso => (iso ? new Date(`${iso}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '—')
-const monthName = id => (id ? new Date(`${id}-01T00:00:00`).toLocaleString('en-GB', { month: 'long', year: 'numeric' }) : '—')
+// a month's name is worked out once and kept (v88): toLocaleString builds a date formatter on every call, and the two
+// month selects called it for every month on every render — 25–40 ms of each tap on a phone (CPU 4x)
+const MONTH_FMT = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric' })
+const monthNames = new Map()
+const monthName = id => {
+  if (!id) return '—'
+  if (!monthNames.has(id)) monthNames.set(id, MONTH_FMT.format(new Date(`${id}-01T00:00:00`)))
+  return monthNames.get(id)
+}
 // a monthly period's name: the month, or April to it
 const spanName = (per, id) => {
   if (!id) return '—'
@@ -1144,7 +1152,8 @@ export default function CoalMap() {
   // THE RAIL SCROLLS ITSELF on a desktop (website.css v78), so a new selection opens at its top, not
   // wherever the reader left the last one
   const railBox = useRef(null)
-  useEffect(() => { railBox.current?.scrollTo?.({ top: 0 }) }, [selView?.kind, selView?.id])
+  // (only where it scrolls itself: on a phone the panel is part of the page, and scrollTo forced a layout of it per tap)
+  useEffect(() => { if (window.matchMedia?.('(min-width: 1021px)').matches) railBox.current?.scrollTo?.({ top: 0 }) }, [selView?.kind, selView?.id])
   const selStateView =selView?.kind === 'state' ? selView.id : selView?.kind === 'plant' ? plantsById.get(selView.id)?.state : null
   const plants = useMemo(() => {
     if (!SHOW_PLANT_DOTS || !data || !layers.plants || !month) return []

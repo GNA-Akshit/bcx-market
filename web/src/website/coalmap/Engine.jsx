@@ -30,6 +30,18 @@ const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').ma
 // for the selected mine only; every marker gets a finger-sized target (website.css).
 const touch = () => !!window.matchMedia?.('(pointer: coarse)').matches
 const esc = s => String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+// A LABEL'S WIDTH, MEASURED AS TEXT (v88): the label's own font (read once, from the first label) on a canvas, plus its
+// 6 px padding each side — what offsetWidth gave, without asking the page for a layout. The font is read again once
+// the web fonts have loaded, so names measured against a fallback are not kept.
+let labelCtx = null, labelFont = null
+if (typeof document !== 'undefined') document.fonts?.ready?.then(() => { labelFont = null })
+function labelWidth(el) {
+  if (!el) return 60
+  if (!labelCtx) labelCtx = document.createElement('canvas').getContext('2d')
+  if (!labelFont) { const cs = getComputedStyle(el); labelFont = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}` }
+  labelCtx.font = labelFont
+  return Math.ceil(labelCtx.measureText(el.textContent || '').width) + 12
+}
 // a fit's margins — `inset` more at the foot where something covers the map there (the phone's sheet, 10 Nov'26)
 let inset = 0
 const fitPad = (p = 28) => ({ paddingTopLeft: [p, p], paddingBottomRight: [p, p + inset] })
@@ -693,11 +705,11 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       for (const c of cands) c.v.marker.getElement()?.classList.add('no-label')
       return
     }
-    // READ every unmeasured name's width first, THEN write: interleaving offsetWidth reads
-    // with class writes forced a layout per name on every zoom step. A name's width never
-    // changes, so it is measured once and kept.
+    // A name's width never changes, so it is measured once and kept — and measured as TEXT (a canvas's measureText at
+    // the label's font), never offsetWidth: reading the box forced a layout of the page for every new marker (v88: on a
+    // phone 50–70 ms of each tap, _cm_phone_prof_v88.py)
     for (const c of cands) {
-      if (c.v.w == null) c.v.w = c.v.marker.getElement()?.querySelector('.cm-label')?.offsetWidth || 60
+      if (c.v.w == null) c.v.w = labelWidth(c.v.marker.getElement()?.querySelector('.cm-label'))
     }
     cands.sort((a, b) => isSel(b) - isSel(a) || b.size - a.size)
     const H = 18, taken = []
@@ -738,6 +750,9 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
     const z = zAt ?? m.getZoom()
     const motion = !reduced()
     const all = live.current.mines
+    // a set chosen (some mines dimmed): a class, not `.cm-map:has(.cm-mk.is-dim)` — a :has() over the markers was
+    // re-tested on every marker's class change
+    m.getContainer().classList.toggle('has-pick', all.some(p => p.dim))
     const allPts = all.map(p => { const xy = m.project([p.lat, p.lon], z); return { ...p, x: xy.x, y: xy.y, flag: !!p.flagship, px: minePx(p, z) } })
     // A CLICKED CLUSTER OPENS ALONE. After a cluster click, only the mines of the clusters
     // clicked are regrouped for the new zoom; every other cluster is drawn as it stood when the
@@ -779,10 +794,11 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       const firstMember = [...v.members][0]
       const dest = shown.find(g => g.members.some(p => p.id === firstMember))
       const node = v.marker.getElement()?.firstElementChild
-      if (node && motion && dest) {
+      if (node?.animate && motion && dest) {
+        // (the Web Animations API with the numbers written in: the GPU runs it — a CSS keyframe built on var() did not)
         const a = m.latLngToLayerPoint(v.latlng), b = m.latLngToLayerPoint(at(dest))
-        node.style.setProperty('--tx', `${b.x - a.x}px`); node.style.setProperty('--ty', `${b.y - a.y}px`)
-        node.classList.add('cm-out')
+        node.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translate(${b.x - a.x}px, ${b.y - a.y}px) scale(.6)` }],
+          { duration: 190, easing: 'ease-in', fill: 'forwards' })
         setTimeout(() => v.marker.remove(), 200)
       } else v.marker.remove()
       mineLive.current.delete(id)
@@ -806,12 +822,23 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       const sts = new Set(g.members.map(p => p.st))
       const out = !!selState && !sts.has(selState)
       const h = mineHtml(g, z)
-      // a picked disc changes size across the zoom regimes: its marker is made again at the new size — and slides and
-      // grows there from the old one, never fading in afresh (resized)
-      let resized = null
-      if (was && was.size !== h.size) { resized = { from: was.latlng, k: was.size / h.size }; was.marker.remove(); mineLive.current.delete(g.id); was = null }
       if (was) {
-        if (!was.latlng.equals(ll)) slide(was.marker.getElement()?.firstElementChild, was.latlng, ll)
+        // A DISC THAT CHANGES SIZE IS RESIZED WHERE IT STANDS (v88, 16 Nov'26, "still super laggy on the phone"). A picked
+        // disc changes size at each zoom regime, and its marker used to be thrown away and made again — every ring's
+        // entrance and fill replayed after a zoom, and on a phone that was most of the lag (_cm_phone_prof_v88.py: style
+        // recalculation 600–830 ms a tap at CPU 4x). Now its box and ring take the new size and it grows into it.
+        let k = 1
+        if (was.size !== h.size) {
+          const el = was.marker.getElement(), s = h.size
+          if (el) { el.style.width = el.style.height = `${s}px`; el.style.marginLeft = el.style.marginTop = `${-s / 2}px` }
+          el?.querySelector('.cm-f')?.style.setProperty('--s', `${s}px`)
+          const c = el?.querySelector('.cm-c')
+          if (c) { c.style.width = c.style.height = `${s}px` }
+          Object.assign(was.marker.options.icon.options, { iconSize: [s, s], iconAnchor: [s / 2, s / 2] })
+          if (g.members.length === 1 && g.members[0].flagship) was.marker.setZIndexOffset(200 + s)
+          k = was.size / s; was.size = s
+        }
+        if (!was.latlng.equals(ll) || k !== 1) slide(was.marker.getElement()?.firstElementChild, was.latlng, ll, k)
         was.marker.setLatLng(ll); was.latlng = ll; was.sts = sts
         const el = was.marker.getElement()
         el?.classList.toggle('is-sel', isSel); el?.classList.toggle('is-dim', g.members.every(p => p.dim)); el?.classList.toggle('is-out', out)
@@ -825,7 +852,7 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       const dim = g.members.every(p => p.dim)
       const icon = L.divIcon({
         className: `cm-mk cm-mine${kind}${isSel ? ' is-sel' : ''}${dim ? ' is-dim' : ''}${out ? ' is-out' : ''}`, iconSize: [h.size, h.size], iconAnchor: [h.size / 2, h.size / 2],
-        html: `<span class="cm-in${resized && motion && ms ? ' cm-kept' : ''}" style="--fx:${fx}px;--fy:${fy}px">${h.body}</span>`,
+        html: `<span class="cm-in">${h.body}</span>`,
       })
       const mk = L.marker(ll, { icon, keyboard: true, alt: g.members.length > 1 ? `${g.members.length} mines` : g.members[0].name,
         zIndexOffset: g.members.length > 1 ? 300 : g.members[0].flagship ? 200 + h.size : 0, bubblingMouseEvents: false })
@@ -883,7 +910,13 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       }, () => live.current.onHover?.(null), 120, 90)
       if (!touch()) { mk.on('mouseover', () => { L_.current.unlight?.(); hov.in() }); mk.on('mouseout', hov.out) }
       mk.addTo(m)
-      if (resized) slide(mk.getElement()?.firstElementChild, resized.from, ll, resized.k)
+      // it arrives from where its mines stood (a cluster opening flies its mines out of it) — the Web Animations API with
+      // the numbers written in, so the GPU runs it (the CSS keyframe built on var(--fx) ran on the main thread)
+      const inner = mk.getElement()?.firstElementChild
+      if (motion && inner?.animate) {
+        inner.animate([{ opacity: 0, transform: `translate(${fx}px, ${fy}px) scale(.6)` }, { opacity: 1, transform: 'none' }],
+          { duration: 500, easing: 'cubic-bezier(.22, 1, .36, 1)' })
+      }
       mineLive.current.set(g.id, { marker: mk, members: new Set(g.members.map(p => p.id)), latlng: ll, size: h.size, sts })
     }
     last.current = { groups, z }
@@ -1007,7 +1040,13 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
   }
 
   useEffect(() => { drawPlants() }, [plants]) // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { drawMines() }, [mines]) // eslint-disable-line react-hooks/exhaustive-deps
+  // A NEW LIST IS DRAWN THE FRAME AFTER (v88): React runs a tap's effects inside the tap itself, so choosing Super 35
+  // laid out and drew every mine before the button could show it was pressed (~100 ms on a phone, CPU 4x)
+  useEffect(() => {
+    let t = 0
+    const r = requestAnimationFrame(() => { t = setTimeout(drawMines, 0) })
+    return () => { cancelAnimationFrame(r); clearTimeout(t) }
+  }, [mines]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { drawCompanies() }, [companies]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return <div ref={el} className="cm-map" role="application" aria-label="Map of India's coal: thermal plants, mines and coal companies" />

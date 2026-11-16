@@ -1539,10 +1539,9 @@ a.bx-kpi:hover .go { color: var(--brand); }
 .cm-plant.is-sel .cm-p::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--brand); animation: cm-ping 1.8s var(--cm-ease) infinite; }
 @keyframes cm-ping { from { opacity: .8; transform: scale(.8); } to { opacity: 0; transform: scale(1.8); } }
 
-.cm-mine .cm-in { display: grid; place-items: center; width: 100%; height: 100%; animation: cm-from .5s var(--cm-ease) backwards; }
-@keyframes cm-from { from { opacity: 0; transform: translate(var(--fx, 0), var(--fy, 0)) scale(.6); } }
-.cm-mine .cm-in.cm-out { animation: cm-to .19s ease-in forwards; }
-@keyframes cm-to { to { opacity: 0; transform: translate(var(--tx, 0), var(--ty, 0)) scale(.6); } }
+/* a mine's arrival (from where its cluster stood) and its exit are the Web Animations API in Engine.drawMines (v88): a
+   CSS keyframe built on var(--fx) ran on the main thread, a style recalculation per marker per frame */
+.cm-mine .cm-in { display: grid; place-items: center; width: 100%; height: 100%; }
 .cm-mine .cm-label { left: calc(100% + 5px); }
 .cm-c { display: grid; place-content: center; text-align: center; border-radius: 50%; color: #fff; cursor: pointer;
   background: rgba(46, 76, 112, .92); box-shadow: 0 0 0 2px rgba(255, 255, 255, .95), 0 6px 14px -6px rgba(16, 24, 40, .5); transition: scale .2s var(--cm-ease); }
@@ -1552,6 +1551,9 @@ a.bx-kpi:hover .go { color: var(--brand); }
   background: conic-gradient(var(--c) calc(var(--p) * 1%), rgba(27, 58, 99, .14) 0); box-shadow: 0 0 0 1.5px #fff, 0 4px 10px -4px rgba(16, 24, 40, .4);
   animation: cm-ringfill 1.1s var(--cm-ease) .25s backwards; transition: scale .2s var(--cm-ease); }
 @keyframes cm-ringfill { from { --p: 0; } }
+/* ON A PHONE A RING FILLS ONCE, WHEN THE MAP FIRST DRAWS (v88): --p is a custom property, so the fill is a style
+   recalculation and a repaint of every ring on every frame — 35 to 75 rings after each tap was most of the phone's lag */
+@media (pointer: coarse) { .cm-map:not(.intro) .cm-f { animation: none; } }
 .cm-f i { width: calc(var(--s) - 7px); height: calc(var(--s) - 7px); border-radius: 50%; background: #fff; }
 .cm-flag.is-sel .cm-f { box-shadow: 0 0 0 2px #fff, 0 0 0 4.5px var(--navy); }
 .cm-f.b-met, .cm-ring.b-met, .cm-co.b-met { --c: #12875e; }
@@ -4412,28 +4414,30 @@ a.bx-credit.on-dark:hover { background: none; color: #fff; text-decoration: unde
 @media (max-width: 1280px) { .cm-bar .cm-select.set, .cm-bar .cm-select.what { width: 190px; } }
 .cm-mk.is-dim { opacity: .28; filter: saturate(.2); transition: opacity .35s var(--cm-ease), filter .35s var(--cm-ease); z-index: 0 !important; }
 .cm-mk.is-dim .cm-label { display: none; }
-.cm-map:has(.cm-mk.is-dim) .cm-flag:not(.is-dim) .cm-f { box-shadow: 0 0 0 2px #fff, 0 4px 14px -3px rgba(16, 24, 40, .45); }
+.cm-map.has-pick .cm-flag:not(.is-dim) .cm-f { box-shadow: 0 0 0 2px #fff, 0 4px 14px -3px rgba(16, 24, 40, .45); }
 @media (hover: hover) { .cm-mk.is-dim:hover { opacity: .75; filter: none; } }
 /* A CHOSEN MINE STANDS OUT, AND NOTHING MOVES (16 Nov'26, the user: its name "gets hidden under other mines"; "the
    mine we select has the same colour and the other mines become a little dull"). It is lifted above every ring, its
    name with it, and keeps its colour even outside a chosen set; the others go quiet. A chosen STATE lights only its
    own mines: the rest are .is-out. Opacity and colour only, on .cm-in — Leaflet owns the marker's own transform. */
-.cm-mine > .cm-in { transition: opacity .3s var(--cm-ease), filter .3s var(--cm-ease); }
-/* a ring re-made at a new size (a zoom regime crossed) slides and grows from the old one (Engine slide), not in afresh */
-.cm-mine .cm-in.cm-kept:not(.cm-out) { animation: none; }
+/* (opacity only — a filter on every quiet marker was a repaint of each one; v88) */
+.cm-mine > .cm-in { transition: opacity .3s var(--cm-ease); }
 .cm-map .cm-mk.cm-mine.is-sel { z-index: 100000 !important; opacity: 1; filter: none; }
 .cm-map .cm-mk.cm-mine.is-sel .cm-label { display: block; opacity: 1; }
-.cm-map.has-msel .cm-mk.cm-mine:not(.is-sel):not(.is-dim):not(.is-out) > .cm-in { opacity: .4; filter: saturate(.3); }
+.cm-map.has-msel .cm-mk.cm-mine:not(.is-sel):not(.is-dim):not(.is-out) > .cm-in { opacity: .38; }
 .cm-map.has-msel .cm-mk.cm-mine:not(.is-sel) .cm-label { opacity: 0; }
 .cm-mk.cm-mine.is-out { z-index: 0 !important; }
-.cm-mk.cm-mine.is-out > .cm-in { opacity: .16; filter: saturate(0); }
+.cm-mk.cm-mine.is-out > .cm-in { opacity: .15; }
 .cm-mk.cm-mine.is-out .cm-label { display: none; }
+/* a phone dims a mine outside a chosen set by opacity alone: saturate() on each of up to a few hundred markers was a
+   repaint of every one whenever the map moved or a set was chosen (v88) */
+@media (pointer: coarse) { .cm-mk.is-dim, .bx.dk .cm-mk.is-dim, .dk .cm-mk.is-dim { filter: none; opacity: .24; } }
 /* the spokes (a spread ring back to its own place) are one path for all of them: with a state or a mine chosen they
    step back with the rings they belong to */
 .cm-spoke, .cm-hub { transition: opacity .3s var(--cm-ease); }
 .cm-map.has-sel .cm-spoke, .cm-map.has-sel .cm-hub, .cm-map.has-msel .cm-spoke, .cm-map.has-msel .cm-hub { opacity: .3; }
 @media (hover: hover) {
-  .cm-map.has-msel .cm-mk.cm-mine:not(.is-sel):hover > .cm-in, .cm-mk.cm-mine.is-out:hover > .cm-in { opacity: .85; filter: none; }
+  .cm-map.has-msel .cm-mk.cm-mine:not(.is-sel):hover > .cm-in, .cm-mk.cm-mine.is-out:hover > .cm-in { opacity: .85; }
   .cm-map.has-msel .cm-mk.cm-mine:not(.is-sel):hover .cm-label { opacity: 1; }
 }
 /* THE OUTLINES. Every state border is one hairline at ONE width whatever the zoom (vector-effect: Leaflet

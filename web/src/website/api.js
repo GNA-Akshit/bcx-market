@@ -3,6 +3,7 @@
 //   /api/website/issues  — the newsletter archive (libs/website/archive.py)
 import { useCallback, useEffect, useState } from 'react'
 import { here } from './route.js'
+import { NEWSLETTER } from './flags.js'
 
 // STALE-WHILE-REVALIDATE (2 Nov'26). A return visit used to wait on a ~1 MB payload before showing a
 // single figure. The last good answer of each endpoint is now kept in the browser's Cache Storage:
@@ -51,9 +52,11 @@ export function fetchJson(url, refresh = false) {
  *  idle), so the page it opens draws at once instead of starting its request on arrival. */
 export const prefetchJson = url => { fetchJson(url).catch(() => {}) }
 
+// (no url: nothing is asked for — a payload the page does not show)
 function useJson(url) {
-  const [state, setState] = useState({ data: null, error: null, loading: true, stale: false })
+  const [state, setState] = useState({ data: null, error: null, loading: !!url, stale: false })
   const load = useCallback(async (refresh = false) => {
+    if (!url) return
     setState(s => ({ ...s, loading: true }))
     try {
       const body = await fetchJson(url, refresh)
@@ -63,6 +66,7 @@ function useJson(url) {
     }
   }, [url])
   useEffect(() => {
+    if (!url) return undefined
     let live = true
     // the cached answer only fills an EMPTY page: it never overwrites a fresh one that won the race
     cacheRead(url).then(body => { if (live && body) setState(s => (s.data ? s : { ...s, data: body, stale: true })) })
@@ -76,7 +80,9 @@ export const useMarket = () => useJson(apiUrl('/api/website/market'))
 //   /api/website/coalmap — the coal map: CEA's plants (monthly + the last week of daily), the
 //                          mine layer and the coal companies (libs/website/coalmap.py)
 export const useCoalmap = () => useJson(apiUrl('/api/website/coalmap'))
-export const useIssues = () => useJson(apiUrl('/api/website/issues'))
+// the newsletter's issue list is asked for only where the newsletter is shown (flags.NEWSLETTER): every visit to
+// bcx.market fetched it and showed none of it — one request a visitor saved in a crowd (v88)
+export const useIssues = () => useJson(NEWSLETTER ? apiUrl('/api/website/issues') : null)
 
 export const issueUrl = (edition, date) => apiUrl(`/api/website/issues/${edition}/${date}`)
 
