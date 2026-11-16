@@ -94,6 +94,8 @@ function parse(hash = addressNow()) {
   if (p[0] === 'exchange') return { view: 'home', section: 'coverage' }     // the section it replaced
   if (p[0] === 'legal') return { view: 'legal', section: p[1] || null }
   if (p[0] === 'news') return { view: 'news' }               // was a home section; now its own page
+  // the Sources module is OFF (16 Nov'26): its address opens the Overview, and the effect below puts that in the bar
+  if (p[0] === 'insights' && p[1] === 'sources') return { view: 'insights', section: null, retired: '#/insights' }
   // section = the module; item = what in it to open (#/insights/stocks/<company>, 27 Oct'26)
   if (p[0] === 'insights') return { view: 'insights', section: p[1] || null, item: p[2] ? decodeURIComponent(p[2]) : null }
   // RESEARCH & REPORTS IS OFF (26 Oct'26, management's call — Research.jsx is kept, unrouted): its
@@ -101,7 +103,8 @@ function parse(hash = addressNow()) {
   if (p[0] === 'research') return { view: 'letter', date: null, retired: '#/newsletter' }
   // Sources is a Market Insights module now (26 Oct'26): the old address opens it and the
   // effect below puts the new one in the bar
-  if (p[0] === 'resources') return { view: 'insights', section: 'sources', retired: '#/insights/sources' }
+  // …and the Sources module is OFF too (16 Nov'26): the old address opens Market Insights' Overview
+  if (p[0] === 'resources') return { view: 'insights', section: null, retired: '#/insights' }
   return { view: 'home', section: p[0] || null }
 }
 
@@ -453,7 +456,7 @@ export default function Website() {
         <HomeMain key="home" data={data} by={by} issueList={issueList} goSection={goSection} openExplorer={openExplorer} openIssue={openIssue} />
       )}
       <Footer data={data} onNav={goSection} onLetters={() => openIssue(null)} onExplore={openExplorer}
-        showVisits={route.view === 'insights' && route.section === 'sources'} />
+        showVisits={route.view === 'legal'} />
       <BackToTop />
       {ret && <ReturnPill key={ret.id} ret={ret} onGone={clearRet} />}
       {/* light / dark, the visitor's choice (5 Nov'26, pass 62): a pill in the bottom-left corner */}

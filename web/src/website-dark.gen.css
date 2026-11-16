@@ -1717,6 +1717,7 @@
 .dk .bx-chart .bref.acc line { stroke: var(--brand); }
 .dk .bx-chart .bref.acc text { fill: var(--brand-ink); }
 .dk .bx-chart:has(.bref.acc) text.blab { stroke: var(--card, #171a1f); }
+.bx.dk .bx-in-more:empty, .bx.dk.dk .bx-in-more:empty { border-top: 0; }
 /*  ---- from frontend/src/website-bands.css  */
 .bx.dk.nb .bx-band {
   --lip: 40px;

@@ -4843,3 +4843,7 @@ html { touch-action: manipulation; }
 .bx-chart .bref.acc text { fill: var(--brand-ink); }
 /* …and where it runs behind a bar's figure the figure keeps a halo of the card's colour, so the line breaks round it */
 .bx-chart:has(.bref.acc) text.blab { paint-order: stroke; stroke: var(--card, #fff); stroke-width: 4px; stroke-linejoin: round; }
+
+/* 16 Nov'26 — the Sources module is off, so a module's foot has no link left (the data centre's is off too): the
+   empty foot keeps its place for the phone's period dock (PeriodDock's end marker) but draws no rule and no space */
+.bx .bx-in-more:empty, .bx.dk .bx-in-more:empty { min-height: 1px; margin-top: 0; padding-top: 0; border-top: 0; }

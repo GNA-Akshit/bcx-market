@@ -174,7 +174,6 @@ export function Footer({ data, onNav, onLetters, onExplore, showVisits = false }
               <li><a href="#/insights">Market Insights</a></li>
               {DATA_CENTRE && <li><button className="lnk" onClick={() => onExplore()}>Data centre</button></li>}
               {NEWSLETTER && <li><button className="lnk" onClick={onLetters}>Newsletter</button></li>}
-              <li><a href="#/insights/sources">Sources</a></li>
               <li><button className="lnk" onClick={() => onNav('chain')}>Mine to plant</button></li>
               {/* FOUR COLUMNS, NOT FIVE (27 Oct'26): with BCX's register hidden the Regulations column
                   held one link, so the link moved here; the column comes back with the register */}

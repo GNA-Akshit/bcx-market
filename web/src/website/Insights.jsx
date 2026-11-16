@@ -66,7 +66,9 @@ export const MODULES = [
   ['sources', 'Sources'],
 ]
 // switched OFF for now (22 Oct'26, the user's call) — the code stays; its address opens Overview
-const HIDDEN = new Set(['prices'])
+// SOURCES IS OFF TOO (16 Nov'26, the user: "I am being told to remove the sources tab") — Sources.jsx is kept; its
+// addresses open the Overview (Website.parse), and the visit total it carried shows on Regulations instead
+const HIDDEN = new Set(['prices', 'sources'])
 export const SHOWN_MODULES = MODULES.filter(([k]) => !HIDDEN.has(k))
 // SWITCHED OFF, CODE KEPT (23 Oct'26, the user's call — "baad me kya pata use aaye"): one line
 // each turns them back on
@@ -2112,14 +2114,13 @@ export default function Insights({ data, module, item = null }) {
         {mod === 'map'
           ? <Suspense fallback={<><Head title="India coal map" meta="Loading the plants, the mines and the coal companies…" /><div className="cm-loading"><i /><i /><i /></div></>}><CoalMap /></Suspense>
           : <View data={data} by={by} basis={basis} setBasis={setBasis} item={item} />}
-        {mod !== 'sources' && (
-          <div className="wrap">
-            <div className="bx-in-more">
-              {DATA_CENTRE &&<a href="#/explorer">Every series, with its full history <ArrowRight /></a>}
-              <a href="#/insights/sources">Where the figures come from <ArrowRight /></a>
-            </div>
+        {/* the module's foot — also the phone's period dock's end marker (PeriodDock), so it stays when empty; its
+            "Where the figures come from" link went with the Sources module (16 Nov'26) */}
+        <div className="wrap">
+          <div className="bx-in-more">
+            {DATA_CENTRE &&<a href="#/explorer">Every series, with its full history <ArrowRight /></a>}
           </div>
-        )}
+        </div>
       </div>
     </div>
     {phone && <Sheet open={figOpen} onClose={() => setFigOpen(false)} label={fig?.label || 'Figure'}>{fig && <KpiDetail fig={fig} />}</Sheet>}
