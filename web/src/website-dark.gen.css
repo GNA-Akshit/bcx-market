@@ -1622,6 +1622,12 @@
 .dk .cm-mk.is-dim { filter: saturate(.2); }
 .dk .cm-map:has(.cm-mk.is-dim) .cm-flag:not(.is-dim) .cm-f { box-shadow: 0 0 0 2px #171a1f, 0 4px 14px -3px rgba(0, 0, 0, 0.8); }
 @media (hover: hover) { .dk .cm-mk.is-dim:hover { filter: none; } }
+.dk .cm-map .cm-mk.cm-mine.is-sel { filter: none; }
+.dk .cm-map.has-msel .cm-mk.cm-mine:not(.is-sel):not(.is-dim):not(.is-out) > .cm-in { filter: saturate(.3); }
+.dk .cm-mk.cm-mine.is-out > .cm-in { filter: saturate(0); }
+@media (hover: hover) {
+  .dk .cm-map.has-msel .cm-mk.cm-mine:not(.is-sel):hover > .cm-in, .dk .cm-mk.cm-mine.is-out:hover > .cm-in { filter: none; }
+}
 @media (min-width: 1141px) {
   .dk .cm-module:has(.cm-br) { --cm-bar: 108px; }
 }

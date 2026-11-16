@@ -479,16 +479,33 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       // glides in by 1.5 levels, centred on it in the clear part of the stage (`top` / `bottom`: what the crumb and the
       // phone's card cover). Already zoomed in, it does not zoom again: it only glides over when the point is near an
       // edge or under the card — a reader who chose their zoom keeps it.
-      focus: (lat, lon, { top = 0, bottom = 0 } = {}) => {
+      // A CHOSEN MINE ARRIVES IN THE MIDDLE IN ONE MOVE (16 Nov'26, the user: "after the zoom all the mines readjust so we
+      // lose the track of exactly which mine we clicked"; "when I click one all the ones shuffle, it looks so goofy").
+      // A wide view spreads the rings clear of each other, and the zoom gives them room again — so they WILL take new
+      // places. They used to take them twice: once when the mine was chosen, and again, all at once, when the zoom
+      // landed, the chosen ring jumping away from the middle. Now the rings are laid out ONCE, for the zoom the glide
+      // lands at, before it starts; each slides from where it stands to that place over the glide itself (drawMines'
+      // `ms`), and the glide centres the chosen ring's NEW place — so it travels to the middle with the camera and stays.
+      // When the zoom lands, nothing is left to move. `mine`: the chosen mine's id.
+      focus: (lat, lon, { top = 0, bottom = 0, mine = null } = {}) => {
         const z = m.getZoom(), india = indiaView().zoom, size = m.getSize()
+        const v = mine ? [...mineLive.current.values()].find(x => x.members.size === 1 && x.members.has(mine)) : null
+        let ll = v ? v.latlng : L.latLng(lat, lon)
         const zoomed = z < india + 1.2
         const target = zoomed ? Math.min(m.getMaxZoom(), z + 1.5) : z
         if (!zoomed) {
-          const pt = m.latLngToContainerPoint([lat, lon])
+          const pt = m.latLngToContainerPoint(ll)
           const comfy = pt.x > size.x * 0.15 && pt.x < size.x * 0.85 && pt.y > top + 24 && pt.y < size.y - bottom - 24
           if (comfy) return
         }
-        const c = m.unproject(m.project([lat, lon], target).add([0, (bottom - top) / 2]), target)
+        if (mine && Math.abs(target - z) > 0.01) {
+          // this zoom lets go of a clicked cluster (as zoomstart would) — so the layout drawn now is the one it lands on
+          openRef.current = null
+          if (drill.current.length) { drill.current = []; live.current.onDrill?.([]) }
+          const g = drawMines(target, reduced() ? 0 : 600)?.find(x => x.members.length === 1 && x.members[0].id === mine)
+          if (g) ll = m.unproject([g.x, g.y], target)
+        }
+        const c = m.unproject(m.project(ll, target).add([0, (bottom - top) / 2]), target)
         atIndia.current = false
         glideTo(c, target, 600)
       },
@@ -543,7 +560,15 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       // (.cm-sel, CSS), and is never traced again.
     }
     for (const [id, v] of plantMk.current) v.marker.getElement()?.classList.toggle('is-sel', selected?.kind === 'plant' && selected.id === id)
-    for (const [, v] of mineLive.current) v.marker.getElement()?.classList.toggle('is-sel', selected?.kind === 'mine' && v.members.size === 1 && v.members.has(selected.id))
+    // A CHOSEN MINE STANDS OUT, AND NOTHING MOVES (16 Nov'26): it is lifted above every other ring (its name with it —
+    // the name was hidden under its neighbours) and the rest go quiet (.has-msel); a chosen STATE lights only its own
+    // mines (.is-out on the rest). Classes only: no ring changes its place for a choice.
+    m.getContainer().classList.toggle('has-msel', selected?.kind === 'mine')
+    for (const [, v] of mineLive.current) {
+      const el = v.marker.getElement()
+      el?.classList.toggle('is-sel', selected?.kind === 'mine' && v.members.size === 1 && v.members.has(selected.id))
+      el?.classList.toggle('is-out', !!selState && !v.sts.has(selState))
+    }
     for (const [id, v] of coMk.current) v.marker.getElement()?.classList.toggle('is-sel', selected?.kind === 'company' && selected.id === id)
     placeLabels()
     drawHull()
@@ -705,10 +730,12 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
   }
 
   // ------------------------------------------------------------------ coal mines (clusters)
-  function drawMines() {
+  // `zAt`: lay the rings out for that zoom instead of the map's own — api.focus, for the zoom its glide lands at;
+  // `ms`: how long a ring slides to its new place (a glide's length). Returns the groups as laid out.
+  function drawMines(zAt = null, ms = 420) {
     const m = map.current
-    if (!m) return
-    const z = m.getZoom()
+    if (!m) return null
+    const z = zAt ?? m.getZoom()
     const motion = !reduced()
     const all = live.current.mines
     const allPts = all.map(p => { const xy = m.project([p.lat, p.lon], z); return { ...p, x: xy.x, y: xy.y, flag: !!p.flagship, px: minePx(p, z) } })
@@ -732,6 +759,7 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       }
     }
     relax(groups.map(g => Object.assign(g, { r: (g.members.length > 1 ? groupSize(g.members.length) : g.members[0].px) / 2 })))
+    const selState = live.current.selected?.kind === 'state' ? live.current.selected.id : null
     const at = g => m.unproject([g.x, g.y], z)
     const before = new Map()
     for (const [, v] of mineLive.current) for (const id of v.members) before.set(id, v.latlng)
@@ -740,7 +768,8 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
     // markers with their own animations for the 40 on screen. The groups are still worked out for ALL mines
     // (so a cluster never changes as the map pans); only those within the view and a margin get a marker,
     // and a pan redraws (moveend, below).
-    const pb = m.getPixelBounds(), sz = pb.getSize()
+    // (the view as it stands, at the zoom laid out for: for api.focus that holds all a zoom IN can show)
+    const vb = m.getBounds(), pb = L.bounds(m.project(vb.getNorthWest(), z), m.project(vb.getSouthEast(), z)), sz = pb.getSize()
     const mx = sz.x * 0.2 + 40, my = sz.y * 0.2 + 40          // a short pan never shows an empty edge
     const inView = g => g.x > pb.min.x - mx && g.x < pb.max.x + mx && g.y > pb.min.y - my && g.y < pb.max.y + my
     const shown = groups.filter(inView)
@@ -759,17 +788,33 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       mineLive.current.delete(id)
     }
     const sel = live.current.selected
+    // A MARKER THAT MOVES SLIDES THERE (16 Nov'26): a ring that takes a new place used to jump to it. Leaflet places the
+    // outer element; the inner one is animated from where it stood (`from`, at the map's zoom now) to none, scaled from
+    // its old size when that changed — the Web Animations API, no reflow per marker. Over a glide (api.focus) the slide
+    // takes the glide's length and easing, so the rings and the camera arrive together.
+    const slide = (node, from, ll, k = 1) => {
+      if (!motion || !ms || !node?.animate) return
+      const a = m.latLngToLayerPoint(from), b = m.latLngToLayerPoint(ll), dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy)
+      if ((d < 0.5 && k === 1) || d > 420) return
+      node.animate([{ transform: `translate(${dx}px, ${dy}px) scale(${k})` }, { transform: 'translate(0, 0) scale(1)' }],
+        { duration: ms, easing: ms === 420 ? 'cubic-bezier(.22, 1, .36, 1)' : 'cubic-bezier(.65, 0, .35, 1)' })
+    }
     for (const g of shown) {
       const ll = at(g)
       let was = mineLive.current.get(g.id)
       const isSel = sel?.kind === 'mine' && g.members.length === 1 && g.members[0].id === sel.id
+      const sts = new Set(g.members.map(p => p.st))
+      const out = !!selState && !sts.has(selState)
       const h = mineHtml(g, z)
-      // a picked disc changes size across the zoom regimes: its marker is made again at the new size
-      if (was && was.size !== h.size) { was.marker.remove(); mineLive.current.delete(g.id); was = null }
+      // a picked disc changes size across the zoom regimes: its marker is made again at the new size — and slides and
+      // grows there from the old one, never fading in afresh (resized)
+      let resized = null
+      if (was && was.size !== h.size) { resized = { from: was.latlng, k: was.size / h.size }; was.marker.remove(); mineLive.current.delete(g.id); was = null }
       if (was) {
-        was.marker.setLatLng(ll); was.latlng = ll
+        if (!was.latlng.equals(ll)) slide(was.marker.getElement()?.firstElementChild, was.latlng, ll)
+        was.marker.setLatLng(ll); was.latlng = ll; was.sts = sts
         const el = was.marker.getElement()
-        el?.classList.toggle('is-sel', isSel); el?.classList.toggle('is-dim', g.members.every(p => p.dim))
+        el?.classList.toggle('is-sel', isSel); el?.classList.toggle('is-dim', g.members.every(p => p.dim)); el?.classList.toggle('is-out', out)
         continue
       }
       const from = before.get(g.members[0].id)
@@ -779,8 +824,8 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       // a mine outside the chosen set is dimmed; a group is dimmed only when every member is
       const dim = g.members.every(p => p.dim)
       const icon = L.divIcon({
-        className: `cm-mk cm-mine${kind}${isSel ? ' is-sel' : ''}${dim ? ' is-dim' : ''}`, iconSize: [h.size, h.size], iconAnchor: [h.size / 2, h.size / 2],
-        html: `<span class="cm-in" style="--fx:${fx}px;--fy:${fy}px">${h.body}</span>`,
+        className: `cm-mk cm-mine${kind}${isSel ? ' is-sel' : ''}${dim ? ' is-dim' : ''}${out ? ' is-out' : ''}`, iconSize: [h.size, h.size], iconAnchor: [h.size / 2, h.size / 2],
+        html: `<span class="cm-in${resized && motion && ms ? ' cm-kept' : ''}" style="--fx:${fx}px;--fy:${fy}px">${h.body}</span>`,
       })
       const mk = L.marker(ll, { icon, keyboard: true, alt: g.members.length > 1 ? `${g.members.length} mines` : g.members[0].name,
         zIndexOffset: g.members.length > 1 ? 300 : g.members[0].flagship ? 200 + h.size : 0, bubblingMouseEvents: false })
@@ -838,7 +883,8 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       }, () => live.current.onHover?.(null), 120, 90)
       if (!touch()) { mk.on('mouseover', () => { L_.current.unlight?.(); hov.in() }); mk.on('mouseout', hov.out) }
       mk.addTo(m)
-      mineLive.current.set(g.id, { marker: mk, members: new Set(g.members.map(p => p.id)), latlng: ll, size: h.size })
+      if (resized) slide(mk.getElement()?.firstElementChild, resized.from, ll, resized.k)
+      mineLive.current.set(g.id, { marker: mk, members: new Set(g.members.map(p => p.id)), latlng: ll, size: h.size, sts })
     }
     last.current = { groups, z }
     L_.current.spokes?.clearLayers()
@@ -863,6 +909,7 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       if (lines.length) L.polyline(lines, { pane: 'spokes', weight: 1, interactive: false, className: 'cm-spoke' }).addTo(L_.current.spokes)
     }
     placeLabels()
+    return groups
   }
 
   // ------------------------------------------------------------------ coal companies

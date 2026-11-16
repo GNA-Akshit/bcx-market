@@ -4414,6 +4414,28 @@ a.bx-credit.on-dark:hover { background: none; color: #fff; text-decoration: unde
 .cm-mk.is-dim .cm-label { display: none; }
 .cm-map:has(.cm-mk.is-dim) .cm-flag:not(.is-dim) .cm-f { box-shadow: 0 0 0 2px #fff, 0 4px 14px -3px rgba(16, 24, 40, .45); }
 @media (hover: hover) { .cm-mk.is-dim:hover { opacity: .75; filter: none; } }
+/* A CHOSEN MINE STANDS OUT, AND NOTHING MOVES (16 Nov'26, the user: its name "gets hidden under other mines"; "the
+   mine we select has the same colour and the other mines become a little dull"). It is lifted above every ring, its
+   name with it, and keeps its colour even outside a chosen set; the others go quiet. A chosen STATE lights only its
+   own mines: the rest are .is-out. Opacity and colour only, on .cm-in — Leaflet owns the marker's own transform. */
+.cm-mine > .cm-in { transition: opacity .3s var(--cm-ease), filter .3s var(--cm-ease); }
+/* a ring re-made at a new size (a zoom regime crossed) slides and grows from the old one (Engine slide), not in afresh */
+.cm-mine .cm-in.cm-kept:not(.cm-out) { animation: none; }
+.cm-map .cm-mk.cm-mine.is-sel { z-index: 100000 !important; opacity: 1; filter: none; }
+.cm-map .cm-mk.cm-mine.is-sel .cm-label { display: block; opacity: 1; }
+.cm-map.has-msel .cm-mk.cm-mine:not(.is-sel):not(.is-dim):not(.is-out) > .cm-in { opacity: .4; filter: saturate(.3); }
+.cm-map.has-msel .cm-mk.cm-mine:not(.is-sel) .cm-label { opacity: 0; }
+.cm-mk.cm-mine.is-out { z-index: 0 !important; }
+.cm-mk.cm-mine.is-out > .cm-in { opacity: .16; filter: saturate(0); }
+.cm-mk.cm-mine.is-out .cm-label { display: none; }
+/* the spokes (a spread ring back to its own place) are one path for all of them: with a state or a mine chosen they
+   step back with the rings they belong to */
+.cm-spoke, .cm-hub { transition: opacity .3s var(--cm-ease); }
+.cm-map.has-sel .cm-spoke, .cm-map.has-sel .cm-hub, .cm-map.has-msel .cm-spoke, .cm-map.has-msel .cm-hub { opacity: .3; }
+@media (hover: hover) {
+  .cm-map.has-msel .cm-mk.cm-mine:not(.is-sel):hover > .cm-in, .cm-mk.cm-mine.is-out:hover > .cm-in { opacity: .85; filter: none; }
+  .cm-map.has-msel .cm-mk.cm-mine:not(.is-sel):hover .cm-label { opacity: 1; }
+}
 /* THE OUTLINES. Every state border is one hairline at ONE width whatever the zoom (vector-effect: Leaflet
    scales the SVG during a flight, and a stroke scaled with it is what read as "badly formed"); the state
    under the pointer and the chosen one are drawn on their own layer above, with ROUND joins, and the

@@ -1162,11 +1162,13 @@ export default function CoalMap() {
   // and the chosen ones are PICKED: never folded into a cluster, so each stands as its own disc at every zoom
   // (11 Nov'26, "top 35 and 75 mine wala feature nahi hai": dimming alone changed nothing at India's zoom,
   // where every cluster holds a flagship mine and so none of them dimmed)
+  // `st`: the state the mine is counted in — a chosen state lights only its own mines (Engine, .is-out)
   const mines = useMemo(() => (layers.mines ? mineAll.filter(p => p.stage !== 'closed').map(p => {
-    if (mineSet === 'all') return p
+    const st = mineState.get(p.id)
+    if (mineSet === 'all') return { ...p, st }
     const pick = !!(p.flagship && (mineSet === 'super75' || p.flagship.sets.includes('Super 35')))
-    return { ...p, dim: !pick, pick }
-  }) : []), [layers.mines, mineAll, mineSet])
+    return { ...p, st, dim: !pick, pick }
+  }) : []), [layers.mines, mineAll, mineSet, mineState])
   // CHOOSING A SET SHOWS IT: the major mines are a mines view, so the mines come on and the plants make way
   // (the map describes the layer that is on — with the plants on, the states would carry the plants' figures)
   const pickSet = k => {
@@ -1562,7 +1564,8 @@ export default function CoalMap() {
     if (!sel || (sel.kind !== 'mine' && sel.kind !== 'plant')) return undefined
     const p = sel.kind === 'mine' ? minesById.get(sel.id) : plantsById.get(sel.id)
     if (!p || p.lat == null) return undefined
-    const t = setTimeout(() => api.current?.focus?.(p.lat, p.lon, keyInset ? { top: 56, bottom: 96 } : { top: 56 }), 60)
+    const mine = sel.kind === 'mine' ? sel.id : null
+    const t = setTimeout(() => api.current?.focus?.(p.lat, p.lon, keyInset ? { top: 56, bottom: 96, mine } : { top: 56, mine }), 60)
     return () => clearTimeout(t)
   }, [sel, keyInset, minesById, plantsById])
   const toDetails = () => {
