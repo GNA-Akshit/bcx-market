@@ -286,17 +286,40 @@ function Strip({ five = false, three = false, groups = null, children }) {
     if (s && !srcs.some(x => x[0] === s)) srcs.push([s, sourceUrl])
   }
   const hasOf = kids.some(k => k.props.of != null)
+  const sourceLine = srcs.length > 0 && (
+    <p className="bx-kc-srcs">Sources:{' '}
+      {srcs.map(([s, u], i) => <Fragment key={s}>{i > 0 && ' · '}{u ? <a href={u} target="_blank" rel="noopener noreferrer">{s}</a> : s}</Fragment>)}
+    </p>
+  )
+  // GROUPS ON A PHONE ARE BLOCKS (16 Nov'26, the user: "the division is not easily distinguishable there, the toggles
+  // for daily and everything are still over everything"): each group its own block under its heading — the period
+  // group's switch IN its heading, its two figures side by side under it, all in view; then a rule, and the levels'
+  // block with its own swipe row. The switch sits over exactly what it changes.
+  if (groups) {
+    const all = Children.toArray(children).filter(Boolean)
+    let at = 0
+    return (
+      <div className={`bx-kpis strip kc rail grouped-ph${n}${hasOf ? ' has-of' : ''}`}>
+        {groups.map(([c, label, cls], gi) => {
+          const part = all.slice(at, at + c)
+          at += c
+          return (
+            <section key={gi} className={`bx-kgrp-ph${cls ? ` ${cls}` : ''}`}>
+              <div className="gl">{label}</div>
+              {c <= 2 ? <div className="bx-kc-row">{part}</div> : <HRail label="Figures">{part}</HRail>}
+            </section>
+          )
+        })}
+        {sourceLine}
+      </div>
+    )
+  }
   // the phone's figures are ONE SWIPE ROW (2 Nov'26, the user's call): every figure in a line, the next
   // one peeking in, dots under it — not a two-by-three wall the reader must scroll past
   return (
-    <div className={`bx-kpis strip kc rail${n}${hasOf ? ' has-of' : ''}${groups ? ` grouped split-${groups[0][0]}` : ''}`}>
-      {groups && <p className="bx-kgl">{groups.map(([, label, cls], gi) => <span key={gi} className={cls || undefined}>{label}</span>)}</p>}
+    <div className={`bx-kpis strip kc rail${n}${hasOf ? ' has-of' : ''}`}>
       <HRail label="Figures">{children}</HRail>
-      {srcs.length > 0 && (
-        <p className="bx-kc-srcs">Sources:{' '}
-          {srcs.map(([s, u], i) => <Fragment key={s}>{i > 0 && ' · '}{u ? <a href={u} target="_blank" rel="noopener noreferrer">{s}</a> : s}</Fragment>)}
-        </p>
-      )}
+      {sourceLine}
     </div>
   )
 }
@@ -442,7 +465,8 @@ const PRODUCER_KEYS = ['CIL', 'Singareni', 'Commercial', 'Captive & Others*']
 function PeriodDock({ basis, setBasis }) {
   const [show, setShow] = useState(false)
   useEffect(() => {
-    const seg = document.querySelector('#insights-body .bx-in-h .bx-seg')
+    // the module's period switch: in its title card, or (the Overview, 16 Nov'26) in the heading of the figures it drives
+    const seg = document.querySelector('#insights-body .bx-in-h .bx-seg') || document.querySelector('#insights-body .bx-kgrp-ph.per .bx-seg, #insights-body .bx-kgrp.per .bx-seg')
     const end = document.querySelector('#insights-body .bx-in-more')
     if (!seg || !end || typeof IntersectionObserver === 'undefined') return undefined
     const at = { gone: false, end: false }
@@ -794,7 +818,7 @@ function Overview({ data, basis, setBasis }) {
   return (
     <>
       <Head title="Market overview" meta={P ? `As of ${day(P.as_of)}` : ''}
-        aside={phone ? <Seg value={basis} onChange={setBasis} options={BASES} label="Period" /> : null} />
+        aside={null} />
       {phone && <PeriodDock basis={basis} setBasis={setBasis} />}
       <div className="wrap bx-in-main">
       {/* TWO GROUPS (16 Nov'26): the switch's two figures under the period it shows, then the plants' three levels,
@@ -804,9 +828,9 @@ function Overview({ data, basis, setBasis }) {
           the two figures it drives, not at the far end of the title card over the plants' levels it does not touch;
           a phone keeps it in the title card, directly above its one row (and the dock) */}
       <Strip five groups={[
-        [2, phone
-          ? <><b key={basis} className="bx-swap">{PERIOD_NAME[basis]}</b> · India&rsquo;s production and offtake</>
-          : <><span className="gt">India&rsquo;s production and offtake</span><Seg value={basis} onChange={setBasis} options={BASES} label="Period" /></>, 'per'],
+        // a phone too, since 16 Nov'26 ("the toggles for daily and everything are still over everything"): the switch
+        // under this heading, the two figures under it — the plants' levels a block of their own below a rule
+        [2, <><span className="gt">India&rsquo;s production and offtake</span><Seg value={basis} onChange={setBasis} options={BASES} label="Period" /></>, 'per'],
         [3, <span className="gt"><b>Latest</b> · coal at thermal power plants</span>, 'lvl'],
       ]}>
         {k('Total(Coal)', 'production', 'India production')}

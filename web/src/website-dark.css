@@ -398,3 +398,7 @@ html:has(.bx.dk), html:has(.bx.dk) body { background: #0f1114; color-scheme: dar
 /* v85b — the chosen option of a switch is the same orange pill on the dark site (website.css explains) */
 .bx.dk .bx-seg > .bx-seg-ind { background: var(--brand-strong); box-shadow: 0 6px 14px -6px rgba(0, 0, 0, .6); }
 .bx.dk .bx-seg.has-ind > button.on, .bx.dk .bx-seg.has-ind > button.on:hover { color: #fff; }
+
+/* v86b — the phone map's selection card on the dark site: a raised panel, its Details button orange with white words */
+.bx.dk.mc .cm-stage .cm-selcard { background: #1d2128; border-color: rgba(255, 255, 255, .1); box-shadow: 0 14px 30px -12px rgba(0, 0, 0, .7); }
+.bx.dk.mc .cm-selcard .go { background: var(--brand-strong); color: #fff; }

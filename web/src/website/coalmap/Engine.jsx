@@ -113,9 +113,12 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
     // A PHONE paints that picture at 3× its pixels, so it draws less past the frame (0.35 still covers a
     // 0.6-level pinch out) and re-projects a flight less often (below) — "coal map laggy on the phone"
     const coarse = touch()
-    // a phone draws the outlines simplified to 2 px (Leaflet's default 1): invisible on its small, dense screen, and
-    // every re-projection and repaint of a glide is that much cheaper (pass 82)
-    const simplify = coarse ? 2 : 1
+    // ONE PRECISION ON EVERY SCREEN (16 Nov'26, the user on a phone: "the boundaries look vague"). A phone drew the outlines
+    // simplified to 2 px (pass 82) — but each state is simplified ON ITS OWN, so two neighbours stopped sharing one border:
+    // dark slivers and doubled, jagged edges between them, worst once zoomed in. The 1 px a desktop uses keeps them shared.
+    // (Was: a phone draws the outlines simplified to 2 px (Leaflet's default 1): invisible on its small, dense screen, and
+    // every re-projection and repaint of a glide is that much cheaper (pass 82).)
+    const simplify = 1
     const makeRenderer = m._createRenderer.bind(m)
     m._createRenderer = o => makeRenderer({ ...o, padding: coarse ? 0.35 : 0.5 })
     // states 300 · the hover and selection outlines 340 (never catch the pointer) · coast 360
@@ -256,7 +259,9 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       // them left ~8 frames for 0.6 s. It redraws once the zoom has moved half a level since the last redraw —
       // 3–4 crisp pictures a glide, the borders never more than ~1.4x their width in between.
       if (gl && coarse) {
-        if (lastDrawZ != null && Math.abs(z - lastDrawZ) < 0.5) return
+        // every 0.3 of a level (16 Nov'26 — every 0.5 stretched the picture to 1.4x between redraws: soft, thick borders
+        // mid-move, "the boundaries look vague"); 0.3 keeps it under 1.25x, at five or six redraws a glide
+        if (lastDrawZ != null && Math.abs(z - lastDrawZ) < 0.3) return
       } else {
         const gap = gl ? (drawCost < 6 ? 0 : Math.min(60, drawCost * 3)) : every
         if (now - lastDraw < gap) return
@@ -463,6 +468,30 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       zoom: () => m.getZoom(),
       drillTo, back: () => drillTo(drill.current.length - 1),
       light: name => L_.current.railLight?.(name),
+      // A CHOSEN MARKER IS NEVER UNDER THE PHONE'S SELECTION CARD (16 Nov'26): a mine or plant chosen in the strip the
+      // card takes at the map's foot is panned up just clear of it — the map does not otherwise move for a mine
+      reveal: (lat, lon, bottom = 0) => {
+        const pt = m.latLngToContainerPoint([lat, lon]), lim = m.getSize().y - bottom - 22
+        if (pt.y > lim) m.panBy([0, pt.y - lim], { animate: !reduced(), duration: 0.35 })
+      },
+      // A CHOSEN MINE OR PLANT IS BROUGHT INTO VIEW, GENTLY (16 Nov'26, the user: "when I click a Super 35 mine it doesn't
+      // zoom — tell me what is better"). Zoomed out (within ~1.2 levels of India's view, where the rings crowd) the map
+      // glides in by 1.5 levels, centred on it in the clear part of the stage (`top` / `bottom`: what the crumb and the
+      // phone's card cover). Already zoomed in, it does not zoom again: it only glides over when the point is near an
+      // edge or under the card — a reader who chose their zoom keeps it.
+      focus: (lat, lon, { top = 0, bottom = 0 } = {}) => {
+        const z = m.getZoom(), india = indiaView().zoom, size = m.getSize()
+        const zoomed = z < india + 1.2
+        const target = zoomed ? Math.min(m.getMaxZoom(), z + 1.5) : z
+        if (!zoomed) {
+          const pt = m.latLngToContainerPoint([lat, lon])
+          const comfy = pt.x > size.x * 0.15 && pt.x < size.x * 0.85 && pt.y > top + 24 && pt.y < size.y - bottom - 24
+          if (comfy) return
+        }
+        const c = m.unproject(m.project([lat, lon], target).add([0, (bottom - top) / 2]), target)
+        atIndia.current = false
+        glideTo(c, target, 600)
+      },
     }
     // THE MARKER REFS DIE WITH THE MAP. React's development build mounts every effect twice
     // (StrictMode); the refs outlive that first unmount, so the second map inherited markers

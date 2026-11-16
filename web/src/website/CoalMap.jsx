@@ -500,7 +500,14 @@ function MineTable({ mines, per, onMine, company = false, limit }) {
   )
 }
 
+// A PHONE LISTS THE TEN LARGEST, THE REST IN A SHEET (16 Nov'26, the user on a phone: "the space when we click super 35,
+// super 75" — the list under the map was every mine, 35 or 75 rows, so the page grew and shrank by up to 1,800 px with
+// each tap): ten rows and "All 75 mines" opening the whole table over the page, so Super 35 and Super 75 take the same
+// room. A desktop's panel scrolls itself and keeps the whole list.
+const PHONE_MINES = 10
 function MajorMines({ mines, set, per, asOf, onMine }) {
+  const phone = usePhone()
+  const [all, setAll] = useState(false)
   const rows = mines.filter(p => p.flagship && (set === 'super75' || p.flagship.sets.includes('Super 35')))
     .sort((a, b) => (flagVal(b, per) || 0) - (flagVal(a, per) || 0))
   const prod = rows.reduce((s, p) => s + (flagVal(p, per) || 0), 0)
@@ -514,8 +521,22 @@ function MajorMines({ mines, set, per, asOf, onMine }) {
       {per === 'fytd' && <Strip items={[{ label: 'Mines', value: rows.length, unit: '', dec: 0 }, { label: 'At or above target', value: rows.filter(p => (p.flagship.achieved_pct || 0) >= 100).length, unit: '', dec: 0 },
         { label: 'Below 90% of target', value: rows.filter(p => (p.flagship.achieved_pct ?? 100) < 90).length, unit: '', dec: 0 }]} />}
       <Sec title={label} unit={day1 ? 'thousand t' : 'MT'}>
-        <MineTable mines={rows} per={per} onMine={onMine} company />
+        <MineTable mines={rows} per={per} onMine={onMine} company limit={phone ? PHONE_MINES : undefined} />
+        {phone && rows.length > PHONE_MINES && (
+          <button type="button" className="cm-more-btn" onClick={() => setAll(true)} aria-haspopup="dialog">
+            All {rows.length} mines <ArrowRight aria-hidden="true" />
+          </button>
+        )}
       </Sec>
+      {phone && (
+        <Sheet open={all} onClose={() => setAll(false)} label={label}>
+          <div className="cm-mines-sheet">
+            <h3>{label}</h3>
+            <p className="sub">{`Production, ${mineWin(asOf, per)} · ${day1 ? 'thousand t' : 'MT'}`}</p>
+            <MineTable mines={rows} per={per} onMine={id => { setAll(false); onMine(id) }} company />
+          </div>
+        </Sheet>
+      )}
     </>
   )
 }
@@ -1499,6 +1520,56 @@ export default function CoalMap() {
       {SET_SHORT.map(([k, l]) => <button key={k} className={mineSet === k ? 'on' : ''} aria-pressed={mineSet === k} onClick={() => pickSet(k)}>{l}</button>)}
     </div>
   )
+  // A PHONE SAYS WHAT WAS CHOSEN ON THE MAP ITSELF (16 Nov'26, the user: on a phone a chosen state's or mine's data
+  // "opens below the map, and it is not easily known that it opened"). A card takes the key's place at the map's foot
+  // — the strip the map already keeps clear for the key, so it covers no mine — with the name, the panel's own
+  // headline figure and "Details", which brings the panel below into view. It goes when the choice goes; the key
+  // comes back. A chosen marker in that strip is panned clear of it (Engine reveal).
+  const STAGE_WORD = { operating: 'Operating mine', closing: 'In final closure', closed: 'Closed before 2009' }
+  const selInfo = (() => {
+    if (!keyInset || !sel || !data) return null
+    const minesFig = name => {
+      const v = mineVal(stateMines[name], mineMeasure, minePeriod), u = mineUnit(mineMeasure, minePeriod)
+      return { fig: v == null ? '—' : `${mineFmt(v, mineMeasure, minePeriod)} ${u ? (u === 'MT' ? 'MT' : 'kt') : 'mines'}`, what: mineLabel(mineMeasure, minePeriod, mineAsOf) }
+    }
+    if (sel.kind === 'state') {
+      if (mode === 'mines' || mode === 'companies') return { kind: 'State', name: sel.id, ...minesFig(sel.id) }
+      const v = stateVal(data.states[sel.id], period, month, ms)
+      return { kind: 'State', name: sel.id, fig: v == null ? '—' : `${mt(v)} MT`, what: `${measureLabel} · ${asOf}` }
+    }
+    if (sel.kind === 'plant' && curPlant) {
+      const v = plantVal(curPlant, period, month, ms)
+      return { kind: 'Power plant', name: pretty(curPlant.name), fig: v == null ? '—' : `${mt(v)} MT`, what: `${measureLabel} · ${asOf}` }
+    }
+    if (sel.kind === 'mine' && curMine) {
+      const f = flagVal(curMine, minePeriod)
+      return { kind: 'Coal mine', name: curMine.label,
+        fig: f == null ? (STAGE_WORD[curMine.stage] || 'Coal mine') : minePeriod === 'day' ? `${num(f * 1000, 0)} kt` : `${num(f, 2)} MT`,
+        what: f == null ? [curMine.subsidiary || curMine.owner, curMine.area && `${curMine.area} area`].filter(Boolean).join(' · ') : `Production, ${mineWin(mineAsOf, minePeriod)}` }
+    }
+    if (sel.kind === 'company') {
+      const f = coFig(data, sel.id, 'production', minePeriod)
+      return { kind: 'Coal company', name: SUB_NAME[sel.id] || sel.id,
+        fig: f.pct != null ? `${num(f.pct, 1)}%` : f.v == null ? '—' : `${num(f.v, f.dec ?? 2)} ${f.unit === 'MT' ? 'MT' : 'kt'}`,
+        what: f.pct != null ? `of its production target, ${coWin(coDay, minePeriod)}` : `Production, ${coWin(coDay, minePeriod)}` }
+    }
+    return null
+  })()
+  // A CHOSEN MINE OR PLANT IS BROUGHT INTO VIEW (16 Nov'26, Engine focus): zoomed out, the map glides in a little,
+  // centred on it between the crumb and the phone's card; zoomed in, it only glides over if the point is near an edge or
+  // under the card. From the map or from a list (the panel, the "All 75 mines" sheet) alike.
+  useEffect(() => {
+    if (!sel || (sel.kind !== 'mine' && sel.kind !== 'plant')) return undefined
+    const p = sel.kind === 'mine' ? minesById.get(sel.id) : plantsById.get(sel.id)
+    if (!p || p.lat == null) return undefined
+    const t = setTimeout(() => api.current?.focus?.(p.lat, p.lon, keyInset ? { top: 56, bottom: 96 } : { top: 56 }), 60)
+    return () => clearTimeout(t)
+  }, [sel, keyInset, minesById, plantsById])
+  const toDetails = () => {
+    const el = railBox.current
+    if (!el) return
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 76, behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+  }
   const tools = (
     <div className="cm-tools">
       <Dropdown className="cm-state-dd" label="State" value={selState || 'all'}
@@ -1556,7 +1627,7 @@ export default function CoalMap() {
 
       <div className="wrap">
       <div className="cm">
-        <div className="cm-stage" ref={stage}>
+        <div className={`cm-stage${selInfo ? ' has-selcard' : ''}`} ref={stage}>
           {data && month && (
             <Engine fills={fills} plants={plants} mines={mines} companies={companies} selected={sel} onSelect={s => choose(s, { fly: s.kind !== 'mine' && s.kind !== 'plant' ? true : false })}
               onBackground={onBackground} onHover={onHover} focus={focus} zoomEl={zoomEl} readout={readout} onHint={onHint} api={api} freeWheel={full}
@@ -1599,6 +1670,15 @@ export default function CoalMap() {
                   {layers.mines && <span><i className="mk" />Mine</span>}
                 </span>
               </div>
+              {/* the phone's card for what was chosen, in the key's place (selInfo, above) — keyed by the choice, so a new
+                  one slides up again */}
+              {selInfo && (
+                <div key={`${sel.kind}-${sel.id}`} className="cm-selcard" role="status" aria-live="polite">
+                  <span className="tx" title={`${selInfo.kind}: ${selInfo.name}`}><b>{selInfo.name}</b></span>
+                  <span className="fg"><b>{selInfo.fig}</b><small>{selInfo.what}</small></span>
+                  <button type="button" className="go" onClick={toDetails} aria-label={`${selInfo.kind} ${selInfo.name}: the details, under the map`}><ArrowDown aria-hidden="true" /><span>Details</span></button>
+                </div>
+              )}
               <div className="cm-zoom">
                 <button onClick={() => api.current?.zoomIn()} aria-label="Zoom in" title="Zoom in (or Ctrl + scroll)"><Plus /></button>
                 {/* inside the clusters, − steps OUT a level (pass 80, "no clear way to go out a level") */}

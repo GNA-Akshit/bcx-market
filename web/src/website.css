@@ -4918,3 +4918,58 @@ html { touch-action: manipulation; }
    sliding as before; the others keep their quiet grey */
 .bx-seg > .bx-seg-ind { background: var(--brand-strong); box-shadow: 0 6px 14px -6px rgba(214, 108, 60, .6); }
 .bx .bx-seg.has-ind > button.on, .bx .bx-seg.has-ind > button.on:hover { color: #fff; }
+
+/* v86 (16 Nov'26) the phone's major-mines list: the ten largest, then a button opening the whole list in a sheet */
+.cm-more-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; margin-top: 10px; padding: 11px 14px;
+  border: 1px solid var(--line); border-radius: 12px; background: transparent; color: var(--brand-ink); font: 600 13.5px var(--f-text); cursor: pointer; }
+.cm-more-btn svg { width: 16px; height: 16px; }
+.cm-more-btn:active { background: var(--bg-soft); }
+.cm-mines-sheet { padding: 22px 16px calc(24px + env(safe-area-inset-bottom)); }
+.cm-mines-sheet h3 { margin: 0; padding-right: 52px; font-size: 19px; line-height: 1.3; }
+.cm-mines-sheet .sub { margin: 4px 0 14px; font-size: 13px; color: var(--ink-3); }
+
+/* v86 (16 Nov'26) THE PHONE'S OVERVIEW FIGURES AS TWO BLOCKS (Insights.Strip groups): India's production and offtake
+   with the Daily / MTD / FYTD switch under its heading and its two figures side by side under that — then a rule — and
+   the plants' three levels ("Latest") in their own swipe row. The switch sits over exactly what it changes. */
+.bx .bx-kpis.strip.grouped-ph { display: block; }
+.bx-kgrp-ph .gl { display: flex; flex-direction: column; align-items: stretch; gap: 9px; margin: 0 0 10px; }
+.bx-kgrp-ph .gl .gt { font-size: 14px; font-weight: 650; line-height: 1.35; color: var(--ink); }
+.bx-kgrp-ph.lvl .gl .gt { font-weight: 500; color: var(--ink-3); }
+.bx-kgrp-ph .gl .gt b { font-weight: 650; color: var(--ink); }
+.bx-kgrp-ph .gl > .bx-seg { display: flex; width: 100%; }
+.bx-kgrp-ph .gl > .bx-seg button { flex: 1 1 0; }
+.bx-kgrp-ph + .bx-kgrp-ph { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.bx-kc-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.bx-kc-row > .bx-kc { min-width: 0; }
+
+/* v86b (16 Nov'26) A PHONE'S MAP SAYS WHAT WAS CHOSEN (CoalMap selInfo): a card in the key's place at the map's foot —
+   what it is, its name, the panel's headline figure, "Details" to the panel below. The key steps aside while it shows;
+   the card rises in, so a tap visibly did something. It sits in the strip the map keeps clear for the key: no mine under it */
+.cm-selcard { display: none; }
+@media (max-width: 600px) {
+  .bx.mc .cm-stage .cm-selcard { position: absolute; left: 10px; right: 62px; bottom: 10px; z-index: 520; display: grid;
+    grid-template-columns: minmax(0, 1fr) auto; column-gap: 10px; row-gap: 2px; align-items: center;
+    padding: 9px 9px 9px 12px; border: 1px solid var(--line); border-radius: 14px; background: #fff;
+    box-shadow: 0 14px 30px -12px rgba(16, 24, 40, .45); animation: cm-selcard-in .38s cubic-bezier(.22, 1, .36, 1) both; }
+  .bx.mc .cm-selcard .tx { grid-column: 1; display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+  .bx.mc .cm-selcard .tx small { flex: none; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--brand-ink); }
+  .bx.mc .cm-selcard .tx b { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 14px; font-weight: 650; color: var(--ink); }
+  .bx.mc .cm-selcard .fg { grid-column: 1; display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+  .bx.mc .cm-selcard .fg b { flex: none; font-size: 15px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .bx.mc .cm-selcard .fg small { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 11.5px; color: var(--ink-3); }
+  .bx.mc .cm-selcard .go { grid-column: 2; grid-row: 1 / span 2; display: inline-flex; align-items: center; gap: 4px; height: 38px; padding: 0 11px;
+    border: 0; border-radius: 10px; background: var(--brand-strong); color: #fff; font: 650 12.5px var(--f-text); cursor: pointer; }
+  .bx.mc .cm-selcard .go svg { width: 14px; height: 14px; }
+  .bx.mc .cm-stage.has-selcard .cm-legend { opacity: 0; visibility: hidden; }
+}
+@keyframes cm-selcard-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .bx.mc .cm-stage .cm-selcard { animation: none; } }
+/* …roomier: the name and the figure get the width — the type is the crumb's to say — and "Details" is an arrow over
+   the word; the Light / Dark pill steps aside while a card is up (it sat on the card's corner) */
+@media (max-width: 600px) {
+  .bx.mc .cm-stage .cm-selcard { padding: 8px 8px 8px 12px; row-gap: 1px; }
+  .bx.mc .cm-selcard .tx b { font-size: 14.5px; }
+  .bx.mc .cm-selcard .go { flex-direction: column; justify-content: center; gap: 1px; width: 58px; height: 44px; padding: 0; font-size: 11px; }
+  .bx.mc .cm-selcard .go svg { width: 15px; height: 15px; }
+  .bx:has(.cm-selcard) .bx-theme-sw { opacity: 0; transform: translateY(8px); pointer-events: none; }
+}

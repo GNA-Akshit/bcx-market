@@ -1734,6 +1734,24 @@
   box-shadow: inset 0 0 0 1.5px var(--brand); background: color-mix(in srgb, var(--brand) 7%, transparent); }
 .dk .bx-seg > .bx-seg-ind { background: var(--brand-strong); box-shadow: 0 6px 14px -6px rgba(214, 108, 60, 0.33); }
 .bx.dk .bx-seg.has-ind > button.on, .bx.dk .bx-seg.has-ind > button.on:hover { color: #ffffff; }
+.dk .cm-more-btn {
+  border: 1px solid var(--line); background: transparent; color: var(--brand-ink); }
+.dk .cm-more-btn:active { background: var(--bg-soft); }
+.dk .cm-mines-sheet .sub { color: var(--ink-3); }
+.dk .bx-kgrp-ph .gl .gt { color: var(--ink); }
+.dk .bx-kgrp-ph.lvl .gl .gt { color: var(--ink-3); }
+.dk .bx-kgrp-ph .gl .gt b { color: var(--ink); }
+.dk .bx-kgrp-ph + .bx-kgrp-ph { border-top: 1px solid var(--line); }
+@media (max-width: 600px) {
+  .bx.dk.mc .cm-stage .cm-selcard { border: 1px solid var(--line); background: #171a1f;
+    box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.8); }
+  .bx.dk.mc .cm-selcard .tx small { color: var(--brand-ink); }
+  .bx.dk.mc .cm-selcard .tx b { color: var(--ink); }
+  .bx.dk.mc .cm-selcard .fg b { color: var(--ink); }
+  .bx.dk.mc .cm-selcard .fg small { color: var(--ink-3); }
+  .bx.dk.mc .cm-selcard .go {
+    border: 0; background: var(--brand-strong); color: #ffffff; }
+}
 /*  ---- from frontend/src/website-bands.css  */
 .bx.dk.nb .bx-band {
   --lip: 40px;
