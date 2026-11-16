@@ -4847,3 +4847,68 @@ html { touch-action: manipulation; }
 /* 16 Nov'26 — the Sources module is off, so a module's foot has no link left (the data centre's is off too): the
    empty foot keeps its place for the phone's period dock (PeriodDock's end marker) but draws no rule and no space */
 .bx .bx-in-more:empty, .bx.dk .bx-in-more:empty { min-height: 1px; margin-top: 0; padding-top: 0; border-top: 0; }
+
+/* ======================================================================================
+   v85 (16 Nov'26) WHAT A SWITCH CHANGES, SHOWN — and which figures it changes.
+   ====================================================================================== */
+/* the Overview's figures in TWO GROUPS: the two the period switch drives, under the period's name, and the plants'
+   three levels ("Latest"), a rule between them (Insights.Strip groups) */
+.bx .bx-kpis.strip.grouped { grid-template-columns: var(--g); column-gap: 33px; row-gap: 0; }
+.bx-kgrp { position: relative; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 16px; align-content: start; min-width: 0; }
+/* each group's heading: ONE row height for both (so the tiles stay level), its words at the left — and in the
+   period group the Daily / MTD / FYTD switch at the right, directly over the two figures it changes */
+.bx-kgrp .gl { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px;
+  margin-bottom: -4px; font-size: 13.5px; font-weight: 500; line-height: 1.4; color: var(--ink-3); white-space: nowrap; }
+.bx-kgrp .gl .gt { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-weight: 650; color: var(--ink-2); }
+.bx-kgrp.lvl .gl .gt { font-weight: 500; color: var(--ink-3); }
+.bx-kgrp .gl > .bx-seg { flex: none; }
+.bx-kgrp .gl b { font-weight: 650; color: var(--ink); }
+.bx-kgrp.per .gl b { color: var(--brand-ink); }
+.bx-kgrp + .bx-kgrp::before { content: ''; position: absolute; left: -17px; top: 2px; bottom: 0; width: 1px; background: var(--line); }
+@media (max-width: 1240px) {
+  .bx .bx-kpis.strip.grouped { grid-template-columns: minmax(0, 1fr); row-gap: 33px; }
+  .bx-kgrp + .bx-kgrp::before { left: 0; right: 0; top: -17px; bottom: auto; width: auto; height: 1px; }
+}
+/* a phone: one swipe row — both labels on one line above it, a rule between the two groups inside it */
+.bx-kgl { display: grid; gap: 1px; margin: 0 0 9px; font-size: 12px; line-height: 1.45; color: var(--ink-3); }
+.bx-kgl b { font-weight: 650; color: var(--ink); }
+.bx-kgl .per b { color: var(--brand-ink); }
+.bx-kpis.strip.split-2 .bx-hrail-item:nth-child(3) { position: relative; margin-left: 13px; }
+.bx-kpis.strip.split-2 .bx-hrail-item:nth-child(3)::before { content: ''; position: absolute; left: -13px; top: 8px; bottom: 8px; width: 1px; background: var(--line); }
+
+/* a SWITCH'S CHOICE SLIDES: one indicator under the buttons (ui.Seg), the chosen button's own fill off */
+.bx-seg { position: relative; }
+.bx-seg > .bx-seg-ind { position: absolute; left: 0; top: 0; z-index: 0; border-radius: 9px; background: #fff; box-shadow: var(--shadow-sm); pointer-events: none; }
+.bx-seg.sm > .bx-seg-ind { border-radius: 8px; }
+.bx-seg.ready > .bx-seg-ind { transition: transform .34s cubic-bezier(.22, 1, .36, 1), width .34s cubic-bezier(.22, 1, .36, 1), height .34s cubic-bezier(.22, 1, .36, 1); }
+.bx-seg.has-ind > button { position: relative; z-index: 1; transition: color .25s; }
+.bx .bx-seg.has-ind > button.on { background: transparent; box-shadow: none; }
+
+/* what changed comes up — a little further than before (8 px, not 3), and the parts in a table row by row */
+@keyframes bx-swap { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.bx-swap { animation: bx-swap .46s cubic-bezier(.22, 1, .36, 1) both; }
+.bx-swap-rows td { animation: bx-swap .46s cubic-bezier(.22, 1, .36, 1) both; }
+.bx-swap-rows tr:nth-child(2) td { animation-delay: 30ms; } .bx-swap-rows tr:nth-child(3) td { animation-delay: 60ms; }
+.bx-swap-rows tr:nth-child(4) td { animation-delay: 90ms; } .bx-swap-rows tr:nth-child(5) td { animation-delay: 120ms; }
+.bx-swap-rows tr:nth-child(6) td { animation-delay: 150ms; } .bx-swap-rows tr:nth-child(7) td { animation-delay: 180ms; }
+.bx-swap-rows tr:nth-child(8) td { animation-delay: 210ms; } .bx-swap-rows tr:nth-child(n+9) td { animation-delay: 240ms; }
+
+/* a figure whose value changed glows once in the accent (Insights.usePulse); one that did not stays still */
+.bx-pulse { position: absolute; inset: -1px; z-index: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 1.5px var(--brand); background: color-mix(in srgb, var(--brand) 7%, transparent);
+  animation: bx-pulse 1.1s cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes bx-pulse { 0% { opacity: 0; } 18% { opacity: 1; } 100% { opacity: 0; } }
+
+/* a chart's bars GROW from the axis, one after another, when it is drawn (a switch redraws it), their figures after */
+@keyframes bx-bar-grow { from { transform: scaleY(0); } to { transform: none; } }
+@keyframes bx-bar-grow-x { from { transform: scaleX(0); } to { transform: none; } }
+@keyframes bx-lab-in { from { opacity: 0; } to { opacity: 1; } }
+.bx-chart path.bgrow { transform-box: view-box; animation: bx-bar-grow .62s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--i, 0) * 34ms); }
+.bx-chart text.blab { animation: bx-lab-in .35s ease-out both; animation-delay: calc(.32s + var(--i, 0) * 34ms); }
+.bx-gbars .tr i { transform-origin: left center; animation: bx-bar-grow-x .62s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--i, 0) * 38ms); }
+.bx-gbars .v { animation: bx-lab-in .35s ease-out .3s both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bx-swap, .bx-swap-rows td, .bx-pulse, .bx-chart path.bgrow, .bx-chart text.blab, .bx-gbars .tr i, .bx-gbars .v { animation: none; }
+  .bx-seg.ready > .bx-seg-ind { transition: none; }
+}

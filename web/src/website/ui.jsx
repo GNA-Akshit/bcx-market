@@ -5,7 +5,7 @@
 // Motion is decoration, so every piece here does nothing under prefers-reduced-motion
 // and lands on the exact final figure — a count-up never shows a number the data does
 // not hold once it stops.
-import { Children, useCallback, useEffect, useRef, useState } from 'react'
+import { Children, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowDownRight, ArrowUp, ArrowUpRight, Check, ChevronDown, ChevronRight, Minus, X } from 'lucide-react'
 import { dir, num, pct } from './format.js'
@@ -399,9 +399,33 @@ export function TabPanel({ tabs, value, onChange, label, pane }) {
 
 /** A segmented switch. options: [[key, label]]. A switch that does not apply right now is
  *  DISABLED, never removed — a control that vanishes moves everything beside it. */
+// THE CHOICE SLIDES (16 Nov'26, the user: "when we click the toggles … the transition needs to be better, so that
+// something changed is reflected better"): one indicator, measured from the chosen button and moved there (transform,
+// so nothing reflows), instead of each button painting its own background. Placed without a slide the first time
+// (`.ready` is added after it), so a page never opens with its switches sliding in.
 export function Seg({ value, onChange, options, label, small = false, disabled = false, title }) {
+  const box = useRef(null)
+  useLayoutEffect(() => {
+    const el = box.current
+    if (!el) return undefined
+    const place = () => {
+      const ind = el.firstElementChild, on = el.querySelector('button.on')
+      if (!ind || !ind.classList.contains('bx-seg-ind')) return
+      if (!on) { ind.style.opacity = '0'; return }
+      ind.style.opacity = ''
+      ind.style.width = `${on.offsetWidth}px`
+      ind.style.height = `${on.offsetHeight}px`
+      ind.style.transform = `translate(${on.offsetLeft}px, ${on.offsetTop}px)`
+    }
+    place()
+    const raf = requestAnimationFrame(() => el.classList.add('ready'))
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(place) : null
+    ro?.observe(el)
+    return () => { cancelAnimationFrame(raf); ro?.disconnect() }
+  }, [value, disabled, options.length])
   return (
-    <div className={`bx-seg${small ? ' sm' : ''}${disabled ? ' off' : ''}`} role="tablist" aria-label={label} title={title}>
+    <div ref={box} className={`bx-seg has-ind${small ? ' sm' : ''}${disabled ? ' off' : ''}`} role="tablist" aria-label={label} title={title}>
+      <i className="bx-seg-ind" aria-hidden="true" />
       {options.map(([k, l]) => (
         <button key={k} className={value === k && !disabled ? 'on' : ''} onClick={() => onChange(k)} role="tab" aria-selected={value === k} disabled={disabled}>{l}</button>
       ))}

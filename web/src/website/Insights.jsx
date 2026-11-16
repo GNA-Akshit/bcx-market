@@ -169,11 +169,47 @@ const phoneUnit = u => PHONE_UNIT[u] ?? unitLabel(u)
 const PHONE_LABEL = {
   'Coal India production': 'CIL production', 'Coal India offtake': 'CIL offtake', 'Production – offtake gap': 'Prod. – offtake',
   'Rakes loaded a day, monthly average': 'Rakes a day, monthly avg', 'Thermal share of demand met': 'Thermal share of demand',
-  'Premium over notified price': 'Premium over notified', 'Indigenous stock at plants': 'Domestic coal stock',
-  'Imported stock at plants': 'Imported coal stock', 'Thermal PLF, month to date': 'Thermal PLF, MTD',
+  'Premium over notified price': 'Premium over notified', 'Indigenous coal at plants': 'Indigenous coal',
+  'Imported coal at plants': 'Imported coal', 'Thermal PLF, month to date': 'Thermal PLF, MTD',
 }
 const phoneLabel = l => PHONE_LABEL[l] ?? l
 const emWidth = s => [...s].reduce((w, ch) => w + (/[0-9]/.test(ch) ? 0.66 : /[A-Za-z%—₹]/.test(ch) ? 0.7 : 0.34), 0)
+
+// A SWITCH SHOWS WHAT IT CHANGED (16 Nov'26, the user: "when we click the toggles … the transition needs to be better,
+// so that something changed is reflected better"). A figure whose value changes COUNTS from the old value to the new
+// (~0.55 s, easing out) and its tile glows once in the accent; a figure the switch does not change (the plants' stock
+// levels on the Overview) stays still — so the eye goes to what moved. The number's element persists across the
+// switch (no remount), so the old value is there to count from. Nothing moves: text and an absolutely-placed glow.
+const calm = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+function CountUp({ value, dec = 0 }) {
+  const [v, setV] = useState(value)
+  const last = useRef(value)
+  useEffect(() => {
+    const from = last.current
+    last.current = value
+    if (value == null || from == null || from === value || calm()) { setV(value); return undefined }
+    let raf = 0, t0 = 0
+    const step = t => {
+      if (!t0) t0 = t
+      const k = Math.min(1, (t - t0) / 560)
+      setV(k < 1 ? from + (value - from) * (1 - Math.pow(1 - k, 3)) : value)
+      if (k < 1) raf = requestAnimationFrame(step)
+    }
+    raf = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(raf)
+  }, [value])
+  return v == null ? '—' : num(v, dec)
+}
+/** A number that bumps each time `value` changes (never on the first draw): the key of the tile's one-off glow. */
+function usePulse(value) {
+  const [n, setN] = useState(0)
+  const last = useRef(value)
+  useEffect(() => {
+    if (last.current !== value && last.current != null && value != null && !calm()) setN(x => x + 1)
+    last.current = value
+  }, [value])
+  return n
+}
 
 function KpiCompact({ fig, open }) {
   // `keepSub`: a bare figure that keeps the empty line, because its neighbour period has one (E-auctions' FYTD)
@@ -183,10 +219,12 @@ function KpiCompact({ fig, open }) {
   const u = phoneUnit(unit)
   // the number's width in ems, and the unit's in px (12 px type, plus the 4 px gap and a little air)
   const fit = { '--nw': Math.max(1, emWidth(txt)).toFixed(2), '--uw': `${Math.round((u || '').length * 6.8 + 8)}px` }
+  const pulse = usePulse(value)
   return (
     <button type="button" className="bx-kpi bx-kc" onClick={() => open(fig)} aria-haspopup="dialog">
       <span className="lbl" title={label}>{phoneLabel(label)}</span>
-      <span key={`v${swap}`} className={`val${sw}`} style={fit} title={`${txt} ${unitLabel(unit)}`}><b>{txt}</b><small>{u}</small></span>
+      {pulse > 0 && <i key={pulse} className="bx-pulse" aria-hidden="true" />}
+      <span className="val" style={fit} title={`${txt} ${unitLabel(unit)}`}><b><CountUp value={value} dec={dec} /></b><small>{u}</small></span>
       {bare && keepSub && <span className="sub" aria-hidden="true" />}
       {!bare && <span key={`c${swap}`} className={`sub${sw}`}>
         {plain ? plain : <><ChangeMark change={change} changeUnit={changeUnit} note={note} />{changeLabel && <> {changeLabel}</>}</>}
@@ -239,9 +277,26 @@ function KpiDetail({ fig }) {
 
 /** A strip of figures. On a phone the tiles are compact and drop their source lines, so the
  *  strip names its publishers once, under the tiles; the desktop's strip is exactly as before. */
-function Strip({ five = false, three = false, children }) {
+// GROUPS (16 Nov'26, the user: on the Overview only two of the five figures follow Daily / MTD / FYTD — "put a
+// division between the 2 metrics which do change and the 3 which don't"): `groups` = [[count, label, className]…].
+// A desktop draws each group under its own label, a rule between them; a phone keeps ONE swipe row with a rule
+// between the groups and both labels on one line above it.
+function Strip({ five = false, three = false, groups = null, children }) {
   const phone = useContext(KpiOpen) != null
   const n = five ? ' five' : three ? ' three' : ''
+  if (!phone && groups) {
+    const all = Children.toArray(children).filter(Boolean)
+    let at = 0
+    return (
+      <div className={`bx-kpis strip${n} grouped`} style={{ '--g': groups.map(([c]) => `minmax(0, ${c}fr)`).join(' ') }}>
+        {groups.map(([c, label, cls], gi) => {
+          const part = all.slice(at, at + c)
+          at += c
+          return <div key={gi} className={`bx-kgrp${cls ? ` ${cls}` : ''}`} style={{ '--n': c }}><span className="gl">{label}</span>{part}</div>
+        })}
+      </div>
+    )
+  }
   if (!phone) return <div className={`bx-kpis strip${n}`}>{children}</div>
   const kids = Children.toArray(children).filter(k => k?.props)
   const srcs = []
@@ -253,7 +308,8 @@ function Strip({ five = false, three = false, children }) {
   // the phone's figures are ONE SWIPE ROW (2 Nov'26, the user's call): every figure in a line, the next
   // one peeking in, dots under it — not a two-by-three wall the reader must scroll past
   return (
-    <div className={`bx-kpis strip kc rail${n}${hasOf ? ' has-of' : ''}`}>
+    <div className={`bx-kpis strip kc rail${n}${hasOf ? ' has-of' : ''}${groups ? ` grouped split-${groups[0][0]}` : ''}`}>
+      {groups && <p className="bx-kgl">{groups.map(([, label, cls], gi) => <span key={gi} className={cls || undefined}>{label}</span>)}</p>}
       <HRail label="Figures">{children}</HRail>
       {srcs.length > 0 && (
         <p className="bx-kc-srcs">Sources:{' '}
@@ -276,6 +332,7 @@ const shortCmp = s => s.replace(/, same days$/, '').replace(/FY (\d{2})(\d{2})-(
  *  never layout (website.css `.bx-swap`, off under prefers-reduced-motion). */
 function Kpi(fig) {
   const open = useContext(KpiOpen)
+  const pulse = usePulse(fig.value)          // before the phone's early return: a hook is never conditional
   if (open) return <KpiCompact fig={fig} open={open} />
   const { label, value, dec = 0, unit, when, of, change, changeLabel, changeUnit = '%', note, trend, href, plain, source, sourceUrl, swap, bare, inline, aside } = fig
   const sw = swap ? ' bx-swap' : ''
@@ -285,10 +342,11 @@ function Kpi(fig) {
   const side = inline ? (of != null ? <em className={of >= 100 ? 'met' : undefined}><b>{num(of, 1)}%</b> of target</em> : plain ? <em>{plain}</em> : aside ? <em>{aside}</em> : null) : null
   const body = (
     <>
+      {pulse > 0 && <i key={pulse} className="bx-pulse" aria-hidden="true" />}
       <span className="hd"><span className="lbl">{label}</span>{when && <span key={`w${swap}`} className={`when${sw}`}>{when}</span>}</span>
-      <span key={`v${swap}`} className={`val${sw}`}><b>{value == null ? '—' : num(value, dec)}</b><small>{unitLabel(unit)}</small>
+      <span className="val"><b><CountUp value={value} dec={dec} /></b><small>{unitLabel(unit)}</small>
         {/* inline, the comparison's label loses its ", same days" (kept in the title) so it fits one line */}
-        {inline && !plain && <span className="vchg" title={changeLabel || undefined}><ChangeMark change={change} changeUnit={changeUnit} note={note} />{changeLabel && <small>{shortCmp(changeLabel)}</small>}</span>}</span>
+        {inline && !plain && <span key={`vc${swap}`} className={`vchg${sw}`} title={changeLabel || undefined}><ChangeMark change={change} changeUnit={changeUnit} note={note} />{changeLabel && <small>{shortCmp(changeLabel)}</small>}</span>}</span>
       {/* a figure its source publishes with no comparison says what it covers, in the same
           line a comparison would sit in — so every tile in the strip stays the same height */}
       {/* `bare`: the figure and nothing under it (27 Oct'26 — the line that said what a figure
@@ -391,6 +449,8 @@ function Trend({ items, days = 180, fmt, height, unit }) {
 // month to date is the year to date it printed on its latest day less the one it printed on
 // the last day of the previous month (series.producers) — it publishes no month figure.
 const BASES = [['day', 'Daily'], ['mtd', 'MTD'], ['fytd', 'FYTD']]
+// the period in words, where a label names it (the Overview's figure groups)
+const PERIOD_NAME = { day: 'Daily', mtd: 'Month to date', fytd: 'Financial year to date' }
 const PRODUCER_KEYS = ['CIL', 'Singareni', 'Commercial', 'Captive & Others*']
 
 /** THE PERIOD DOCK (phone): once the title card's Daily / MTD / FYTD switch has scrolled away
@@ -753,18 +813,29 @@ function Overview({ data, basis, setBasis }) {
   return (
     <>
       <Head title="Market overview" meta={P ? `As of ${day(P.as_of)}` : ''}
-        aside={<Seg value={basis} onChange={setBasis} options={BASES} label="Period" />} />
+        aside={phone ? <Seg value={basis} onChange={setBasis} options={BASES} label="Period" /> : null} />
       {phone && <PeriodDock basis={basis} setBasis={setBasis} />}
       <div className="wrap bx-in-main">
-      <Strip five>
+      {/* TWO GROUPS (16 Nov'26): the switch's two figures under the period it shows, then the plants' three levels,
+          which are the latest reading whatever the period */}
+      {/* THE SWITCH SITS OVER WHAT IT CHANGES (16 Nov'26, the user: "the toggles are on the right but production and
+          offtake is on the left — very confusing"): on a desktop the Daily / MTD / FYTD switch is in the heading of
+          the two figures it drives, not at the far end of the title card over the plants' levels it does not touch;
+          a phone keeps it in the title card, directly above its one row (and the dock) */}
+      <Strip five groups={[
+        [2, phone
+          ? <><b key={basis} className="bx-swap">{PERIOD_NAME[basis]}</b> · India&rsquo;s production and offtake</>
+          : <><span className="gt">India&rsquo;s production and offtake</span><Seg value={basis} onChange={setBasis} options={BASES} label="Period" /></>, 'per'],
+        [3, <span className="gt"><b>Latest</b> · coal at thermal power plants</span>, 'lvl'],
+      ]}>
         {k('Total(Coal)', 'production', 'India production')}
         {k('Total(Coal)', 'offtake', 'India offtake')}
         <Kpi label="Thermal plant coal stock" value={ST?.value} dec={2} unit="MT" when={stockWhen} bare
           trend={ST?.trend ?? null} source={ST?.source_short} sourceUrl={ST?.source_url} />
         {/* one line each, so the five figures sit level (a two-line label pushed its figure down) */}
-        <Kpi label="Indigenous stock at plants" value={split?.d} dec={2} unit="MT" when={split?.when} bare
+        <Kpi label="Indigenous coal at plants" value={split?.d} dec={2} unit="MT" when={split?.when} bare
           trend={split?.td ?? null} source={split?.src?.source_short} sourceUrl={split?.src?.source_url} />
-        <Kpi label="Imported stock at plants" value={split?.i} dec={2} unit="MT" when={split?.when} bare
+        <Kpi label="Imported coal at plants" value={split?.i} dec={2} unit="MT" when={split?.when} bare
           trend={split?.ti ?? null} source={split?.src?.source_short} sourceUrl={split?.src?.source_url} />
       </Strip>
       <div className="bx-in-grid">

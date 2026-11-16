@@ -434,14 +434,15 @@ export function BarChart({ categories, groups, height = 260, yFmt = String, vFmt
               const x = m.l + band * i + pad / 2 + gi * (bw + 2)
               const part = g.partial && g.partial[i]
               const mk = g.marks?.[i]
-              return <Fragment key={g.id}><path d={bar(x, v, bw)} fill={g.color} opacity={part ? 0.38 : 1}
+              // each bar GROWS from the baseline when the chart is drawn — and a switch redraws it (16 Nov'26)
+              return <Fragment key={g.id}><path className="bgrow" style={{ '--i': i, transformOrigin: `0px ${y0}px` }} d={bar(x, v, bw)} fill={g.color} opacity={part ? 0.38 : 1}
                 stroke={part ? g.color : 'none'} strokeDasharray={part ? '2 2' : undefined} />
                 {mk != null && <g className="bmark"><line className="h" x1={x - 3} x2={x + bw + 3} y1={sy(mk)} y2={sy(mk)} /><line x1={x - 3} x2={x + bw + 3} y1={sy(mk)} y2={sy(mk)} /></g>}
                 {lab && (lab.only == null || (i === lab.only && gi === lab.g)) && (lab.up
-                  ? <text className="blab up" transform={`rotate(-90 ${x + bw / 2 + 3.5} ${(v >= 0 ? sy(v) : y0) - 4})`}
+                  ? <text className="blab up" style={{ '--i': i }} transform={`rotate(-90 ${x + bw / 2 + 3.5} ${(v >= 0 ? sy(v) : y0) - 4})`}
                       x={x + bw / 2 + 3.5} y={(v >= 0 ? sy(v) : y0) - 4} textAnchor="start">{lab.fmt(v)}</text>
                   // the one figure (lastOnly) may be wider than its bar: it stays inside the plot
-                  : <text className="blab" x={lab.only == null ? x + bw / 2 : Math.min(x + bw / 2, m.l + iw - lab.fmt(v).length * 3.3)}
+                  : <text className="blab" style={{ '--i': i }} x={lab.only == null ? x + bw / 2 : Math.min(x + bw / 2, m.l + iw - lab.fmt(v).length * 3.3)}
                       y={v >= 0 ? sy(v) - 5 : sy(v) + 13} textAnchor="middle">{lab.fmt(v)}</text>)}</Fragment>
             })}
             <rect x={m.l + band * i} y={m.t} width={band} height={ih} fill="transparent" onMouseEnter={() => setHover(i)} />
@@ -519,7 +520,7 @@ export function GroupBars({ categories, groups, fmt = String, aside, refLine, ar
               return (
                 <div className="b" key={g.id} title={v == null ? undefined : `${g.label}: ${fmt(v)}`}>
                   <span className="tr">
-                    {v != null && <i data-c={g.color} style={{ width: at(v), background: g.color }} className={g.partial?.[i] ? 'part' : undefined} />}
+                    {v != null && <i data-c={g.color} style={{ width: at(v), background: g.color, '--i': i }} className={g.partial?.[i] ? 'part' : undefined} />}
                   </span>
                   <span className={`v${g.muted ? ' mu' : ''}`}>{v == null ? '—' : fmt(v)}</span>
                 </div>

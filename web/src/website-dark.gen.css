@@ -1718,6 +1718,20 @@
 .dk .bx-chart .bref.acc text { fill: var(--brand-ink); }
 .dk .bx-chart:has(.bref.acc) text.blab { stroke: var(--card, #171a1f); }
 .bx.dk .bx-in-more:empty, .bx.dk.dk .bx-in-more:empty { border-top: 0; }
+.dk .bx-kgrp .gl { color: var(--ink-3); }
+.dk .bx-kgrp .gl .gt { color: var(--ink-2); }
+.dk .bx-kgrp.lvl .gl .gt { color: var(--ink-3); }
+.dk .bx-kgrp .gl b { color: var(--ink); }
+.dk .bx-kgrp.per .gl b { color: var(--brand-ink); }
+.dk .bx-kgrp + .bx-kgrp::before { background: var(--line); }
+.dk .bx-kgl { color: var(--ink-3); }
+.dk .bx-kgl b { color: var(--ink); }
+.dk .bx-kgl .per b { color: var(--brand-ink); }
+.dk .bx-kpis.strip.split-2 .bx-hrail-item:nth-child(3)::before { background: var(--line); }
+.dk .bx-seg > .bx-seg-ind { background: #171a1f; box-shadow: var(--shadow-sm); }
+.bx.dk .bx-seg.has-ind > button.on { background: transparent; box-shadow: none; }
+.dk .bx-pulse {
+  box-shadow: inset 0 0 0 1.5px var(--brand); background: color-mix(in srgb, var(--brand) 7%, transparent); }
 /*  ---- from frontend/src/website-bands.css  */
 .bx.dk.nb .bx-band {
   --lip: 40px;
