@@ -324,7 +324,8 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
       cancelAnimationFrame(glRaf); gl = null
       m._moveEnd(true)
     }
-    const glideTo = (center, zoom, ms = 600) => {
+    // `laid`: the mines are already laid out for where it lands (api.focus did it)
+    const glideTo = (center, zoom, ms = 600, laid = false) => {
       center = L.latLng(center)
       zoom = Math.max(m.getMinZoom(), Math.min(m.getMaxZoom(), zoom))
       m._stop()                                      // Leaflet's own flight or pan, if one is running
@@ -337,6 +338,21 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
         m.panTo(center, { animate: true, duration: ms / 1000, easeLinearity: 0.3 })
         m.once('moveend', () => L_.current.onGlideEnd?.())
         return
+      }
+      // EVERY GLIDE MOVES THE MINES ONCE, WITH THE CAMERA (v90, 17 Nov'26 — the user, on an iPhone: "the most laggy part
+      // is when I have selected a mine and then I click the cross and the zoom goes away and the mines spread out
+      // again"). The rings used to take their places for the new zoom only when the glide had LANDED — 75 rings
+      // re-spreading as a second move after the camera stopped. They are now laid out for the zoom the glide lands at
+      // BEFORE it starts, and each slides there over the glide itself (as api.focus already did going in), so going
+      // back out to India is one motion and nothing is left to do at the landing. A glide the reader's own hand
+      // started lets go of an opened cluster here, as its zoomstart would a moment later — so the layout drawn now is
+      // the one the landing finds.
+      if (!laid) {
+        if (!clickZoom.current && openRef.current) {
+          openRef.current = null
+          if (drill.current.length) { drill.current = []; live.current.onDrill?.([]) }
+        }
+        drawMines(z1, ms, center)
       }
       const chained = !!gl
       cancelAnimationFrame(glRaf)
@@ -537,16 +553,18 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
           const comfy = pt.x > size.x * 0.15 && pt.x < size.x * 0.85 && pt.y > top + 24 && pt.y < size.y - bottom - 24
           if (comfy) return
         }
+        let laid = false
         if (mine && Math.abs(target - z) > 0.01) {
           // this zoom lets go of a clicked cluster (as zoomstart would) — so the layout drawn now is the one it lands on
           openRef.current = null
           if (drill.current.length) { drill.current = []; live.current.onDrill?.([]) }
           const g = drawMines(target, reduced() ? 0 : 600)?.find(x => x.members.length === 1 && x.members[0].id === mine)
           if (g) ll = m.unproject([g.x, g.y], target)
+          laid = true
         }
         const c = m.unproject(m.project(ll, target).add([0, (bottom - top) / 2]), target)
         atIndia.current = false
-        glideTo(c, target, 600)
+        glideTo(c, target, 600, laid)
       },
     }
     // THE MARKER REFS DIE WITH THE MAP. React's development build mounts every effect twice
@@ -821,8 +839,9 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
   }
 
   // `zAt`: lay the rings out for that zoom instead of the map's own — api.focus, for the zoom its glide lands at;
-  // `ms`: how long a ring slides to its new place (a glide's length). Returns the groups as laid out.
-  function drawMines(zAt = null, ms = 420) {
+  // `ms`: how long a ring slides to its new place (a glide's length); `centerAt`: where that glide lands, so a zoom OUT
+  // draws every ring its wider view will show before it starts. Returns the groups as laid out.
+  function drawMines(zAt = null, ms = 420, centerAt = null) {
     const m = map.current
     if (!m) return null
     const z = zAt ?? m.getZoom()
@@ -847,7 +866,9 @@ export default function Engine({ fills, plants, mines, companies, selected, onSe
     // (so a cluster never changes as the map pans); only those within the view and a margin get a marker,
     // and a pan redraws (moveend, below).
     // (the view as it stands, at the zoom laid out for: for api.focus that holds all a zoom IN can show)
-    const vb = m.getBounds(), pb = L.bounds(m.project(vb.getNorthWest(), z), m.project(vb.getSouthEast(), z)), sz = pb.getSize()
+    const vb = m.getBounds(), pb = L.bounds(m.project(vb.getNorthWest(), z), m.project(vb.getSouthEast(), z))
+    if (centerAt) { const c = m.project(centerAt, z), h = m.getSize().divideBy(2); pb.extend(c.subtract(h)); pb.extend(c.add(h)) }
+    const sz = pb.getSize()
     const mx = sz.x * 0.2 + 40, my = sz.y * 0.2 + 40          // a short pan never shows an empty edge
     const inView = g => g.x > pb.min.x - mx && g.x < pb.max.x + mx && g.y > pb.min.y - my && g.y < pb.max.y + my
     const shown = groups.filter(inView)

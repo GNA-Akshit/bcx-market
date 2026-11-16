@@ -1145,7 +1145,8 @@ export default function CoalMap() {
   const [railSel, setRailSel] = useState(sel)
   useEffect(() => {
     if (!window.matchMedia?.('(pointer: coarse)').matches) { setRailSel(sel); return undefined }
-    const t = setTimeout(() => setRailSel(sel), 640)
+    // 850 ms, not 640 (v90): at 640 the panel's render met the glide's LANDING (0.6 s + its redraw) in one long frame
+    const t = setTimeout(() => setRailSel(sel), 850)
     return () => clearTimeout(t)
   }, [sel])
   const selView = useDeferredValue(railSel)
