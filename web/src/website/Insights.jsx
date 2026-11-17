@@ -80,6 +80,7 @@ const SHOW_TARGET_TILE = false       // Production & offtake: Coal India's produ
 const SHOW_AUCTION_TABLE = false     // E-auctions: the by-subsidiary table under the two charts (27 Oct'26)
 const SHOW_IMPORTS_TABLE = false     // Overview: imported coal as a table with slim bars (27 Oct'26 — a chart now)
 const SHOW_TARGET_MET = false        // Production & offtake: the two "target met" tiles (27 Oct'26 — rakes took their place; the share of target is in the production tiles and the company table)
+const RAKES_DAILY = false            // rakes: one day's report under Daily (17 Nov'26, the manager: MTD and FYTD averages only — Daily keeps the MTD)
 const SHOW_WIDE_COTABLE = false      // Production & offtake: the full-width company table with share-of-target bars (27 Oct'26 — the panel is half width now)
 // the coal map carries Leaflet and India's outline: loaded only when its module opens
 const loadCoalMap = () => import('./CoalMap.jsx')
@@ -326,7 +327,9 @@ function Strip({ five = false, three = false, groups = null, children }) {
 
 // an inline comparison's label, short enough for four tiles a row: "vs Oct 2025, same days" -> "vs Oct'25",
 // "vs FY 2025-26, same days" -> "vs FY25-26" (the full label is the title)
-const shortCmp = s => s.replace(/, same days$/, '').replace(/FY (\d{2})(\d{2})-(\d{2})/, 'FY$2-$3').replace(/ (?:19|20)(\d{2})\b/, "'$1")
+// …and the rakes' "vs Oct, the same 8 days" -> "vs Oct" (17 Nov'26: at 1440 px it was wider than the room beside
+// "349.7 rakes a day", and the unit was drawn over the number; the chart's legend names the 8 days)
+const shortCmp = s => s.replace(/, (?:the )?same (?:\d+ )?days$/, '').replace(/FY (\d{2})(\d{2})-(\d{2})/, 'FY$2-$3').replace(/ (?:19|20)(\d{2})\b/, "'$1")
 
 /** One figure: its label and date, the number, how it moved, its share of target (when it
  *  has one, as a plain percentage) and its trend. `href` opens its full series.
@@ -348,7 +351,10 @@ function Kpi(fig) {
     <>
       {pulse > 0 && <i key={pulse} className="bx-pulse" aria-hidden="true" />}
       <span className="hd"><span className="lbl">{label}</span>{when && <span key={`w${swap}`} className={`when${sw}`}>{when}</span>}</span>
-      <span className="val"><b>{value == null ? '—' : num(value, dec)}</b><small>{unitLabel(unit)}</small>
+      {/* an inline tile carries the phone's SHORT unit too (kt, MT, rakes), shown when the tile is narrow (website.css
+          "v91", a container query) — "thousand t" beside its comparison did not fit under 1366 px */}
+      <span className="val"><b>{value == null ? '—' : num(value, dec)}</b><small>{inline && phoneUnit(unit) !== unitLabel(unit)
+        ? <><span className="ul">{unitLabel(unit)}</span><span className="us">{phoneUnit(unit)}</span></> : unitLabel(unit)}</small>
         {/* inline, the comparison's label loses its ", same days" (kept in the title) so it fits one line */}
         {inline && !plain && <span key={`vc${swap}`} className={`vchg${sw}`} title={changeLabel || undefined}><ChangeMark change={change} changeUnit={changeUnit} note={note} />{changeLabel && <small>{shortCmp(changeLabel)}</small>}</span>}</span>
       {/* a figure its source publishes with no comparison says what it covers, in the same
@@ -942,14 +948,15 @@ function Pct({ v, quiet = false }) {
 // THE PHONE'S COMPANY TABLE SAYS LESS (13 Nov'26, the user: "the production number, the target percentage and the change
 // is too much for phone … only show percent up or down"): a figure and its change, one line under it — the share of
 // target is the desktop table's and the tile's sheet's. Each row is a line shorter, so the card is.
+// the phone's company table: the figure alone since 17 Nov'26 (CO_CHANGE — the manager's call)
 function FigCell({ c, dec }) {
   if (!c || c.value == null) return <td className="fc"><span className="v"><b className="z">—</b></span><span className="sub">not published</span></td>
   return (
     <td className="fc">
       <span className="v"><b>{num(c.value, dec)}</b></span>
-      <span className="sub">
+      {CO_CHANGE && <span className="sub">
         {c.change_pct != null ? <Pct v={c.change_pct} /> : <span className="na" title={c.note || 'no comparison'}>—</span>}
-      </span>
+      </span>}
     </td>
   )
 }
@@ -1021,10 +1028,10 @@ function DespatchOne({ D, k }) {
       <table className="bx-table bx-figtable bx-desp" data-stack="no">
         <thead><tr><th>Industry</th><th>{D.label}</th><th>FY {D.fy} to date</th></tr></thead>
         <tbody key={k} className="bx-swap-rows">
-          {D.rows.map(r => {
+          {despRows(D).map(r => {
             const c = r[k]
             return (
-              <tr key={r.sector}>
+              <tr key={r.sector} className={r === D.total_row ? 'tot' : undefined}>
                 <td><b>{r.sector === 'CPP' ? 'Captive power plants' : r.sector}</b></td>
                 {cell(c?.month, c?.growth, c?.small)}
                 {cell(c?.fytd, c?.fytd_growth, c?.fytd_small)}
@@ -1092,13 +1099,16 @@ function VsTarget({ of }) {
   return <span className={`ofp ${d >= 0 ? 'met' : 'below'}`} title={`${num(of, 1)}% of the target`}>{t}</span>
 }
 
+// NO CHANGE UNDER A COMPANY'S FIGURES (17 Nov'26, the manager's call — "remove the percent part below the figures"):
+// the change on the period before is the strip's, above; a company's line keeps only how far it stands from target
+const CO_CHANGE = false
 function CoHalfTable({ b, order, unitShort }) {
   const cell = c => (
     <td className="v">{c?.value == null ? <span className="z">—</span> : <>
       <b>{num(c.value, b.decimals)}</b>
       <small>
         {c.of_target != null && <VsTarget of={c.of_target} />}
-        {c.change_pct != null && <Pct v={c.change_pct} />}
+        {CO_CHANGE && c.change_pct != null && <Pct v={c.change_pct} />}
       </small>
     </>}</td>
   )
@@ -1142,8 +1152,8 @@ function CoChart({ b, order, unitShort, height, pc = false }) {
               <span className="v"><b>{c?.value == null ? '—' : num(c.value, b.decimals)}</b><small>{unitShort}</small></span>
               <span className="sub">
                 {c?.of_target != null && <VsTarget of={c.of_target} />}
-                {c?.of_target != null && <i aria-hidden="true">·</i>}
-                {c?.change_pct != null ? <Pct v={c.change_pct} /> : <span className="na" title={c?.note || undefined}>no comparison</span>}
+                {CO_CHANGE && c?.of_target != null && <i aria-hidden="true">·</i>}
+                {CO_CHANGE && (c?.change_pct != null ? <Pct v={c.change_pct} /> : <span className="na" title={c?.note || undefined}>no comparison</span>)}
               </span>
             </div>
           )
@@ -1191,6 +1201,9 @@ function CoChartPct({ b, order, unitShort, height }) {
 const DESP_COLS = D => [...D.dispatchers, { key: 'total', label: 'Total' }]
 // a phone's despatcher switch: four short names fit a 360px panel
 const DESP_SHORT = { cil: 'Coal India', sccl: 'Singareni', captive: 'Captive', total: 'Total' }
+// THE TOTAL UNDER THE INDUSTRIES (17 Nov'26, the manager's call): each despatcher's coal to every industry, added up on
+// the server (series.dispatch_total_row) — the last row, set like Coal India's total row in the company table
+const despRows = D => (D.total_row ? [...D.rows, D.total_row] : D.rows)
 function DespatchPeriod({ D, view }) {
   const f = view === 'month' ? ['month', 'growth', 'small'] : ['fytd', 'fytd_growth', 'fytd_small']
   return (
@@ -1200,8 +1213,8 @@ function DespatchPeriod({ D, view }) {
           <tr><th className="co">Industry</th>{DESP_COLS(D).map(x => <th key={x.key} className={`v${x.key === 'total' ? ' tt' : ''}`}>{x.label}</th>)}</tr>
         </thead>
         <tbody key={view} className="bx-swap-rows">
-          {D.rows.map(r => (
-            <tr key={r.sector}>
+          {despRows(D).map(r => (
+            <tr key={r.sector} className={r === D.total_row ? 'tot' : undefined}>
               <td className="co"><b>{r.sector === 'CPP' ? 'Captive power plants' : r.sector}</b></td>
               {DESP_COLS(D).map(x => {
                 const c = r[x.key]
@@ -1275,15 +1288,22 @@ function Supply({ data, by, basis, setBasis }) {
   // period (series.rake_loading_from) — the latest full daily report; rakes a day this month to date;
   // rakes a day April to the Ministry's latest month — each against its own comparison
   const RK = data.boards?.rake_loading
-  const rp = RK?.[basis]
+  // MTD AND FYTD ONLY (17 Nov'26, the manager's call — "Rakes loaded to be fixated in MTD & FYTD only, remove the
+  // daily part … wherever we're showing, average it out"): a rakes figure is always rakes A DAY, averaged over the
+  // month to date or April to MSG's latest month. Under Daily the rakes tile and chart STAY on the month to date (its
+  // span in the tile's head) — the one figure in the strip a Daily / MTD switch does not change, so it does not glow.
+  // The server still sends the day's report (`day`); RAKES_DAILY brings it back.
+  const rkb = basis === 'day' && !RAKES_DAILY && RK?.mtd ? 'mtd' : basis
+  const rp = RK?.[rkb]
   // the day names its report; the month and the year carry their own labels from the server
-  const rkWhen = !rp ? '' : basis === 'day' ? day(rp.as_of) : rp.label
-  const rkCmp = !rp ? '' : basis === 'day' ? (rp.prev ? `vs ${day(rp.prev).replace(/'\d{2}$/, '')}` : '') : rp.cmp
+  const rkWhen = !rp ? '' : rkb === 'day' ? day(rp.as_of) : rp.label
+  const rkCmp = !rp ? '' : rkb === 'day' ? (rp.prev ? `vs ${day(rp.prev).replace(/'\d{2}$/, '')}` : '') : rp.cmp
+  const rkUnit = rkb === 'day' ? 'rakes' : 'rakes a day'
   const rakes = () => (
-    <Kpi key="rakes" label={basis === 'day' ? 'Rakes loaded' : basis === 'fytd' ? 'Rakes loaded a day, monthly average' : 'Rakes loaded a day'} value={rp?.total} dec={basis === 'day' ? 0 : 1}
-      unit={basis === 'day' ? 'rakes' : 'rakes a day'} when={rkWhen} inline change={rp?.change_pct} changeLabel={rkCmp}
-      trend={rp?.trend ?? null} swap={basis}
-      source={basis === 'fytd' ? RK?.fytd_source_short : RK?.source_short} sourceUrl={basis === 'fytd' ? RK?.fytd_source_url : RK?.source_url} />
+    <Kpi key="rakes" label={rkb === 'day' ? 'Rakes loaded' : rkb === 'fytd' ? 'Rakes loaded a day, monthly average' : 'Rakes loaded a day'} value={rp?.total} dec={rkb === 'day' ? 0 : 1}
+      unit={rkUnit} when={rkWhen} inline change={rp?.change_pct} changeLabel={rkCmp}
+      trend={rp?.trend ?? null} swap={rkb}
+      source={rkb === 'fytd' ? RK?.fytd_source_short : RK?.source_short} sourceUrl={rkb === 'fytd' ? RK?.fytd_source_url : RK?.source_url} />
   )
   // TARGET MET (27 Oct'26, the user's call — it replaced the target as a figure): the share of the
   // period's target Coal India met, its last seven published days, and its move on the day before in
@@ -1399,21 +1419,21 @@ function Supply({ data, by, basis, setBasis }) {
           // m2: its line under the title follows the period and runs to two lines in some; a phone keeps two lines
           // for it in every period, so the Daily / MTD / FYTD switch moves nothing below (_probe_toggles.py)
           <Panel className="m2" title="Rakes loaded, by subsidiary"
-            unit={basis === 'day' ? `Coal India's report of ${day(rp.as_of)}` : basis === 'mtd' ? `${rp.label} · rakes a day · ${rp.days} reports` : `${rp.span} · rakes a day`}
-            source={basis === 'fytd' ? RK.fytd_source : RK.source} sourceUrl={basis === 'fytd' ? RK.fytd_source_url : RK.source_url}
-            legend={[{ label: basis === 'day' ? (rp.prev ? day(rp.prev) : 'Report before') : rp.prev_label, color: LAST_YEAR, kind: 'box' },
-                     { label: basis === 'day' ? day(rp.as_of) : rp.cur_label, color: THIS_YEAR, kind: 'box' }]}>
-            <div key={`r${basis}`} className="bx-swap">
-              {pc ? <GroupBars unit={basis === 'day' ? 'rakes' : 'rakes a day'} fmt={v => num(v, basis === 'day' ? 0 : 1)} ariaLabel={`Coal India's rakes loaded by subsidiary, ${rkWhen}`}
+            unit={rkb === 'day' ? `Coal India's report of ${day(rp.as_of)}` : rkb === 'mtd' ? `${rp.label} · rakes a day · ${rp.days} reports` : `${rp.span} · rakes a day`}
+            source={rkb === 'fytd' ? RK.fytd_source : RK.source} sourceUrl={rkb === 'fytd' ? RK.fytd_source_url : RK.source_url}
+            legend={[{ label: rkb === 'day' ? (rp.prev ? day(rp.prev) : 'Report before') : rp.prev_label, color: LAST_YEAR, kind: 'box' },
+                     { label: rkb === 'day' ? day(rp.as_of) : rp.cur_label, color: THIS_YEAR, kind: 'box' }]}>
+            <div key={`r${rkb}`} className="bx-swap">
+              {pc ? <GroupBars unit={rkUnit} fmt={v => num(v, rkb === 'day' ? 0 : 1)} ariaLabel={`Coal India's rakes loaded by subsidiary, ${rkWhen}`}
                 categories={rp.rows.map(r => r.company)}
-                groups={[{ id: 'p', label: basis === 'day' ? (rp.prev ? day(rp.prev) : 'Report before') : rp.prev_label, color: LAST_YEAR, values: rp.rows.map(r => r.prev), muted: true },
-                         { id: 'c', label: basis === 'day' ? day(rp.as_of) : rp.cur_label, color: THIS_YEAR, values: rp.rows.map(r => r.cur) }]} />
-              : <BarChart labelFmt={barLab} height={phone ? 220 : 500} unit={basis === 'day' ? 'rakes' : 'rakes a day'} yFmt={axis}
-                vFmt={v => `${num(v, basis === 'day' ? 0 : 1)} ${basis === 'day' ? 'rakes' : 'rakes a day'}`}
+                groups={[{ id: 'p', label: rkb === 'day' ? (rp.prev ? day(rp.prev) : 'Report before') : rp.prev_label, color: LAST_YEAR, values: rp.rows.map(r => r.prev), muted: true },
+                         { id: 'c', label: rkb === 'day' ? day(rp.as_of) : rp.cur_label, color: THIS_YEAR, values: rp.rows.map(r => r.cur) }]} />
+              : <BarChart labelFmt={barLab} height={phone ? 220 : 500} unit={rkUnit} yFmt={axis}
+                vFmt={v => `${num(v, rkb === 'day' ? 0 : 1)} ${rkUnit}`}
                 ariaLabel={`Coal India's rakes loaded by subsidiary, ${rkWhen}`}
                 categories={rp.rows.map(r => r.company)} catTitle={i => `${COMPANY[rp.rows[i].company]} — ${rkWhen}`}
-                groups={[{ id: 'p', label: basis === 'day' ? (rp.prev ? day(rp.prev) : 'Report before') : rp.prev_label, color: LAST_YEAR, values: rp.rows.map(r => r.prev) },
-                         { id: 'c', label: basis === 'day' ? day(rp.as_of) : rp.cur_label, color: THIS_YEAR, values: rp.rows.map(r => r.cur) }]} />}
+                groups={[{ id: 'p', label: rkb === 'day' ? (rp.prev ? day(rp.prev) : 'Report before') : rp.prev_label, color: LAST_YEAR, values: rp.rows.map(r => r.prev) },
+                         { id: 'c', label: rkb === 'day' ? day(rp.as_of) : rp.cur_label, color: THIS_YEAR, values: rp.rows.map(r => r.cur) }]} />}
             </div>
           </Panel>
         )}

@@ -1526,6 +1526,7 @@
 .dk .bx-imp tr.tot .ib i { background: var(--brand); }
 .dk .bx-cot.bx-dsp thead tr:last-child th.tt:nth-child(n), .dk .bx-cot.bx-dsp td.tt { border-left: 1px solid var(--line-2); }
 .dk .bx-dsp td.tt { background: #181b20; }
+.dk .bx-dsp tr.tot td, .dk .bx-desp tr.tot td { border-top: 1px solid var(--line); color: var(--ink); }
 .dk .bx-dsp tbody tr:hover td.tt { background: #191c21; }
 .dk .ofbar.sh .tr i { background: var(--navy); }
 .dk .ofbar.sh b { color: var(--ink); }

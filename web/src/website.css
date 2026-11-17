@@ -3894,6 +3894,8 @@ a.bx-credit.on-dark:hover { background: none; color: #fff; text-decoration: unde
 .bx-dsp td.v { font-weight: 600; }
 .bx-cot.bx-dsp thead tr:last-child th.tt:nth-child(n), .bx-cot.bx-dsp td.tt { border-left: 1px solid var(--line-2); }
 .bx-dsp td.tt { font-weight: 700; background: #fafbfc; }
+/* the Total ROW under the industries (17 Nov'26, series.dispatch_total_row): a rule above it, its figures bold */
+.bx-dsp tr.tot td, .bx-desp tr.tot td { border-top: 1px solid var(--line); font-weight: 700; color: var(--ink); }
 .bx-dsp tbody tr:hover td.tt { background: #f4f6f9; }
 
 /* the E-auctions table: the share allocated as a bar to 100%, neutral (it is not a target) */
@@ -4033,6 +4035,25 @@ a.bx-credit.on-dark:hover { background: none; color: #fff; text-decoration: unde
 .bx-kpi.inl .vchg { flex-direction: column; align-items: flex-end; justify-content: center; gap: 3px; flex-shrink: 0; align-self: center; }
 .bx-kpi.inl .vchg small { font-size: 11.5px; line-height: 1; }
 @media (max-width: 1366px) { .bx-kpis.strip .bx-kpi.inl .val b { font-size: 30px; } }
+/* v91 (17 Nov'26): THE NUMBER IS NEVER DRAWN OVER. With the number free to shrink (min-width 0 above) a long comparison
+   ("vs Oct, the same 8 days") squeezed it, and "rakes a day" was laid over its last digits. The number and its unit
+   keep their width; it is the comparison's label that gives way — an ellipsis, the whole label in its title. */
+.bx-kpis.strip .bx-kpi.inl .val > b, .bx-kpis.strip .bx-kpi.inl .val > small { flex-shrink: 0; }
+.bx-kpis.strip .bx-kpi.inl .vchg { flex-shrink: 1; min-width: 0; }
+.bx-kpis.strip .bx-kpi.inl .vchg small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+/* …and A NARROW TILE TAKES THE PHONE'S SHORT UNIT. Each tile is a size container: under 244 px of content (below
+   1366 px, a four-tile row) "thousand t" / "million t" / "rakes a day" become kt / MT / rakes (its label says "a
+   day"); under 206 px (≤1180) the number steps down too. Measured by scratch/dev/_probe_v91_widths.py: a tile needs
+   216–255 px with the long unit, its content box is 260 at ≥1440, 247 at 1366, 226 at 1280, 201 at 1180, 187 at 1100. */
+.bx-kpis.strip .bx-kpi.inl { container-type: inline-size; }
+.bx-kpi .val .us { display: none; }
+@container (max-width: 243px) {
+  .bx-kpi.inl .val .ul { display: none; }
+  .bx-kpi.inl .val .us { display: inline; }
+}
+@container (max-width: 205px) {
+  .bx-kpis.strip .bx-kpi.inl .val > b { font-size: 26px; }
+}
 
 /* ==== v57 (2 Nov'26): A SMOOTHER HOME SCROLL, AND THE UI-TIPS PASS — LOCAL ONLY until the user approves ====
    The band's card lost its backdrop blur (rule at .bx-mcard). Everything below is additive: desktop layouts
