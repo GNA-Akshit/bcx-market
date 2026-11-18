@@ -5031,3 +5031,99 @@ html { touch-action: manipulation; }
   /* v89: and whenever the map itself is on screen — the button sat on the map's key (CoalMap, IntersectionObserver) */
   .bx.map-on .bx-theme-sw { opacity: 0; transform: translateY(8px); pointer-events: none; }
 }
+
+/* ==== v92 (18 Nov'26, LOCAL ONLY): THE HOME PAGE'S LATEST REGULATIONS (Legal.LatestRegulations) — in the coal chain's
+   place. The Regulations page's own document rows (.bx-rg-row), two to a line on a desktop, one below 1100 px; no motion
+   but the row's own hover. */
+.bx-hreg-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.bx-hreg-list > li { display: flex; }
+.bx-hreg-list .bx-rg-row { flex: 1; }
+@media (max-width: 1100px) { .bx-hreg-list { grid-template-columns: minmax(0, 1fr); gap: 10px; } }
+
+/* ==== v93 (18 Nov'26, LOCAL ONLY): "WRITE TO US" — the enquiry form in a dialog (website/ContactForm.jsx) ==========
+   The VP: a web form, not a mailto. A desktop: a dialog in the middle of the screen over a BLURRED page (ui.Sheet
+   `center`); a phone: the site's bottom sheet. The form on the left, the office and direct addresses on the right.
+   Calm: the dialog fades and rises once; every field's error line is held, so a message never moves the form. */
+.bx-sheet.center .bx-sheet-bg { background: rgba(15, 23, 35, .4); backdrop-filter: blur(10px) saturate(.9); -webkit-backdrop-filter: blur(10px) saturate(.9); }
+@media (min-width: 641px) {
+  .bx-sheet.center .bx-sheet-panel { top: 50%; left: 50%; right: auto; bottom: auto; width: min(1000px, calc(100vw - 48px)); max-height: calc(100vh - 48px);
+    border-radius: 22px; opacity: 0; transform: translate(-50%, calc(-50% + 14px)) scale(.985);
+    transition: opacity .28s ease, transform .34s cubic-bezier(.2, .75, .2, 1); }
+  .bx-sheet.center.in .bx-sheet-panel { opacity: 1; transform: translate(-50%, -50%); }
+}
+@media (prefers-reduced-motion: reduce) { .bx-sheet.center .bx-sheet-panel { transition: none; } }
+
+.bx-cform { display: grid; grid-template-columns: minmax(0, 1fr) 300px; min-height: 100%; }
+.bx-cform .f { display: flex; flex-direction: column; padding: 34px 36px 30px; }
+.bx-cform .f .eyebrow { margin-bottom: 8px; }
+.bx-cform h2 { margin: 0 0 6px; font: 650 28px/1.15 var(--f-display); letter-spacing: -.02em; color: var(--ink); }
+.bx-cform .lede { margin: 0 0 20px; font-size: 14.5px; line-height: 1.55; color: var(--ink-3); }
+.bx-cform .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 16px; }
+.bx-cform .fld { display: flex; flex-direction: column; gap: 6px; position: relative; }
+.bx-cform .fld label { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.bx-cform .fld label i { font-style: normal; color: var(--brand-ink); }
+.bx-cform .fld label small { font-size: 12px; font-weight: 500; color: var(--ink-4); }
+.bx-cform :is(input[type="text"], input[type="email"], input[type="tel"], select, textarea) { width: 100%; box-sizing: border-box; padding: 11px 13px;
+  border: 1px solid #d7dde6; border-radius: 10px; background: #fff; font: 400 15px/1.4 var(--f-text); color: var(--ink);
+  transition: border-color .15s ease, box-shadow .15s ease; }
+.bx-cform :is(input, select, textarea):focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(241, 136, 91, .2); }
+.bx-cform textarea { min-height: 128px; max-height: 320px; resize: vertical; }
+.bx-cform textarea::placeholder { color: var(--ink-4); }
+.bx-cform .fld.bad :is(input, select, textarea) { border-color: var(--down); }
+.bx-cform .msg { min-height: 18px; margin: 0 0 4px; font-size: 12px; line-height: 1.4; color: var(--down); }
+.bx-cform .count { position: absolute; right: 0; bottom: 4px; font-size: 11.5px; color: var(--ink-4); font-variant-numeric: tabular-nums; }
+.bx-cform .hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+.bx-cform .consent label { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.5; color: var(--ink-3); cursor: pointer; }
+.bx-cform .consent input { flex-shrink: 0; width: 17px; height: 17px; margin: 2px 0 0; accent-color: var(--brand-strong); }
+.bx-cform .consent .msg { padding-left: 27px; }
+.bx-cform .fail { margin: 2px 0 12px; padding: 10px 12px; border-radius: 10px; background: var(--down-wash); font-size: 13px; line-height: 1.5; color: var(--down); }
+.bx-cform .fail a { color: inherit; font-weight: 650; }
+.bx-cform .send { align-self: flex-start; min-width: 180px; justify-content: center; }
+.bx-cform .send:disabled { opacity: .7; cursor: progress; }
+.bx-cform .side { display: flex; flex-direction: column; gap: 26px; padding: 34px 28px; border-left: 1px solid var(--line-2); background: var(--bg-soft); }
+.bx-cform .side .eyebrow { display: block; margin-bottom: 12px; }
+.bx-cform .side b { display: block; font-size: 14px; font-weight: 650; color: var(--ink); }
+.bx-cform .side .addr { display: flex; gap: 10px; margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--ink-3); }
+.bx-cform .side :is(.addr, .ln) > svg { flex-shrink: 0; width: 18px; height: 18px; margin-top: 2px; color: var(--brand); }
+.bx-cform .side .ln { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-top: 1px solid var(--line-2); font-size: 13.5px; line-height: 1.5;
+  color: var(--ink-3); text-decoration: none; }
+.bx-cform .side .ln:first-of-type { border-top: 0; padding-top: 0; }
+.bx-cform .side .ln:hover b { color: var(--brand-ink); }
+.bx-cform .side .ln .go { width: 15px; height: 15px; margin: 3px 0 0 auto; color: var(--ink-4); }
+.bx-cform.done { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 70px 40px 60px; text-align: center; }
+.bx-cform.done .ok { display: grid; place-items: center; width: 56px; height: 56px; margin-bottom: 6px; border-radius: 50%; background: var(--up-wash); color: var(--up); }
+.bx-cform.done .ok svg { width: 28px; height: 28px; }
+.bx-cform.done h2 { font-size: 26px; }
+.bx-cform.done p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--ink-3); }
+.bx-cform.done .ref b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.bx-cform.done .bx-btn { margin-top: 14px; min-width: 140px; justify-content: center; }
+@media (max-width: 640px) {
+  .bx-cform { grid-template-columns: minmax(0, 1fr); }
+  /* the sheet's grab bar and close button sit above: the heading starts level with the close button */
+  .bx-cform .f { padding: 10px 18px 18px; }
+  .bx-cform .f .eyebrow { padding-right: 56px; }
+  .bx-cform .two { grid-template-columns: minmax(0, 1fr); }
+  .bx-cform h2 { font-size: 24px; }
+  .bx-cform .send { align-self: stretch; }
+  .bx-cform .side { padding: 22px 18px 30px; border-left: 0; border-top: 1px solid var(--line-2); }
+}
+@media (pointer: coarse) { .bx-cform :is(input, select, textarea) { font-size: 16px; } }
+
+/* the Contact section's Enquiries card is a BUTTON now (it opens the form): the card's look, not a button's */
+.bx-contact button.cc { width: 100%; border: 0; font: inherit; text-align: left; cursor: pointer; }
+.bx-contact button.cc:hover { transform: translateY(-2px); }
+.bx .bx-contact button.cc:hover { border-color: #fff; background: rgba(255, 255, 255, .76); }
+.bx-contact button.cc:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+
+/* ==== v94 (19 Nov'26, LOCAL ONLY): A PHOTOGRAPH'S CREDIT SHOWS WHEN THE PHOTOGRAPH IS POINTED AT ===================
+   The user: "instead of the reference being right there, it should only appear when we hover over a certain image,
+   like we did on our phone". Every photograph's credit (media.Credit `.bx-credit` - the page bands, Market Snapshot,
+   Contact; the hero's `.bx-photo-credit` on a desktop) is hidden until its own block is pointed at with a mouse,
+   reached with the keyboard, or pressed with a finger. It stays in the page all the while - a link to the photo's
+   source with its full credit in the title - as CC BY-SA asks. The phone's hero keeps its own hold (`.hold` / `.show`). */
+.bx :is(.bx-credit, .bx-photo-credit:not(.hold)) { opacity: 0; transition: opacity .25s ease; }
+.bx :hover > :is(.bx-credit, .bx-photo-credit:not(.hold)),
+.bx :focus-within > :is(.bx-credit, .bx-photo-credit:not(.hold)),
+.bx :is(.bx-credit, .bx-photo-credit):focus-visible { opacity: 1; }
+@media (hover: none) { .bx :active > .bx-credit { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .bx :is(.bx-credit, .bx-photo-credit) { transition: none; } }

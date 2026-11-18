@@ -9,7 +9,7 @@ import { Children, useCallback, useEffect, useLayoutEffect, useRef, useState } f
 import { createPortal } from 'react-dom'
 import { ArrowDownRight, ArrowUp, ArrowUpRight, Check, ChevronDown, ChevronRight, Minus, X } from 'lucide-react'
 import { dir, num, pct } from './format.js'
-import { BAND } from './flags.js'
+import { BAND, VISION_ONCE } from './flags.js'
 import { Credit, Photo } from './media.jsx'
 
 const reduced = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -174,10 +174,21 @@ export function PageBand({ crumb, title, sub, sheet = 'var(--bg)', photo, childr
   )
 }
 
-/** Words that fill in, one after another, as their block crosses the screen (the vision statement,
- *  5 Nov'26). The progress is ONE custom property on the block, written straight to the DOM on the
- *  scroll frame — never React state, which would re-render the page every frame (useOnScroll). */
-export function FillText({ text, as: Tag = 'blockquote', className = '' }) {
+/** A statement that lights up ALL AT ONCE, once, when it comes into view (the vision statement). It was a word-by-word
+ *  fill tied to the scroll position (5 Nov'26): a reader who stopped half way left half the sentence grey, and scrolling
+ *  back emptied it again — the VP read it as "text highlight keeps changing randomly". 18 Nov'26, the user: "all the
+ *  text starts becoming highlighted together and it is not dependent on the scroll". Now it is faint until the block is
+ *  well inside the screen, then all of it brightens in about a second and stays (website-bands.css `.bx-fill`). */
+// LOCAL ONLY (flags.VISION_ONCE, 19 Nov'26): a build that ships keeps the scroll-linked fill (FillScroll) until the user
+// sends this out
+export function FillText(props) {
+  return VISION_ONCE ? <FillOnce {...props} /> : <FillScroll {...props} />
+}
+
+/** Words that fill in, one after another, as their block crosses the screen (the vision statement, 5 Nov'26) — what
+ *  the live site shows. The progress is ONE custom property on the block, written straight to the DOM on the scroll
+ *  frame — never React state, which would re-render the page every frame (useOnScroll). */
+function FillScroll({ text, as: Tag = 'blockquote', className = '' }) {
   const ref = useRef(null)
   const words = text.split(/\s+/)
   useOnScroll(() => {
@@ -192,6 +203,26 @@ export function FillText({ text, as: Tag = 'blockquote', className = '' }) {
   return (
     <Tag ref={ref} className={`bx-fill ${className}`.trim()}>
       {words.map((w, i) => <span key={i} style={{ '--i': i }}>{w} </span>)}
+    </Tag>
+  )
+}
+
+function FillOnce({ text, as: Tag = 'blockquote', className = '' }) {
+  const ref = useRef(null)
+  const [lit, setLit] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || lit) return undefined
+    if (typeof IntersectionObserver === 'undefined') { setLit(true); return undefined }
+    // most of the statement inside the top three quarters of the screen
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setLit(true); io.disconnect() } },
+      { rootMargin: '0px 0px -25% 0px', threshold: 0.6 })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [lit])
+  return (
+    <Tag ref={ref} className={`bx-fill once${lit ? ' lit' : ''} ${className}`.trim()}>
+      <span>{text}</span>
     </Tag>
   )
 }
@@ -509,7 +540,9 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), [tabi
  *  page's scroll, keeps keyboard focus inside, and gives focus back on close.
  *  children may be a function: children(close). wide: a large reading panel that rises
  *  from the bottom (the daily letter), instead of a side panel. */
-export function Sheet({ open, onClose, label, children, wide = false }) {
+// `center` (18 Nov'26, the "Write to us" form): on a desktop a dialog in the middle of the screen over a blurred page,
+// not a panel from the right; on a phone the same bottom sheet as every other
+export function Sheet({ open, onClose, label, children, wide = false, center = false }) {
   const [mounted, setMounted] = useState(open)
   const [shown, setShown] = useState(false)
   const panel = useRef(null)
@@ -633,7 +666,7 @@ export function Sheet({ open, onClose, label, children, wide = false }) {
 
   if (!mounted) return null
   return createPortal(
-    <div className={`bx-sheet${wide ? ' wide' : ''}${shown ? ' in' : ''}`} role="dialog" aria-modal="true" aria-label={label}>
+    <div className={`bx-sheet${wide ? ' wide' : ''}${center ? ' center' : ''}${shown ? ' in' : ''}`} role="dialog" aria-modal="true" aria-label={label}>
       <div className="bx-sheet-bg" onClick={requestClose} />
       <div className="bx-sheet-panel" ref={panel}>
         <div className="bx-sheet-grab" aria-hidden="true" onPointerDown={grabDown} onPointerMove={grabMove}

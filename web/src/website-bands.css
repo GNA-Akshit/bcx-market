@@ -14,7 +14,7 @@
    nahi lag raha") — no orange background is left anywhere; orange stays an accent.
    Each band: a large centred title, and the page rising over the band's foot as a sheet with
    rounded top corners. THE HOME PAGE: the vision is a navy band whose statement fills in word by
-   word as it scrolls (ui.FillText); the coverage list sits on a pale panel; Careers is white so two
+   word as it scrolls (ui.FillText — since 18 Nov'26 all of it at once, when it comes into view); the coverage list sits on a pale panel; Careers is white so two
    tints never touch; the footer is a light cool tint.
    Everything here is scoped to `.bx.nb`, which exists only while the flag is on: on the dev server
    `?before` (…/site/?before#/news) takes the class away and the site is exactly what it was.
@@ -52,7 +52,9 @@
 .bx.nb .bx-band-in > :nth-child(2) { animation-delay: .06s; }
 .bx.nb .bx-band-in > :nth-child(3) { animation-delay: .14s; }
 .bx.nb .bx-band-in > :nth-child(n + 4) { animation-delay: .2s; }
-.bx.nb .bx-band h1 { max-width: 18ch; font-size: clamp(42px, 5.6vw, 76px); font-weight: 650; line-height: 1.02; letter-spacing: -.04em; text-wrap: balance; }
+/* THE TITLE CARRIES THE BAND (19 Nov'26, the user: with the line under it gone the titles "look small for the
+   header"): up to 96 px (was 76), and wide enough for "Coal Exchange Regulations" on one line (24ch, was 18ch) */
+.bx.nb .bx-band h1 { max-width: 24ch; font-size: clamp(48px, 6.6vw, 96px); font-weight: 650; line-height: 1.02; letter-spacing: -.04em; text-wrap: balance; }
 .bx.nb .bx-band h1 em { font-style: normal; }
 .bx.nb .bx-band .bx-crumbs { justify-content: center; margin: 0; }
 /* one line on a desktop, the longest (Regulations') included */
@@ -67,7 +69,7 @@
 .bx.nb .bx-band .bx-btn { margin-top: 6px; }
 @media (max-width: 760px) {
   .bx.nb .bx-band { --lip: 26px; --band-h: 296px; padding: 0 0 calc(var(--lip) + 6px); }
-  .bx.nb .bx-band h1 { font-size: 38px; letter-spacing: -.035em; }
+  .bx.nb .bx-band h1 { font-size: 46px; letter-spacing: -.035em; }      /* was 38 (19 Nov'26) */
   .bx.nb .bx-band-sub { font-size: 15px; }
 }
 @media (prefers-reduced-motion: reduce) { .bx.nb .bx-band-in > * { animation: none; } }
@@ -245,9 +247,14 @@
 .bx.nb .bx-sec.navy .eyebrow.light::before { background: var(--brand); }
 .bx.nb .bx-sec.navy .bx-vision blockquote { color: #fff; }
 .bx.nb .bx-sec.navy .bx-vision blockquote::before { color: var(--brand); opacity: .9; }
-/* THE FILL: every word starts faint and takes full white as the reading line passes it (ui.FillText
-   writes --p, the number of words filled; --i is each word's place) */
-.bx.nb .bx-fill span { opacity: clamp(.24, calc(var(--p, 0) - var(--i)), 1); transition: opacity .18s linear; }
+/* THE HIGHLIGHT (18 Nov'26 — was a word-by-word fill tied to the scroll): the whole statement starts faint and, once it
+   is well inside the screen, brightens TOGETHER in about a second and stays (ui.FillText adds `lit`, once). The quote
+   mark is the blockquote's own ::before, so it is the text's span that fades, not the block. */
+.bx.nb .bx-fill.once > span { opacity: .24; transition: opacity 1.2s cubic-bezier(.4, 0, .2, 1); }
+.bx.nb .bx-fill.once.lit > span { opacity: 1; }
+/* …and the live site's fill, word by word as the reading line passes it (ui.FillScroll writes --p, the words filled;
+   --i is each word's place) — kept for the builds that ship while VISION_ONCE is local */
+.bx.nb .bx-fill:not(.once) span { opacity: clamp(.24, calc(var(--p, 0) - var(--i)), 1); transition: opacity .18s linear; }
 @media (prefers-reduced-motion: reduce) { .bx.nb .bx-fill span { opacity: 1; transition: none; } }
 .bx.nb .bx-sec.navy .bx-vision .pillars { border-top-color: rgba(255, 255, 255, .14); }
 .bx.nb .bx-sec.navy .bx-vision .pillars b { color: #fff; }

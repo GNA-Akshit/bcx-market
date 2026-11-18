@@ -49,14 +49,19 @@ import DataCentre from './website/DataCentre.jsx'
 import SeriesPage from './website/SeriesPage.jsx'
 import { About, Careers, Chain, Contact, Principles, VisionMission } from './website/Company.jsx'
 import { IndustryOpener } from './website/Industry.jsx'
+// THE COAL CHAIN IS OFF ON THE DEV SERVER (18 Nov'26, pass 92 — the VP could not see its use): in its place, the four
+// newest regulations (Legal.LatestRegulations). A seller-to-buyer flow diagram was tried first and turned down
+// ("extremely AI generated", too much animation). LOCAL ONLY (flags.HOME_REGULATIONS): a build that ships keeps the chain.
+const SHOW_CHAIN = !HOME_REGULATIONS
 import { LettersShowcase, Reader } from './website/Newsletters.jsx'
 import { Coverage, Footer } from './website/About.jsx'
-import { BAND, BANDS, DATA_CENTRE, NEWSLETTER, PHONE_COMPACT } from './website/flags.js'
+import { BAND, BANDS, CONTACT_FORM, DATA_CENTRE, HOME_REGULATIONS, NEWSLETTER, PHONE_COMPACT } from './website/flags.js'
 import { useTheme } from './website/theme.js'               // the live theme (pass 64): a switch re-renders the root, no reload
 import ThemeSwitch from './website/ThemeSwitch.jsx'      // the visitor's light / dark switch, bottom left (flags.THEME)
 import { ReturnPill, pageOf, useReturnTrail } from './website/ReturnTrail.jsx'   // the way back after a card's link (pass 84)
 import { addressOf, adoptAddress, cleanLinks, here as addressNow, nameOfHref } from './website/route.js'   // '#/…' names ↔ the address bar (path on bcx.market)
-import Legal from './website/Legal.jsx'
+import Legal, { LatestRegulations } from './website/Legal.jsx'
+import ContactDialog from './website/ContactForm.jsx'
 import NewsPage from './website/NewsPage.jsx'
 import Insights from './website/Insights.jsx'
 import Research from './website/Research.jsx'
@@ -167,7 +172,8 @@ const HomeMain = memo(function HomeMain({ data, by, issueList, goSection, openEx
       <div className="bx-zone">
         {/* opened from an industry card's panel, the series page REPLACES the panel's own
             history entry, so Back returns to the card instead of re-opening the panel */}
-        <Chain data={data} onOpen={id => openExplorer(id, { replace: window.history.state?.bxSheet === true })} />
+        {SHOW_CHAIN ? <Chain data={data} onOpen={id => openExplorer(id, { replace: window.history.state?.bxSheet === true })} />
+          : <LatestRegulations />}
         {NEWSLETTER && <LettersShowcase issues={issueList} onOpen={openIssue} onArchive={() => openIssue(null)} />}
       </div>
       <Contact />
@@ -461,6 +467,9 @@ export default function Website() {
       {ret && <ReturnPill key={ret.id} ret={ret} onGone={clearRet} />}
       {/* light / dark, the visitor's choice (5 Nov'26, pass 62): a pill in the bottom-left corner */}
       <ThemeSwitch />
+      {/* the "Write to us" form (18 Nov'26): one dialog for the whole site, opened by openContact() — local only
+          (flags.CONTACT_FORM), so a build that ships mounts none */}
+      {CONTACT_FORM && <ContactDialog />}
     </div>
   )
 }

@@ -16,6 +16,21 @@ export const DATA_CENTRE = false
 // newsletter section on the home page; the coverage card points at Regulations; and an old
 // #/newsletter address opens the home page. The code (Newsletters.jsx, the reader, the covers) stays.
 export const NEWSLETTER = import.meta.env.DEV || import.meta.env.VITE_NEWSLETTER === '1'
+
+// THE "WRITE TO US" FORM IS LOCAL ONLY, LIKE THE NEWSLETTER (19 Nov'26, the user: "keep them uncommitted and
+// undeployed, keep them in our local just like our newsletter"). ON on the dev server (:5173), OFF in every build that
+// ships: there, every "Write to us" stays the mailto link it was and the form's dialog is never mounted
+// (website/ContactForm.jsx; its API, POST /api/website/contact, and the two mails live in libs/website/enquiries.py).
+// Only the user's own word turns it on: VITE_CONTACT_FORM=1 in frontend/.env.production.
+export const CONTACT_FORM = import.meta.env.DEV || import.meta.env.VITE_CONTACT_FORM === '1'
+
+// TWO HOME-PAGE CHANGES OF 18 Nov'26, KEPT LOCAL (19 Nov'26, the user: the next deploy carries ONLY the photo credits on
+// hover, the softer light bands of the dark site, the bands' lines removed and their bigger titles). ON on the dev server,
+// OFF in every build that ships - there the coal chain and the scroll-filled vision statement stay as they are live:
+//   HOME_REGULATIONS - "What's new in coal regulation" in the coal chain's place (Legal.LatestRegulations);
+//   VISION_ONCE      - the vision statement lit all at once when it comes into view (ui.FillText).
+export const HOME_REGULATIONS = import.meta.env.DEV
+export const VISION_ONCE = import.meta.env.DEV
 // PATH ADDRESSES — bcx.market/insights, not bcx.market/#/insights (16 Nov'26, website/route.js): on for the
 // bcx-website build (VITE_ROUTES=path); off here, where the site is ONE file (/site/index.html) and keeps '#/…'
 export const PATH_ROUTES = import.meta.env.VITE_ROUTES === 'path'

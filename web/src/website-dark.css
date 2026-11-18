@@ -123,25 +123,29 @@ html:has(.bx.dk), html:has(.bx.dk) body { background: #0f1114; color-scheme: dar
 /* THE BAND CONTRASTS WITH ITS PAGE (the user, 5 Nov'26: "light mode me ye dark ho and dark mode me ye
    light"): charcoal on the light site (website-bands.css), so here the page's photograph under a WHITE
    wash with black words. Literal colours: inside .dk the tokens are the dark theme's. */
-.bx.dk.nb .bx-band.is-photo { color: #364357; background: linear-gradient(180deg, #f4f6f9 0%, #eceff3 100%); }
+/* A SOFTER LIGHT (19 Nov'26, the user: on the dark site Regulations', News' and Market Insights' bands "look too
+   white and weird … make it more subtle white, a little bit darker"): a cool light grey (#d3d8de) for the near-white,
+   its wash the same grey and lighter, so the photograph shows through a little more. The black words keep their
+   contrast (about 12:1); the grey words are a step darker to keep theirs. */
+.bx.dk.nb .bx-band.is-photo { color: #364357; background: linear-gradient(180deg, #d6dbe1 0%, #ccd2d9 100%); }
 .bx.dk.nb .bx-band.is-photo::before { opacity: 0; }
-.bx.dk.nb .bx-band.is-photo .bx-band-bg { background: #eceff3; }
-.bx.dk.nb .bx-band.is-photo .bx-band-bg img { filter: grayscale(.3) contrast(1.04); }
+.bx.dk.nb .bx-band.is-photo .bx-band-bg { background: #ccd2d9; }
+.bx.dk.nb .bx-band.is-photo .bx-band-bg img { filter: grayscale(.35) contrast(1.02) brightness(.94); }
 .bx.dk.nb .bx-band.is-photo .bx-band-bg::after {
   background:
-    radial-gradient(56% 78% at 50% 46%, rgba(255, 255, 255, .92) 0%, rgba(255, 255, 255, .8) 55%, rgba(255, 255, 255, .62) 100%),
-    linear-gradient(180deg, rgba(255, 255, 255, .4) 0%, rgba(255, 255, 255, .15) 60%, rgba(255, 255, 255, .55) 100%);
+    radial-gradient(56% 78% at 50% 46%, rgba(214, 219, 225, .9) 0%, rgba(210, 215, 222, .78) 55%, rgba(204, 210, 217, .6) 100%),
+    linear-gradient(180deg, rgba(204, 210, 217, .35) 0%, rgba(204, 210, 217, .12) 60%, rgba(204, 210, 217, .5) 100%);
 }
 .bx.dk.nb .is-photo h1 { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: #0f1b2d; -webkit-text-fill-color: #0f1b2d; }
 .bx.dk.nb .is-photo h1 em { color: #F1885B; -webkit-text-fill-color: #F1885B; }
-.bx.dk.nb .is-photo .bx-crumbs, .bx.dk.nb .is-photo .bx-crumbs a { color: #64728a; }
+.bx.dk.nb .is-photo .bx-crumbs, .bx.dk.nb .is-photo .bx-crumbs a { color: #56637a; }
 .bx.dk.nb .is-photo .bx-crumbs a:hover { color: #0f1b2d; }
 .bx.dk.nb .is-photo .bx-crumbs span { color: #364357; }
 .bx.dk.nb .is-photo .bx-crumbs svg { color: #98a3b4; }
 .bx.dk.nb .is-photo .bx-band-sub { color: #364357; }
-.bx.dk.nb .is-photo .bx-band-pill { background: rgba(255, 255, 255, .85); border-color: #dfe3e9; color: #64728a; }
+.bx.dk.nb .is-photo .bx-band-pill { background: rgba(255, 255, 255, .5); border-color: rgba(15, 27, 45, .12); color: #56637a; }
 .bx.dk.nb .is-photo .bx-band-pill b { color: #0f1b2d; }
-.bx.dk.nb .is-photo .bx-band-meta { color: #64728a; }
+.bx.dk.nb .is-photo .bx-band-meta { color: #56637a; }
 .bx.dk.nb .is-photo .bx-band-meta svg { color: #d66c3c; }
 .bx.dk.nb .is-photo .bx-band-credit { color: rgba(15, 27, 45, .5); }
 .bx.dk.nb .is-photo a.bx-band-credit:hover { color: #0f1b2d; }

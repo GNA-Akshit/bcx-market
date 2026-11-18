@@ -23,12 +23,13 @@
 //   * never print a DATE for a milestone BCX does not control (registration is the
 //     Authority's decision); say what it waits on instead.
 import { useEffect, useState } from 'react'
-import { ArrowUpRight, BellRing, Check, ChevronDown, ChevronRight, ExternalLink, FileSpreadsheet, FileText, Info, Mail,
+import { ArrowRight, ArrowUpRight, BellRing, Check, ChevronDown, ChevronRight, ExternalLink, FileSpreadsheet, FileText, Info, Mail,
          Megaphone, ScrollText, ShieldCheck, UserPlus } from 'lucide-react'
 import { CONTACT, REGULATIONS, REG_CHECKED, REG_GROUPS, REG_SOURCES } from './content.js'
 import { day } from './format.js'
-import { Dropdown, PageBand, isReload } from './ui.jsx'
-import { BANDS } from './flags.js'
+import { Dropdown, PageBand, SecHead, isReload } from './ui.jsx'
+import { openContact } from './ContactForm.jsx'
+import { BANDS, CONTACT_FORM } from './flags.js'
 import { PHOTOS } from './media.jsx'
 
 /** The register: one row per section. `when` names what it waits on, not a date. */
@@ -79,7 +80,7 @@ const host = u => { try { return new URL(u).hostname.replace(/^www\./, '') } cat
 /** One regulation, built to read as a document you can open: a file tile, its kind, date
  *  and standing, the title, who issued it under what reference, and a "View document"
  *  button. The whole card is the link; it opens the issuer's own copy in a new tab. */
-function Regulation({ r }) {
+function Regulation({ r, bare = false }) {
   return (
     <li>
       <a className="bx-rg-row" href={r.url} target="_blank" rel="noopener noreferrer"
@@ -92,12 +93,32 @@ function Regulation({ r }) {
             {r.status && <span className={`s ${tone(r.status)}`}>{r.status}</span>}
           </span>
           <span className="t">{r.title}</span>
-          {r.note && <span className="n">{r.note}</span>}
+          {r.note && !bare && <span className="n">{r.note}</span>}
           <span className="by">{r.issuer}{r.ref && <> · <em>{r.ref}</em></>} · {host(r.url)}</span>
         </span>
         <span className="go">View document<ArrowUpRight aria-hidden="true" /></span>
       </a>
     </li>
+  )
+}
+
+/** THE HOME PAGE'S LATEST REGULATIONS (18 Nov'26, pass 92 — in the coal chain's place). The VP could not see the chain's
+ *  use; the user: a professional home page, "not AI generated", no animations. What an exchange's home page carries: its
+ *  newest documents, here the four newest regulations exactly as the Regulations page shows them (the same row, its
+ *  `bare` form: no notes of ours — every title is its issuer's), each opening the issuer's own copy. */
+export function LatestRegulations({ n = 4 }) {
+  const items = [...REGULATIONS].sort((a, b) => b.date.localeCompare(a.date)).slice(0, n)
+  return (
+    <section className="bx-sec bx-hreg" id="chain">
+      <div className="wrap">
+        <SecHead eyebrow="Regulations" title={<>What&rsquo;s new <em>in coal regulation.</em></>}
+          lede="The latest Acts, rules and notices, each opening the issuer’s own copy."
+          action={<a className="bx-btn secondary" href="#/legal/regulations">All regulations <ArrowRight /></a>} />
+        <ul className="bx-rg-list bx-hreg-list bx-reveal">
+          {items.map(r => <Regulation key={r.url} r={r} bare />)}
+        </ul>
+      </div>
+    </section>
   )
 }
 
@@ -187,8 +208,8 @@ export default function Legal({ section }) {
     <div className={`bx-legal${BANDS && !SHOW_REGISTER ? ' v-band' : ''}`}>
       {/* the navy band (flags.BANDS); the register's "Where BCX stands" panel keeps the old head */}
       {BANDS && !SHOW_REGISTER ? (
-        <PageBand crumb="Regulations" title={<>Coal Exchange <em>Regulations</em></>} photo={PHOTOS.portParadip}
-          sub="The laws and regulations coal trading in India works under, each linked to the official copy its issuer publishes." />
+        // the band's line under the title went (19 Nov'26, the user) - the title and the cards say it
+        <PageBand crumb="Regulations" title={<>Coal Exchange <em>Regulations</em></>} photo={PHOTOS.portParadip} />
       ) : (
       <section className="bx-lg-hero">
         <div className="wrap in">
@@ -246,7 +267,10 @@ export default function Legal({ section }) {
           </div>}
           <div className="ask">
             <b>A question about these regulations?</b>
-            <a className="bx-btn primary" href={`mailto:${CONTACT.email}?subject=${encodeURIComponent('Legal & documents')}`}><Mail /> Write to {CONTACT.email}</a>
+            {/* the form (18 Nov'26 — a form, not a mailto); local only (flags.CONTACT_FORM) */}
+            {CONTACT_FORM
+              ? <button type="button" className="bx-btn primary" onClick={() => openContact('other')}><Mail /> Write to us</button>
+              : <a className="bx-btn primary" href={`mailto:${CONTACT.email}?subject=${encodeURIComponent('Legal & documents')}`}><Mail /> Write to {CONTACT.email}</a>}
           </div>
         </div>
       </section>

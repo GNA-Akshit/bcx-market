@@ -11,12 +11,13 @@ import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, ArrowUpRight, Check, Cpu, Globe2, Mail, MapPin, Phone, Scale, ShieldCheck, Sparkles, Zap } from 'lucide-react'
 import { Credit, PHOTOS, Photo } from './media.jsx'
 import LinkedInIcon from './LinkedIn.jsx'
+import { openContact } from './ContactForm.jsx'
 import { ABOUT, CAREERS, CONTACT, MISSION, PRINCIPLES, VISION } from './content.js'
 import { FillText, HRail, SecHead, Sheet, usePhone } from './ui.jsx'
 import { monthLong, num } from './format.js'
 import { shortSource } from './sourceLabel.js'
 import { SeriesChart, seriesHref } from './seriesui.jsx'
-import { BANDS, DATA_CENTRE } from './flags.js'
+import { BANDS, CONTACT_FORM, DATA_CENTRE } from './flags.js'
 
 export function About() {
   return (
@@ -343,7 +344,11 @@ export function Careers() {
           <h2 className="h-sec">{CAREERS.title}<em>.</em></h2>
           <p className="lede">{CAREERS.intro}</p>
           <p className="note">{CAREERS.note}</p>
-          <a className="bx-btn primary" href={`mailto:${CONTACT.email}?subject=Careers%20at%20BCX`}><Mail /> Write to us</a>
+          {/* the form, open on Careers (18 Nov'26 — the VP: a form, not a mailto that opens Outlook); local only
+              (flags.CONTACT_FORM) — a build that ships keeps the mailto */}
+          {CONTACT_FORM
+            ? <button type="button" className="bx-btn primary" onClick={() => openContact('careers')}><Mail /> Write to us</button>
+            : <a className="bx-btn primary" href={`mailto:${CONTACT.email}?subject=Careers%20at%20BCX`}><Mail /> Write to us</a>}
         </div>
         {/* four cards, each a heading and its line, as BCX's changes document suggests */}
         {phone ? (
@@ -376,11 +381,16 @@ export function Contact() {
             <span className="eyebrow light">Contact</span>
             <h2>{CONTACT.title}</h2>
             <p>{CONTACT.lede}</p>
-            <a className="bx-btn white" href={`mailto:${CONTACT.email}`}><Mail /> {CONTACT.email}</a>
+            {/* WRITE TO US opens the form (18 Nov'26); the address stays on the Enquiries card for those who prefer mail */}
+            {CONTACT_FORM
+              ? <button type="button" className="bx-btn white" onClick={() => openContact()}><Mail /> Write to us</button>
+              : <a className="bx-btn white" href={`mailto:${CONTACT.email}`}><Mail /> {CONTACT.email}</a>}
           </div>
           <div className="cards">
             <div className="cc"><span className="ic"><MapPin /></span><span><b>{CONTACT.company}</b>{CONTACT.address}</span></div>
-            <a className="cc" href={`mailto:${CONTACT.email}`}><span className="ic"><Mail /></span><span><b>Enquiries</b>{CONTACT.email}</span><ArrowRight className="go" /></a>
+            {CONTACT_FORM
+              ? <button type="button" className="cc" onClick={() => openContact()}><span className="ic"><Mail /></span><span><b>Enquiries</b>{CONTACT.email}</span><ArrowRight className="go" /></button>
+              : <a className="cc" href={`mailto:${CONTACT.email}`}><span className="ic"><Mail /></span><span><b>Enquiries</b>{CONTACT.email}</span><ArrowRight className="go" /></a>}
             {/* the phone (16 Nov'26) — its own card; a tap dials it on a phone */}
             {CONTACT.phone && (
               <a className="cc" href={CONTACT.phoneHref}>

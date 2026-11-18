@@ -11,9 +11,10 @@
 // points into the register, so it is shown only when the register is (Legal.SHOW_REGISTER).
 import { ArrowUpRight, ChevronRight, Mail, ScrollText } from 'lucide-react'
 import { CONTACT, NEWS } from './content.js'
+import { openContact } from './ContactForm.jsx'
 import { SHOW_REGISTER } from './Legal.jsx'
 import { PageBand, usePhone } from './ui.jsx'
-import { BANDS } from './flags.js'
+import { BANDS, CONTACT_FORM } from './flags.js'
 import { PHOTOS } from './media.jsx'
 
 const longDate = s => new Date(`${s}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
@@ -24,7 +25,10 @@ const Media = () => (
   <aside className="bx-nw-media">
     <span className="k">Media enquiries</span>
     <p>For interviews, statements or information about BCX, write to us.</p>
-    <a className="bx-btn primary" href={`mailto:${CONTACT.email}?subject=${encodeURIComponent('Media enquiry')}`}><Mail /> {CONTACT.email}</a>
+    {/* the form, open on Media and press (18 Nov'26 — a form, not a mailto); local only (flags.CONTACT_FORM) */}
+    {CONTACT_FORM
+      ? <button type="button" className="bx-btn primary" onClick={() => openContact('media')}><Mail /> Write to us</button>
+      : <a className="bx-btn primary" href={`mailto:${CONTACT.email}?subject=${encodeURIComponent('Media enquiry')}`}><Mail /> {CONTACT.email}</a>}
   </aside>
 )
 
@@ -35,8 +39,8 @@ export default function NewsPage() {
   return (
     <div className={`bx-newsroom${BANDS ? ' v-band' : ''}`}>
       {BANDS ? (
-        <PageBand crumb="News" title={<>BCX <em>in the news</em></>} sub="Coverage of Bharat Coal Exchange in the press."
-          photo={PHOTOS.newsCoalWagons} />
+        // the band's line under the title went (19 Nov'26, the user)
+        <PageBand crumb="News" title={<>BCX <em>in the news</em></>} photo={PHOTOS.newsCoalWagons} />
       ) : (
       <section className="bx-nw-hero">
         <div className="wrap in">

@@ -17,13 +17,14 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronLeft, X } from 'lucide-react'
 import { here, nameOfHref } from './route.js'
+import { HOME_REGULATIONS } from './flags.js'
 
 const WAIT = 1100
 const LIFE = 9000
 const ALIAS = { mines: 'map', resources: 'sources' }
 // a home section by the name the page gives it
 const HOME_NAME = { about: 'About BCX', coverage: 'What we cover', vision: 'Our vision', principles: 'Our principles', careers: 'Careers',
-  industry: 'Market Snapshot', chain: 'The coal chain', letter: 'Newsletter', contact: 'Contact' }
+  industry: 'Market Snapshot', chain: HOME_REGULATIONS ? 'Latest regulations' : 'The coal chain', letter: 'Newsletter', contact: 'Contact' }
 const MODULE_NAME = { overview: 'Overview', supply: 'Production & offtake', map: 'Coal map', stocks: 'Plant stocks', power: 'Coal in electricity',
   auction: 'E-auctions', sources: 'Sources' }
 

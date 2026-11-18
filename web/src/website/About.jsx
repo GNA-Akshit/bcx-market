@@ -18,7 +18,7 @@ import { ArrowRight, ArrowUpRight, BarChart3, BookOpen, CircleCheck, Clock3, Fil
 import BcxLogo from './BrandLogo.jsx'      // the bcx.market logo (27 Oct'26)
 import { CONTACT } from './content.js'
 import { LEGAL, SHOW_REGISTER } from './Legal.jsx'
-import { DATA_CENTRE, NEWSLETTER } from './flags.js'
+import { DATA_CENTRE, HOME_REGULATIONS, NEWSLETTER } from './flags.js'
 import { HRail, usePhone } from './ui.jsx'
 import { publishers } from './Sources.jsx'
 import { useVisits } from './api.js'
@@ -173,7 +173,8 @@ export function Footer({ data, onNav, onLetters, onExplore, showVisits = false }
               <li><a href="#/insights">Market Insights</a></li>
               {DATA_CENTRE && <li><button className="lnk" onClick={() => onExplore()}>Data centre</button></li>}
               {NEWSLETTER && <li><button className="lnk" onClick={onLetters}>Newsletter</button></li>}
-              <li><button className="lnk" onClick={() => onNav('chain')}>Mine to plant</button></li>
+              {/* the coal chain's link, where the chain still is (a build that ships - flags.HOME_REGULATIONS) */}
+              {!HOME_REGULATIONS && <li><button className="lnk" onClick={() => onNav('chain')}>Mine to plant</button></li>}
               {/* FOUR COLUMNS, NOT FIVE (27 Oct'26): with BCX's register hidden the Regulations column
                   held one link, so the link moved here; the column comes back with the register */}
               {!SHOW_REGISTER && <li><a href="#/legal/regulations">Latest regulations</a></li>}
