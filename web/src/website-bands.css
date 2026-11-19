@@ -382,3 +382,17 @@
     radial-gradient(46% 120% at 100% 115%, rgba(91, 141, 214, .16), rgba(91, 141, 214, 0) 70%),
     linear-gradient(180deg, var(--slate-top), var(--slate-mid));
 }
+
+/* ---------------------------------------------------------------- no photographs: still gradients */
+/* 19 Nov'26, the user: "remove all the images apart from the one … Shaping the future of coal trading in India …
+   instead of the images we can make the background colour gradually shifting from one end to another (not
+   animation, just a gradient)". flags.PAGE_PHOTOS off puts `.flat` on the page bands, Market Snapshot and the
+   Contact card: each its own colour from one end to the other, COOL where the words start (left) and WARM where
+   they end — coal to ember on the charcoal band, grey to sand on the light ones. Nothing moves. The hero and the
+   coal chain keep their photographs. The dark theme's versions are in website-dark.css. */
+.bx.nb .bx-band.flat.is-photo, .bx.nb .bx-band.flat.is-navy {
+  background: linear-gradient(100deg, #0e1013 0%, #171a1f 38%, #262321 70%, #3b2a21 100%); }
+.bx.nb .bx-band.flat.is-light { background: linear-gradient(100deg, #eef1f5 0%, #f1f2f4 50%, #f6ece4 100%); }
+.bx.nb .bx-industry.flat .bg { background: linear-gradient(100deg, #dde1e7 0%, #e2e4e8 46%, #ebe2da 78%, #efdccf 100%); }
+.bx.nb .bx-industry.flat::before { background: none; }
+.bx.nb .bx-contact.flat::before { background: linear-gradient(105deg, #c85e2f 0%, #dc7143 42%, #e9855a 72%, #f09468 100%); }

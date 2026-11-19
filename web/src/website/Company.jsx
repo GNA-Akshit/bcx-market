@@ -17,7 +17,7 @@ import { FillText, HRail, SecHead, Sheet, usePhone } from './ui.jsx'
 import { monthLong, num } from './format.js'
 import { shortSource } from './sourceLabel.js'
 import { SeriesChart, seriesHref } from './seriesui.jsx'
-import { BANDS, CONTACT_FORM, DATA_CENTRE } from './flags.js'
+import { BANDS, CONTACT_FORM, DATA_CENTRE, PAGE_PHOTOS } from './flags.js'
 
 export function About() {
   return (
@@ -374,9 +374,10 @@ export function Contact() {
   return (
     <section className="bx-sec" id="contact">
       <div className="wrap">
-        <div className="bx-contact bx-reveal">
-          <Photo p={PHOTOS.railChp} sizes="100vw" />
-          <Credit p={PHOTOS.railChp} className="on-dark" />
+        <div className={`bx-contact bx-reveal${PAGE_PHOTOS ? '' : ' flat'}`}>
+          {/* PAGE_PHOTOS off (19 Nov'26): no photograph, a still gradient (website-bands.css `.flat`) */}
+          {PAGE_PHOTOS && <Photo p={PHOTOS.railChp} sizes="100vw" />}
+          {PAGE_PHOTOS && <Credit p={PHOTOS.railChp} className="on-dark" />}
           <div className="tx">
             <span className="eyebrow light">Contact</span>
             <h2>{CONTACT.title}</h2>

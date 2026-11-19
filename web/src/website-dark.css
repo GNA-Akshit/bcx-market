@@ -406,3 +406,11 @@ html:has(.bx.dk), html:has(.bx.dk) body { background: #0f1114; color-scheme: dar
 /* v86b — the phone map's selection card on the dark site: a raised panel, its Details button orange with white words */
 .bx.dk.mc .cm-stage .cm-selcard { background: #1d2128; border-color: rgba(255, 255, 255, .1); box-shadow: 0 14px 30px -12px rgba(0, 0, 0, .7); }
 .bx.dk.mc .cm-selcard .go { background: var(--brand-strong); color: #fff; }
+
+/* NO PHOTOGRAPHS, THE DARK THEME'S GRADIENTS (19 Nov'26, flags.PAGE_PHOTOS off — website-bands.css `.flat`): the
+   page band light grey to a warm sand (its black words keep their contrast), Market Snapshot a step-up grey to a
+   warm brown-grey, the Contact card the same orange as the light site's */
+.bx.dk.nb .bx-band.flat.is-photo { background: linear-gradient(100deg, #cbd1d8 0%, #d2d6dc 45%, #dbd6d1 75%, #e3d5ca 100%); }
+.bx.dk.nb .bx-industry.flat .bg { background: linear-gradient(100deg, #24282e 0%, #2a2e34 45%, #322f2e 75%, #3b312a 100%); }
+.bx.dk.nb .bx-industry.flat::before { background: none; }
+.bx.dk.nb .bx-contact.flat::before { background: linear-gradient(105deg, #c85e2f 0%, #dc7143 42%, #e9855a 72%, #f09468 100%); }

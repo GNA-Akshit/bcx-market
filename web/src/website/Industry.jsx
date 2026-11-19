@@ -11,6 +11,7 @@
 import { ArrowRight, Database, Factory, Pickaxe, TriangleAlert, Truck } from 'lucide-react'
 import { Credit, PHOTOS, Photo } from './media.jsx'
 import { Spark } from './charts.jsx'
+import { PAGE_PHOTOS } from './flags.js'
 import { arrow, day, dir, num, pct } from './format.js'
 
 /** One figure of the card. `change` is a percentage (coloured by its sign); `count` a change
@@ -60,9 +61,10 @@ function MarketCard({ data }) {
 export function IndustryOpener({ data }) {
   const sources = new Set((data.series || []).map(s => s.source.split('—')[0].trim())).size
   return (
-    <section className="bx-industry" id="industry">
-      <div className="bg" aria-hidden="true"><Photo p={PHOTOS.plantNight} sizes="100vw" /></div>
-      <Credit p={PHOTOS.plantNight} className="on-dark" />
+    <section className={`bx-industry${PAGE_PHOTOS ? '' : ' flat'}`} id="industry">
+      {/* PAGE_PHOTOS off (19 Nov'26): no photograph, a still gradient (website-bands.css `.flat`) */}
+      <div className="bg" aria-hidden="true">{PAGE_PHOTOS && <Photo p={PHOTOS.plantNight} sizes="100vw" />}</div>
+      {PAGE_PHOTOS && <Credit p={PHOTOS.plantNight} className="on-dark" />}
       {/* NOT "wrap in": the reveal marks a shown block with the class `in`, so a `.bx-industry .in`
           grid rule also caught the two revealed blocks inside it and split them into columns */}
       <div className="wrap bx-industry-in">

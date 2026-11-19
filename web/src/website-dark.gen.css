@@ -1899,3 +1899,5 @@
     radial-gradient(46% 120% at 100% 115%, rgba(28, 31, 37, 0.16), rgba(28, 31, 37, 0) 70%),
     linear-gradient(180deg, var(--slate-top), var(--slate-mid));
 }
+.bx.dk.nb .bx-band.flat.is-light { background: linear-gradient(100deg, #1a1d23 0%, #1a1d22 50%, #1b1e24 100%); }
+.bx.dk.nb .bx-contact.flat::before { background: linear-gradient(105deg, #c85e2f 0%, #dc7143 42%, #e9855a 72%, #f09468 100%); }

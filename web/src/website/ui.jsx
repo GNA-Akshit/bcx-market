@@ -9,7 +9,7 @@ import { Children, useCallback, useEffect, useLayoutEffect, useRef, useState } f
 import { createPortal } from 'react-dom'
 import { ArrowDownRight, ArrowUp, ArrowUpRight, Check, ChevronDown, ChevronRight, Minus, X } from 'lucide-react'
 import { dir, num, pct } from './format.js'
-import { BAND, VISION_ONCE } from './flags.js'
+import { BAND, PAGE_PHOTOS, VISION_ONCE } from './flags.js'
 import { Credit, Photo } from './media.jsx'
 
 const reduced = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -159,9 +159,10 @@ export function useStackedTables() {
 export function PageBand({ crumb, title, sub, sheet = 'var(--bg)', photo, children }) {   // --bg: the page's own ground (white; the dark theme's near-black)
   // flags.BAND: 'light' (the default) lays the page's own photograph under a white wash, 'photo' under a
   // navy one (its credit on it, as the licence asks); 'navy' and 'slate' draw the band without one
-  const pic = (BAND === 'light' || BAND === 'photo') && photo
+  // PAGE_PHOTOS off (19 Nov'26): no photograph — the band is a still gradient (website-bands.css `.flat`)
+  const pic = PAGE_PHOTOS && (BAND === 'light' || BAND === 'photo') && photo
   return (
-    <section className={`bx-band is-${BAND}`} style={{ '--sheet': sheet }}>
+    <section className={`bx-band is-${BAND}${PAGE_PHOTOS ? '' : ' flat'}`} style={{ '--sheet': sheet }}>
       {pic && <div className="bx-band-bg" aria-hidden="true"><Photo p={photo} eager sizes="100vw" /></div>}
       <div className="wrap bx-band-in">
         {crumb && <nav className="bx-crumbs" aria-label="Breadcrumb"><a href="#/">Home</a><ChevronRight /><span>{crumb}</span></nav>}

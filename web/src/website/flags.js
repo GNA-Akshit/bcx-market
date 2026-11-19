@@ -24,13 +24,16 @@ export const NEWSLETTER = import.meta.env.DEV || import.meta.env.VITE_NEWSLETTER
 // Only the user's own word turns it on: VITE_CONTACT_FORM=1 in frontend/.env.production.
 export const CONTACT_FORM = import.meta.env.DEV || import.meta.env.VITE_CONTACT_FORM === '1'
 
-// TWO HOME-PAGE CHANGES OF 18 Nov'26, KEPT LOCAL (19 Nov'26, the user: the next deploy carries ONLY the photo credits on
+// A HOME-PAGE CHANGE OF 18 Nov'26, KEPT LOCAL (19 Nov'26, the user: the next deploy carries ONLY the photo credits on
 // hover, the softer light bands of the dark site, the bands' lines removed and their bigger titles). ON on the dev server,
-// OFF in every build that ships - there the coal chain and the scroll-filled vision statement stay as they are live:
-//   HOME_REGULATIONS - "What's new in coal regulation" in the coal chain's place (Legal.LatestRegulations);
-//   VISION_ONCE      - the vision statement lit all at once when it comes into view (ui.FillText).
+// OFF in every build that ships - there the coal chain stays as it is live:
+//   HOME_REGULATIONS - "What's new in coal regulation" in the coal chain's place (Legal.LatestRegulations).
 export const HOME_REGULATIONS = import.meta.env.DEV
-export const VISION_ONCE = import.meta.env.DEV
+// VISION_ONCE - the vision statement lit all at once when it comes into view (ui.FillText), not filled word by word with
+// the scroll. SHIPPED 19 Nov'26 (pass 95, the user: "deploy … the text highlighting way we changed in the Our vision
+// section"); `false` brings the scroll-linked fill back.
+export const VISION_ONCE = true
+
 // PATH ADDRESSES — bcx.market/insights, not bcx.market/#/insights (16 Nov'26, website/route.js): on for the
 // bcx-website build (VITE_ROUTES=path); off here, where the site is ONE file (/site/index.html) and keeps '#/…'
 export const PATH_ROUTES = import.meta.env.VITE_ROUTES === 'path'
@@ -100,3 +103,12 @@ export const BAND = (() => {
   }
   return BAND_DEFAULT
 })()
+// PAGE_PHOTOS — the photographs BEHIND things (19 Nov'26, the user: "remove all the images apart from the one which
+// is here right now — Shaping the future of coal trading in India … instead of the images we can make the background
+// colour gradually shifting from one end to another (not animation, just a gradient)"). Off: the page bands (Market
+// Insights, News, Regulations, the Newsletter), Market Snapshot ("India's coal market, in public data.") and
+// the Contact card are each a still gradient, cool at one end and warm at the other (website-bands.css `.flat`). Kept:
+// the home hero's photograph and the coal chain's (India's coal industry, mine to plant). `true` brings every photo
+// back; the dev server shows them with ?photos.
+export const PAGE_PHOTOS = import.meta.env.DEV && typeof location !== 'undefined'
+  && new URLSearchParams(location.search).has('photos')
