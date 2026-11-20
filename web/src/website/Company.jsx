@@ -347,8 +347,8 @@ export function Careers() {
           {/* the form, open on Careers (18 Nov'26 — the VP: a form, not a mailto that opens Outlook); local only
               (flags.CONTACT_FORM) — a build that ships keeps the mailto */}
           {CONTACT_FORM
-            ? <button type="button" className="bx-btn primary" onClick={() => openContact('careers')}><Mail /> Write to us</button>
-            : <a className="bx-btn primary" href={`mailto:${CONTACT.email}?subject=Careers%20at%20BCX`}><Mail /> Write to us</a>}
+            ? <button type="button" className="bx-btn primary" onClick={() => openContact('careers')}><Mail /> Get in touch</button>
+            : <a className="bx-btn primary" href={`mailto:${CONTACT.email}?subject=Careers%20at%20BCX`}><Mail /> Get in touch</a>}
         </div>
         {/* four cards, each a heading and its line, as BCX's changes document suggests */}
         {phone ? (
