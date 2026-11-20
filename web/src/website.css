@@ -5127,3 +5127,33 @@ html { touch-action: manipulation; }
 .bx :is(.bx-credit, .bx-photo-credit):focus-visible { opacity: 1; }
 @media (hover: none) { .bx :active > .bx-credit { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .bx :is(.bx-credit, .bx-photo-credit) { transition: none; } }
+
+/* ==== v98 (20 Nov'26): "WRITE TO US" ON A PHONE, TIGHTER =====================================================
+   The user: "perfect for the laptop, but on phone ... just a little bit better". The phone's sheet ran ~1.7 screens:
+   now the heading sits level with the close button (no eyebrow), the fields stand closer (an empty error line folds
+   to a sliver and opens only for an error), the message box is shorter, and the direct ways are ONE ROW OF THREE
+   CHIPS above a one-line office - not four tall blocks. The desktop is unchanged but for the topic's placeholder. */
+.bx-cform .side .val { font-style: normal; }
+.bx-cform select.unset { color: var(--ink-4); }
+.bx-cform select option { color: var(--ink); }
+@media (max-width: 640px) {
+  .bx-cform .f { padding: 2px 18px 22px; }
+  .bx-cform .f .eyebrow { display: none; }
+  .bx-cform h2 { display: flex; align-items: center; min-height: 40px; margin: 0 0 2px; padding-right: 52px; font-size: 23px; }
+  .bx-cform .lede { margin: 0 0 14px; font-size: 14px; }
+  .bx-cform .fld { gap: 5px; }
+  .bx-cform .msg:empty { min-height: 10px; margin: 0; }
+  .bx-cform textarea { min-height: 104px; }
+  #cf-message-err:empty { min-height: 20px; }      /* the message's line keeps room for its character count */
+  .bx-cform .side { flex-direction: column-reverse; gap: 14px; padding: 18px 18px 26px; }
+  .bx-cform .side .direct { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .bx-cform .side .direct .eyebrow { grid-column: 1 / -1; margin-bottom: 2px; }
+  .bx-cform .side .direct .ln, .bx-cform .side .direct .ln:first-of-type { flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; min-height: 64px; padding: 10px 6px; border: 1px solid var(--line); border-radius: 12px; background: var(--card, #fff); text-align: center; }
+  .bx-cform .side .direct .ln > svg { margin: 0; }
+  .bx-cform .side .direct b { font-size: 13px; }
+  .bx-cform .side .direct :is(.val, .go) { display: none; }
+  .bx-cform .side .office .eyebrow { display: none; }
+  .bx-cform .side .office .addr { font-size: 12.5px; line-height: 1.5; }
+  .bx-cform .side .office .addr b { font-size: 12.5px; }
+}

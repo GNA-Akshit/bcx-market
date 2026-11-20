@@ -17,12 +17,10 @@ export const DATA_CENTRE = false
 // #/newsletter address opens the home page. The code (Newsletters.jsx, the reader, the covers) stays.
 export const NEWSLETTER = import.meta.env.DEV || import.meta.env.VITE_NEWSLETTER === '1'
 
-// THE "WRITE TO US" FORM IS LOCAL ONLY, LIKE THE NEWSLETTER (19 Nov'26, the user: "keep them uncommitted and
-// undeployed, keep them in our local just like our newsletter"). ON on the dev server (:5173), OFF in every build that
-// ships: there, every "Write to us" stays the mailto link it was and the form's dialog is never mounted
-// (website/ContactForm.jsx; its API, POST /api/website/contact, and the two mails live in libs/website/enquiries.py).
-// Only the user's own word turns it on: VITE_CONTACT_FORM=1 in frontend/.env.production.
-export const CONTACT_FORM = import.meta.env.DEV || import.meta.env.VITE_CONTACT_FORM === '1'
+// THE "WRITE TO US" FORM IS LIVE (20 Nov'26, the user: "deploy it"; local only from 18 Nov): every "Write to us" opens
+// the form (website/ContactForm.jsx) - its API, POST /api/website/contact, and the two mails from no-reply@bcx.market
+// live in libs/website/enquiries.py + mailroom.py. `false` puts every button back to the mailto link it was.
+export const CONTACT_FORM = true
 
 // A HOME-PAGE CHANGE OF 18 Nov'26, KEPT LOCAL (19 Nov'26, the user: the next deploy carries ONLY the photo credits on
 // hover, the softer light bands of the dark site, the bands' lines removed and their bigger titles). ON on the dev server,

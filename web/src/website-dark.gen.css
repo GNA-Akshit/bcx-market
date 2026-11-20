@@ -1795,6 +1795,11 @@
 .dk .bx-contact button.cc { border: 0; }
 .bx.dk .bx-contact button.cc:hover { border-color: rgba(255, 255, 255, 0.07); background: rgba(15, 17, 20, 0.76); }
 .dk .bx-contact button.cc:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+.dk .bx-cform select.unset { color: var(--ink-4); }
+.dk .bx-cform select option { color: var(--ink); }
+@media (max-width: 640px) {
+  .dk .bx-cform .side .direct .ln, .dk .bx-cform .side .direct .ln:first-of-type { border: 1px solid var(--line); background: var(--card, #171a1f); }
+}
 /*  ---- from frontend/src/website-bands.css  */
 .bx.dk.nb .bx-band {
   --lip: 40px;
@@ -1846,6 +1851,7 @@
 .bx.dk.nb .v-band .bx-in-tabs { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.114), 0 18px 40px -22px rgba(0, 0, 0, 0.8); }
 @media (min-width: 761px) {
   .bx.dk.nb .bx-in-nav .bx-in-tabs a { background: transparent; }
+  .bx.dk.nb .bx-in-tabs a + a::before { background: var(--ink-4); }
   .bx.dk.nb .bx-in-tabs a:hover { background: var(--bg-soft); color: var(--ink); }
   .bx.dk.nb .bx-in-nav .bx-in-tabs a.on { background: transparent; color: var(--ink); }
   .bx.dk.nb .bx-in-nav .bx-in-tabs a.on:hover { background: transparent; }

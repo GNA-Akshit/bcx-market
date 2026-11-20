@@ -1102,16 +1102,23 @@ function VsTarget({ of }) {
 // NO CHANGE UNDER A COMPANY'S FIGURES (17 Nov'26, the manager's call — "remove the percent part below the figures"):
 // the change on the period before is the strip's, above; a company's line keeps only how far it stands from target
 const CO_CHANGE = false
+// NO TARGET UNDER A COMPANY'S FIGURES EITHER (20 Nov'26, the user: "remove the from target comparisons, just the number
+// of production and offtake is fine"): the table and the chart's two Coal India figures print the tonnes alone
+const CO_TARGET = false
 function CoHalfTable({ b, order, unitShort }) {
-  const cell = c => (
-    <td className="v">{c?.value == null ? <span className="z">—</span> : <>
-      <b>{num(c.value, b.decimals)}</b>
-      <small>
-        {c.of_target != null && <VsTarget of={c.of_target} />}
-        {CO_CHANGE && c.change_pct != null && <Pct v={c.change_pct} />}
-      </small>
-    </>}</td>
-  )
+  const cell = c => {
+    const tgt = CO_TARGET && c?.of_target != null
+    const chg = CO_CHANGE && c?.change_pct != null
+    return (
+      <td className="v">{c?.value == null ? <span className="z">—</span> : <>
+        <b>{num(c.value, b.decimals)}</b>
+        {(tgt || chg) && <small>
+          {tgt && <VsTarget of={c.of_target} />}
+          {chg && <Pct v={c.change_pct} />}
+        </small>}
+      </>}</td>
+    )
+  }
   return (
     <div className="bx-table-wrap">
       <table className="bx-cot bx-coh" data-stack="no">
@@ -1150,11 +1157,11 @@ function CoChart({ b, order, unitShort, height, pc = false }) {
             <div key={m} className="fig">
               <span className="k">Coal India {l.toLowerCase()}</span>
               <span className="v"><b>{c?.value == null ? '—' : num(c.value, b.decimals)}</b><small>{unitShort}</small></span>
-              <span className="sub">
-                {c?.of_target != null && <VsTarget of={c.of_target} />}
-                {CO_CHANGE && c?.of_target != null && <i aria-hidden="true">·</i>}
+              {(CO_TARGET || CO_CHANGE) && <span className="sub">
+                {CO_TARGET && c?.of_target != null && <VsTarget of={c.of_target} />}
+                {CO_TARGET && CO_CHANGE && c?.of_target != null && <i aria-hidden="true">·</i>}
                 {CO_CHANGE && (c?.change_pct != null ? <Pct v={c.change_pct} /> : <span className="na" title={c?.note || undefined}>no comparison</span>)}
-              </span>
+              </span>}
             </div>
           )
         })}
@@ -1167,7 +1174,7 @@ function CoChart({ b, order, unitShort, height, pc = false }) {
         groups={[{ id: 'p', label: 'Production', color: NAVY, values: subs.map(r => r.production?.value ?? null) },
                  { id: 'o', label: 'Offtake', color: ACCENT, values: subs.map(r => r.offtake?.value ?? null) }]} />
       : <BarChart labelFmt={barLab} height={height} unit={unitShort} yFmt={axis} vFmt={f}
-        ariaLabel={`Coal India's subsidiaries: production and offtake against target, ${b.label}`}
+        ariaLabel={`Coal India's subsidiaries: production and offtake, ${b.label}`}
         categories={subs.map(r => r.company)}
         catTitle={i => `${COMPANY[subs[i].company]} — ${b.label}`}
         groups={[{ id: 'p', label: 'Production', color: NAVY, values: subs.map(r => r.production?.value ?? null) },
