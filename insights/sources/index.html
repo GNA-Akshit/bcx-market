@@ -19,7 +19,14 @@
     <meta property="og:type" content="website" />
     <meta property="og:image" content="/site/img/hero-mine.webp" />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="icon" href="/site/favicon.svg" type="image/svg+xml" /><!-- the site's own: bcx.market's orange (27 Oct'26); the studio keeps /favicon.svg -->
+    <!-- THE SITE ICON IS THE BCX LOGO (20 Nov'26): "B" orange, "CX" black, on white - what Google shows beside a result,
+         in a circle, as MCX's. Outlines of the logo's own Montserrat Black (scripts/website/make_favicon.py); Google
+         takes an SVG or a multiple of 48 px; 180 px for an iPhone's home screen. The studio keeps /favicon.svg -->
+    <link rel="icon" href="/site/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/site/favicon-48.png" type="image/png" sizes="48x48" />
+    <link rel="icon" href="/site/favicon-96.png" type="image/png" sizes="96x96" />
+    <link rel="icon" href="/site/favicon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/site/apple-touch-icon.png" />
     <!-- the desktop's full-bleed hero photograph; a phone's banner picks its own smaller file from the srcset (Hero.jsx) -->
     <link rel="preload" as="image" href="/site/img/hero-mine.webp" media="(min-width: 601px)" />
     <!-- THE SITE OPENS DARK; light is a visitor's choice, kept in this browser (flags.THEME). Paint the page
