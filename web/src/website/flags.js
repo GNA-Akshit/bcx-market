@@ -32,6 +32,13 @@ export const HOME_REGULATIONS = import.meta.env.DEV
 // section"); `false` brings the scroll-linked fill back.
 export const VISION_ONCE = true
 
+// CAREERS - the openings page (#/jobs, #/jobs/<role>) and its application form with the CV and the ATS behind it
+// (website/Jobs.jsx; API backend/app/routes/careers.py; the HR portal is its own page, frontend/hr/, on the console's
+// host only). LOCAL ONLY - on the dev server, in NO build that ships (20 Nov'26, the user: "bcx.market has to have no
+// career page right now ... i was only setting up the hr dashboard for future"). The HR portal and the careers API are
+// deployed and wait for it; taking careers live is this one line (`true`), the guard test, and a /jobs line in
+// bcx-website's web/scripts/routes.mjs - and only on the user's word.
+export const CAREERS_PORTAL = import.meta.env.DEV
 // PATH ADDRESSES — bcx.market/insights, not bcx.market/#/insights (16 Nov'26, website/route.js): on for the
 // bcx-website build (VITE_ROUTES=path); off here, where the site is ONE file (/site/index.html) and keeps '#/…'
 export const PATH_ROUTES = import.meta.env.VITE_ROUTES === 'path'

@@ -414,3 +414,8 @@ html:has(.bx.dk), html:has(.bx.dk) body { background: #0f1114; color-scheme: dar
 .bx.dk.nb .bx-industry.flat .bg { background: linear-gradient(100deg, #24282e 0%, #2a2e34 45%, #322f2e 75%, #3b312a 100%); }
 .bx.dk.nb .bx-industry.flat::before { background: none; }
 .bx.dk.nb .bx-contact.flat::before { background: linear-gradient(105deg, #c85e2f 0%, #dc7143 42%, #e9855a 72%, #f09468 100%); }
+
+/* THE CAREERS PAGE'S CLOSING CARD (19 Nov'26, LOCAL ONLY): as the dark theme's page band - light grey to sand, dark words */
+.bx.dk .bx-cp-cta { color: #0f1b2d; background: linear-gradient(100deg, #cbd1d8 0%, #d2d6dc 45%, #dbd6d1 75%, #e3d5ca 100%); box-shadow: none; }
+.bx.dk .bx-cp-cta h3 { color: #0f1b2d; -webkit-text-fill-color: #0f1b2d; }
+.bx.dk .bx-cp-cta p { color: #364357; }

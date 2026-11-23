@@ -17,7 +17,7 @@ import { FillText, HRail, SecHead, Sheet, usePhone } from './ui.jsx'
 import { monthLong, num } from './format.js'
 import { shortSource } from './sourceLabel.js'
 import { SeriesChart, seriesHref } from './seriesui.jsx'
-import { BANDS, CONTACT_FORM, DATA_CENTRE, PAGE_PHOTOS } from './flags.js'
+import { BANDS, CAREERS_PORTAL, CONTACT_FORM, DATA_CENTRE, PAGE_PHOTOS } from './flags.js'
 
 export function About() {
   return (
@@ -346,9 +346,13 @@ export function Careers() {
           <p className="note">{CAREERS.note}</p>
           {/* the form, open on Careers (18 Nov'26 — the VP: a form, not a mailto that opens Outlook); local only
               (flags.CONTACT_FORM) — a build that ships keeps the mailto */}
-          {CONTACT_FORM
-            ? <button type="button" className="bx-btn primary" onClick={() => openContact('careers')}><Mail /> Get in touch</button>
-            : <a className="bx-btn primary" href={`mailto:${CONTACT.email}?subject=Careers%20at%20BCX`}><Mail /> Get in touch</a>}
+          {/* the openings (LOCAL ONLY - flags.CAREERS_PORTAL): the page leads, writing to us follows */}
+          <span className={CAREERS_PORTAL ? 'bx-careers-ctas' : undefined}>
+            {CAREERS_PORTAL && <a className="bx-btn primary" href="#/jobs">See open positions <ArrowRight /></a>}
+            {CONTACT_FORM
+              ? <button type="button" className={`bx-btn ${CAREERS_PORTAL ? 'secondary' : 'primary'}`} onClick={() => openContact('careers')}><Mail /> Get in touch</button>
+              : <a className={`bx-btn ${CAREERS_PORTAL ? 'secondary' : 'primary'}`} href={`mailto:${CONTACT.email}?subject=Careers%20at%20BCX`}><Mail /> Get in touch</a>}
+          </span>
         </div>
         {/* four cards, each a heading and its line, as BCX's changes document suggests */}
         {phone ? (

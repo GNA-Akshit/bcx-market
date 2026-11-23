@@ -68,6 +68,9 @@ const PATH = [
 // registration), the "Where BCX stands" path and the status note are not shown. The code
 // stays; set this true to bring the tab back.
 export const SHOW_REGISTER = false
+// "A QUESTION ABOUT THESE REGULATIONS?" AND ITS WRITE TO US ARE OFF (23 Nov'26, the user); `true` brings them back. With
+// the register off too, the closing band has nothing to show and is not drawn.
+export const SHOW_ASK = false
 
 const isSection = s => LEGAL.some(d => d.id === s)
 /** which tab an address opens: the register for #/legal/documents and its sections */
@@ -258,22 +261,22 @@ export default function Legal({ section }) {
         {tab === 'regulations' ? <Regulations cat={cat} /> : <Register part={part} />}
       </div>
 
-      <section className="bx-lg-end">
+      {(SHOW_REGISTER || SHOW_ASK) && <section className="bx-lg-end">
         <div className="wrap in">
           {SHOW_REGISTER && <div className="bx-status" role="note">
             <Info />
             <span><b>Registration filed; not yet operating.</b> BCX has filed its project report under Rule 7(2)(d) of the
               Coal Exchange Rules, 2026. Until the Authority registers it, nothing on this site is an offer to buy or sell coal.</span>
           </div>}
-          <div className="ask">
+          {SHOW_ASK && <div className="ask">
             <b>A question about these regulations?</b>
             {/* the form (18 Nov'26 — a form, not a mailto); local only (flags.CONTACT_FORM) */}
             {CONTACT_FORM
               ? <button type="button" className="bx-btn primary" onClick={() => openContact('other')}><Mail /> Write to us</button>
               : <a className="bx-btn primary" href={`mailto:${CONTACT.email}?subject=${encodeURIComponent('Legal & documents')}`}><Mail /> Write to {CONTACT.email}</a>}
-          </div>
+          </div>}
         </div>
-      </section>
+      </section>}
     </div>
   )
 }

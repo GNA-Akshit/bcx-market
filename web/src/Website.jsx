@@ -55,7 +55,8 @@ import { IndustryOpener } from './website/Industry.jsx'
 const SHOW_CHAIN = !HOME_REGULATIONS
 import { LettersShowcase, Reader } from './website/Newsletters.jsx'
 import { Coverage, Footer } from './website/About.jsx'
-import { BAND, BANDS, CONTACT_FORM, DATA_CENTRE, HOME_REGULATIONS, NEWSLETTER, PHONE_COMPACT } from './website/flags.js'
+import { BAND, BANDS, CAREERS_PORTAL, CONTACT_FORM, DATA_CENTRE, HOME_REGULATIONS, NEWSLETTER, PHONE_COMPACT } from './website/flags.js'
+import Jobs from './website/Jobs.jsx'          // careers (LOCAL ONLY - flags.CAREERS_PORTAL)
 import { useTheme } from './website/theme.js'               // the live theme (pass 64): a switch re-renders the root, no reload
 import ThemeSwitch from './website/ThemeSwitch.jsx'      // the visitor's light / dark switch, bottom left (flags.THEME)
 import { ReturnPill, pageOf, useReturnTrail } from './website/ReturnTrail.jsx'   // the way back after a card's link (pass 84)
@@ -76,13 +77,17 @@ import Resources from './website/Resources.jsx'
 // "HOME", NOT "ABOUT" (26 Oct'26, the user's call): the nav had About and About BCX side by side.
 // The first item is the top of the home page; while the reader is in About, Vision or Principles
 // it stays lit (PARENT), and "About BCX" is the coverage section, as before.
-const NAV = [['top', 'Home'], ['coverage', 'About BCX'], ['careers', 'Careers'], ['industry', 'Market Snapshot']]
+// CAREERS IS A PAGE (19 Nov'26, LOCAL ONLY - flags.CAREERS_PORTAL; the user: the openings were reached only through the
+// home page's Careers section): with the portal on, Careers leaves the home sections and sits among the pages (below)
+const NAV = CAREERS_PORTAL ? [['top', 'Home'], ['coverage', 'About BCX'], ['industry', 'Market Snapshot']]
+  : [['top', 'Home'], ['coverage', 'About BCX'], ['careers', 'Careers'], ['industry', 'Market Snapshot']]
 // the folded header's "Market Insights" door — OFF since 2 Nov'26 (a search field took its place); code kept
 const SHOW_HEADER_DOOR = false
 // the home sections the command menu offers (Home itself is a page there)
 const CMD_SECTIONS = [...NAV.filter(([id]) => id !== 'top'), ['contact', 'Contact']]
 // a section that is not in the nav still lights its nearest parent while you read it
-const PARENT = { about: 'top', vision: 'top', principles: 'top', chain: 'industry', letter: 'industry' }
+const PARENT = { about: 'top', vision: 'top', principles: 'top', chain: 'industry', letter: 'industry',
+  ...(CAREERS_PORTAL ? { careers: 'coverage' } : {}) }       // the home's Careers section, no longer a header link
 // the pages that are industry data: the reading line is industry blue on them
 const INDUSTRY_VIEWS = ['insights', 'explorer', 'letter', 'research', 'resources']
 
@@ -99,6 +104,9 @@ function parse(hash = addressNow()) {
   if (p[0] === 'exchange') return { view: 'home', section: 'coverage' }     // the section it replaced
   if (p[0] === 'legal') return { view: 'legal', section: p[1] || null }
   if (p[0] === 'news') return { view: 'news' }               // was a home section; now its own page
+  // careers: the openings and one role (LOCAL ONLY - flags.CAREERS_PORTAL); off, the address opens the
+  // home page's Careers section
+  if (p[0] === 'jobs') return CAREERS_PORTAL ? { view: 'jobs', item: p[1] ? decodeURIComponent(p[1]) : null } : { view: 'home', section: 'careers' }
   // the Sources module is OFF (16 Nov'26): its address opens the Overview, and the effect below puts that in the bar
   if (p[0] === 'insights' && p[1] === 'sources') return { view: 'insights', section: null, retired: '#/insights' }
   // section = the module; item = what in it to open (#/insights/stocks/<company>, 27 Oct'26)
@@ -297,6 +305,7 @@ export default function Website() {
       : route.view === 'explorer' ? `${by[route.series] ? `${by[route.series].title} — ` : ''}Data centre — ${base}`
       : route.view === 'legal' ? `Coal Exchange Regulations — ${base}`
       : route.view === 'news' ? `News & media — ${base}`
+      : route.view === 'jobs' ? `Careers — ${base}`
       : route.view === 'insights' ? `${route.section === 'sources' ? 'Sources — ' : ''}Market Insights — ${base}`
       : route.view === 'research' ? `Research & reports — ${base}`
       : route.view === 'resources' ? `Sources — ${base}`
@@ -404,6 +413,7 @@ export default function Website() {
             {NEWSLETTER && <button className={route.view === 'letter' ? 'on' : ''} onClick={() => openIssue(null)}>Newsletter</button>}
             <button className={route.view === 'news' ? 'on' : ''} onClick={() => navigate('#/news')}>News</button>
             <button className={route.view === 'legal' ? 'on' : ''} onClick={() => navigate('#/legal')}>Regulations</button>
+            {CAREERS_PORTAL && <button className={route.view === 'jobs' ? 'on' : ''} onClick={() => navigate('#/jobs')}>Careers</button>}
           </nav>
           <div className="bx-head-cta">
             <button className="bx-cmd-btn" onClick={() => setCmd(true)} aria-label="Search the site">
@@ -425,6 +435,7 @@ export default function Website() {
           ...(NEWSLETTER ? [{ key: 'letter', label: 'Newsletter', on: route.view === 'letter', onGo: () => openIssue(null) }] : []),
           { key: 'news', label: 'News', on: route.view === 'news', onGo: () => navigate('#/news') },
           { key: 'legal', label: 'Regulations', on: route.view === 'legal', onGo: () => navigate('#/legal') },
+          ...(CAREERS_PORTAL ? [{ key: 'jobs', label: 'Careers', on: route.view === 'jobs', onGo: () => navigate('#/jobs') }] : []),
           { key: 'search', label: 'Search', on: false, onGo: () => setCmd(true) },
         ]} />
       <CommandMenu open={cmd} onClose={closeCmd} onGo={navigate} onSection={goSection} data={data} sections={CMD_SECTIONS} />
@@ -439,6 +450,8 @@ export default function Website() {
         <main key="legal" className={ENTER}><Legal key={route.section || ''} section={route.section} /></main>
       ) : route.view === 'news' ? (
         <main key="news" className={ENTER}><NewsPage /></main>
+      ) : CAREERS_PORTAL && route.view === 'jobs' ? (
+        <main key={`jobs:${route.item || ''}`} className={ENTER}><Jobs slug={route.item} /></main>
       ) : route.view === 'research' ? (
         <main key="research" className={ENTER}><Research issues={issueList} /></main>
       ) : !data ? (
@@ -461,7 +474,7 @@ export default function Website() {
       ) : (
         <HomeMain key="home" data={data} by={by} issueList={issueList} goSection={goSection} openExplorer={openExplorer} openIssue={openIssue} />
       )}
-      <Footer data={data} onNav={goSection} onLetters={() => openIssue(null)} onExplore={openExplorer}
+      <Footer data={data} onNav={CAREERS_PORTAL ? (k => (k === 'careers' ? navigate('#/jobs') : goSection(k))) : goSection} onLetters={() => openIssue(null)} onExplore={openExplorer}
         showVisits={route.view === 'legal'} />
       <BackToTop />
       {ret && <ReturnPill key={ret.id} ret={ret} onGone={clearRet} />}

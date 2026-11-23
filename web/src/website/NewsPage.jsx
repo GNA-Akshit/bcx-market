@@ -21,6 +21,10 @@ const longDate = s => new Date(`${s}T00:00:00Z`).toLocaleDateString('en-GB', { d
 // newest first; a story without a date goes last (sort is stable, so same-day stories keep their order)
 const STORIES = [...NEWS].sort((a, b) => (b.date || '').localeCompare(a.date || ''))
 
+// THE MEDIA-ENQUIRIES CARD IS OFF (23 Nov'26, the user: "remove the write to us from Media enquiries"); `true` brings it
+// back, form and mailto twin with it
+export const SHOW_MEDIA = false
+
 const Media = () => (
   <aside className="bx-nw-media">
     <span className="k">Media enquiries</span>
@@ -35,7 +39,7 @@ const Media = () => (
 export default function NewsPage() {
   const phone = usePhone()
   // the navy band (flags.BANDS): the title alone on the band, the media card after the stories
-  const mediaAfter = BANDS || phone
+  const mediaAfter = SHOW_MEDIA && (BANDS || phone)
   return (
     <div className={`bx-newsroom${BANDS ? ' v-band' : ''}`}>
       {BANDS ? (
@@ -50,7 +54,7 @@ export default function NewsPage() {
             <h1>BCX <em>in the news</em></h1>
             <p className="lede">Coverage of Bharat Coal Exchange in the press.</p>
           </div>
-          {!phone && <Media />}
+          {SHOW_MEDIA && !phone && <Media />}
         </div>
       </section>
       )}

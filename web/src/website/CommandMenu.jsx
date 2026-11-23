@@ -9,7 +9,7 @@ import { createPortal } from 'react-dom'
 import { ArrowRight, Search } from 'lucide-react'
 import { SHOWN_MODULES } from './Insights.jsx'
 import { pretty } from './coalmap/names.js'
-import { NEWSLETTER } from './flags.js'
+import { CAREERS_PORTAL, NEWSLETTER } from './flags.js'
 
 
 function catalogue(data, sections) {
@@ -18,6 +18,7 @@ function catalogue(data, sections) {
     hash: k === 'overview' ? '#/insights' : `#/insights/${k}` }))
   if (NEWSLETTER) out.push({ group: 'Pages', label: 'Newsletter', hash: '#/newsletter', rank: 0 })
   out.push({ group: 'Pages', label: 'News', hash: '#/news', rank: 0 }, { group: 'Pages', label: 'Regulations', hash: '#/legal', rank: 0 })
+  if (CAREERS_PORTAL) out.push({ group: 'Pages', label: 'Careers', hash: '#/jobs', rank: 0 })      // LOCAL ONLY (flags.CAREERS_PORTAL)
   sections.forEach(([id, l]) => out.push({ group: 'On the home page', label: l, section: id, rank: 0 }))
   const plants = data?.boards?.plant_stocks?.plants || []
   const count = {}

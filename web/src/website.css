@@ -5063,7 +5063,7 @@ html { touch-action: manipulation; }
 .bx-cform .fld label { font-size: 13px; font-weight: 600; color: var(--ink-2); }
 .bx-cform .fld label i { font-style: normal; color: var(--brand-ink); }
 .bx-cform .fld label small { font-size: 12px; font-weight: 500; color: var(--ink-4); }
-.bx-cform :is(input[type="text"], input[type="email"], input[type="tel"], select, textarea) { width: 100%; box-sizing: border-box; padding: 11px 13px;
+.bx-cform :is(input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="url"], select, textarea) { width: 100%; box-sizing: border-box; padding: 11px 13px;
   border: 1px solid #d7dde6; border-radius: 10px; background: #fff; font: 400 15px/1.4 var(--f-text); color: var(--ink);
   transition: border-color .15s ease, box-shadow .15s ease; }
 .bx-cform :is(input, select, textarea):focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(241, 136, 91, .2); }
@@ -5127,6 +5127,162 @@ html { touch-action: manipulation; }
 .bx :is(.bx-credit, .bx-photo-credit):focus-visible { opacity: 1; }
 @media (hover: none) { .bx :active > .bx-credit { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .bx :is(.bx-credit, .bx-photo-credit) { transition: none; } }
+
+/* ==== v95 (19 Nov'26, LOCAL ONLY - flags.CAREERS_PORTAL): CAREERS - the openings, one role, the application ==========
+   website/Jobs.jsx. The list: one card a role, its facts on a quiet line. A role: the description to read on the left,
+   a card that holds the facts and the Apply button on the right (it stays in view while the description scrolls). The
+   application is the "Write to us" form's frame (.bx-cform) in one column, with a drop zone for the CV. */
+.bx-careers-ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+.bx-jobs { padding-top: 46px; padding-bottom: 80px; }
+.bx-jobs .hd { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.bx-jobs .hd h2 { margin: 0; font: 650 28px/1.2 var(--f-display); letter-spacing: -.02em; color: var(--ink); }
+.bx-jobs .hd span { font-size: 14px; color: var(--ink-3); }
+.bx-jobs ul { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.bx-job { display: flex; align-items: center; gap: 24px; padding: 24px 26px; border: 1px solid var(--line); border-radius: 16px;
+  background: var(--card, #fff); text-decoration: none; transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+.bx-job:hover { border-color: var(--brand-soft); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.bx-job:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+.bx-job .tx { display: grid; gap: 8px; min-width: 0; flex: 1; }
+.bx-job .tx b { font: 650 21px/1.25 var(--f-display); letter-spacing: -.01em; color: var(--ink); }
+.bx-job .sum { font-size: 14.5px; line-height: 1.6; color: var(--ink-3); }
+.bx-job .go { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; font-weight: 650; font-size: 14px; color: var(--brand-ink); }
+.bx-job .go svg { width: 16px; height: 16px; transition: transform .18s ease; }
+.bx-job:hover .go svg { transform: translateX(3px); }
+.bx-careers-pg .facts { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13.5px; color: var(--ink-3); }
+.bx-careers-pg .facts span { display: inline-flex; align-items: center; gap: 6px; }
+.bx-careers-pg .facts svg { width: 15px; height: 15px; color: var(--ink-4); }
+.bx-jobs .empty { margin: 8px 0 0; padding: 22px 24px; border: 1px dashed var(--line); border-radius: 14px; font-size: 15px; color: var(--ink-3); }
+.bx-jobs .empty a { color: var(--brand-ink); font-weight: 600; }
+.bx-jobs-skel { display: grid; gap: 14px; }
+.bx-jobs-skel i { display: block; height: 118px; border-radius: 16px; background: var(--bg-soft); }
+
+.bx-role { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 56px; align-items: start; padding-top: 40px; padding-bottom: 90px; }
+.bx-role .back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 18px; font-size: 14px; font-weight: 600; color: var(--ink-3); text-decoration: none; }
+.bx-role .back:hover { color: var(--brand-ink); }
+.bx-role .back svg { width: 16px; height: 16px; }
+.bx-role .jd .lede { margin: 0 0 30px; font-size: 19px; line-height: 1.6; color: var(--ink-2); }
+.bx-role .jd section { padding: 26px 0; border-top: 1px solid var(--line-2); }
+.bx-role .jd h3 { margin: 0 0 12px; font: 650 20px/1.3 var(--f-display); color: var(--ink); }
+.bx-role .jd p { margin: 0 0 12px; font-size: 15.5px; line-height: 1.75; color: var(--ink-2); }
+.bx-role .jd ul { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+.bx-role .jd li { position: relative; padding-left: 20px; font-size: 15.5px; line-height: 1.65; color: var(--ink-2); }
+.bx-role .jd li::before { content: ''; position: absolute; left: 2px; top: .7em; width: 7px; height: 7px; border-radius: 2px; background: var(--brand); }
+.bx-role .card { position: sticky; top: 104px; display: grid; gap: 16px; padding: 24px; border: 1px solid var(--line); border-radius: 18px; background: var(--card, #fff); box-shadow: var(--shadow-sm); }
+.bx-role .card dl { display: grid; gap: 0; margin: 0; }
+.bx-role .card dl div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line-2); font-size: 14px; }
+.bx-role .card dt { color: var(--ink-3); }
+.bx-role .card dd { margin: 0; font-weight: 600; text-align: right; color: var(--ink); }
+.bx-role .card .bx-btn { justify-content: center; }
+.bx-role .card .note { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-4); }
+/* a section's sub-groups (the JD's Key Responsibilities, 19 Nov'26) */
+.bx-role .jd .grp + .grp { margin-top: 20px; }
+.bx-role .jd h4 { margin: 0 0 10px; font: 650 16px/1.35 var(--f-display); color: var(--ink); }
+/* the JD document: open it as a PDF, or take the Word original */
+.bx-role .jdoc { display: grid; gap: 10px; padding-top: 16px; border-top: 1px solid var(--line-2); }
+.bx-role .jdoc .lab { font-size: 13px; font-weight: 600; color: var(--ink-3); }
+.bx-role .jdoc a { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border: 1px solid var(--line); border-radius: 12px;
+  color: var(--ink); text-decoration: none; transition: border-color .15s ease, background .15s ease; }
+.bx-role .jdoc a:hover { border-color: var(--brand-soft); background: var(--brand-wash); }
+.bx-role .jdoc a:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.bx-role .jdoc a > svg { flex-shrink: 0; width: 20px; height: 20px; color: var(--brand); }
+.bx-role .jdoc a span { display: grid; gap: 1px; min-width: 0; font-size: 12.5px; color: var(--ink-3); }
+.bx-role .jdoc a b { font-size: 14px; font-weight: 600; color: var(--ink); }
+.bx-role .jdoc a .go { width: 16px; height: 16px; margin-left: auto; color: var(--ink-4); }
+
+/* the application: the enquiry form's frame, one column, a narrower dialog */
+.bx-cform.bx-apply { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 641px) { .bx-sheet.center:has(.bx-apply) .bx-sheet-panel, .bx-sheet.center:has(.bx-cform.done) .bx-sheet-panel { width: min(780px, calc(100vw - 48px)); } }
+.bx-drop { position: relative; display: flex; align-items: center; gap: 14px; padding: 16px 18px; border: 1.5px dashed #c9d1dc;
+  border-radius: 12px; background: var(--bg-soft); cursor: pointer; transition: border-color .15s ease, background .15s ease; }
+.bx-drop:hover, .bx-drop.over { border-color: var(--brand); background: var(--brand-wash); }
+.bx-drop:focus-within { outline: 2px solid var(--brand); outline-offset: 2px; }
+.bx-drop.has { border-style: solid; border-color: var(--brand-soft); background: var(--card, #fff); }
+.bx-drop input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.bx-drop svg { flex-shrink: 0; width: 22px; height: 22px; color: var(--brand); }
+.bx-drop span { display: grid; gap: 2px; min-width: 0; font-size: 13px; color: var(--ink-3); }
+.bx-drop b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 600; color: var(--ink); }
+.bx-drop u { color: var(--brand-ink); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.bx-cform .fld:not(.bad) .msg { color: var(--ink-4); }
+
+@media (max-width: 1020px) {
+  .bx-role { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .bx-role .card { position: static; }
+}
+@media (max-width: 600px) {
+  .bx-jobs { padding-top: 28px; }
+  .bx-job { flex-direction: column; align-items: flex-start; gap: 14px; padding: 20px; }
+  .bx-job .tx b { font-size: 19px; }
+  .bx-role { padding-top: 24px; }
+  .bx-role .jd .lede { font-size: 17px; }
+}
+
+/* ==== v97 (19 Nov'26, LOCAL ONLY - flags.CAREERS_PORTAL): THE CAREERS PAGE ==========================================
+   Careers is a page of its own (the header's pages, not a home section). It opens on the open positions, then why join
+   BCX (content.CAREERS), what happens after an application, and a closing card - with room before the footer, so one
+   role no longer ends the page against it. */
+.bx-cp-sec { padding: 76px 0; }
+.bx-cp-sec.soft { background: var(--bg-soft); border-block: 1px solid var(--line-2); }
+.bx-cp-open { padding-top: 44px; }
+.bx-cp-sec:last-child { padding-bottom: 112px; }
+.bx-cp-hd { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px; margin-bottom: 30px; }
+.bx-cp-hd .eyebrow { margin-bottom: 12px; }
+.bx-cp-roles { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
+.bx-cp-role { position: relative; overflow: hidden; display: flex; align-items: center; gap: 32px; padding: 30px 34px; background: var(--card, #fff);
+  border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow-sm); text-decoration: none;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+.bx-cp-role::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--brand); opacity: 0; transition: opacity .2s ease; }
+.bx-cp-role:hover { border-color: var(--brand-soft); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.bx-cp-role:hover::before, .bx-cp-role:focus-visible::before { opacity: 1; }
+.bx-cp-role:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+.bx-cp-role .tx { display: grid; gap: 10px; flex: 1; min-width: 0; }
+.bx-cp-role .dept { font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--brand-ink); }
+.bx-cp-role b { font: 650 27px/1.2 var(--f-display); letter-spacing: -.02em; color: var(--ink); }
+.bx-cp-role .sum { max-width: 72ch; font-size: 16px; line-height: 1.6; color: var(--ink-2); }
+.bx-cp-role .facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.bx-cp-role .facts span { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border: 1px solid var(--line-2); border-radius: 999px;
+  background: var(--bg-soft); font-size: 13px; color: var(--ink-3); }
+.bx-cp-role .facts svg { width: 14px; height: 14px; color: var(--ink-4); }
+.bx-cp-role .go { flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 22px; border-radius: 12px;
+  background: var(--brand); color: #fff; font-weight: 650; font-size: 15px; box-shadow: 0 10px 24px -10px rgba(241, 136, 91, .65); transition: background .2s ease; }
+.bx-cp-role:hover .go { background: var(--brand-strong); }
+.bx-cp-role .go svg { width: 18px; height: 18px; transition: transform .2s ease; }
+.bx-cp-role:hover .go svg { transform: translateX(3px); }
+.bx-cp-note { margin: 18px 4px 0; font-size: 14.5px; color: var(--ink-3); }
+.bx-cp-empty { margin: 0; padding: 24px 26px; border: 1px dashed var(--line); border-radius: 18px; font-size: 15px; color: var(--ink-3); background: var(--card, #fff); }
+.bx-cp-why { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; align-items: start; }
+.bx-cp-why .tx { display: grid; gap: 16px; justify-items: start; }
+.bx-cp-why .tx .lede { margin: 0; }
+.bx-cp-why ul.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.bx-cp-why ul.cards li { display: grid; align-content: start; gap: 8px; padding: 24px 24px 26px; background: var(--card, #fff); border: 1px solid var(--line);
+  border-radius: 20px; box-shadow: var(--shadow-xs); }
+.bx-cp-why ul.cards b { font: 650 18px/1.3 var(--f-display); color: var(--ink); }
+.bx-cp-why ul.cards span { font-size: 14.5px; line-height: 1.55; color: var(--ink-3); }
+.bx-cp-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.bx-cp-steps li { display: grid; align-content: start; gap: 8px; padding: 26px 26px 28px; background: var(--card, #fff); border: 1px solid var(--line); border-radius: 20px; }
+.bx-cp-steps .ic { display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 8px; border-radius: 14px; background: var(--brand-wash); color: var(--brand-strong); }
+.bx-cp-steps .ic svg { width: 22px; height: 22px; }
+.bx-cp-steps b { font: 650 18px/1.3 var(--f-display); color: var(--ink); }
+.bx-cp-steps li > span:last-child { font-size: 14.5px; line-height: 1.55; color: var(--ink-3); }
+/* the closing card: the page band's own gradient, so the page ends as it began */
+.bx-cp-cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 32px; margin-top: 56px; padding: 38px 42px;
+  border-radius: 26px; color: #fff; background: linear-gradient(100deg, #0e1013 0%, #171a1f 38%, #262321 70%, #3b2a21 100%); box-shadow: var(--shadow-lg); }
+.bx-cp-cta h3 { color: #fff; font-size: clamp(22px, 2.4vw, 30px); font-weight: 650; }
+.bx-cp-cta p { margin: 8px 0 0; font-size: 16px; color: rgba(255, 255, 255, .74); }
+@media (max-width: 1020px) {
+  .bx-cp-why { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .bx-cp-steps { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .bx-cp-sec { padding: 52px 0; }
+  .bx-cp-open { padding-top: 30px; }
+  .bx-cp-sec:last-child { padding-bottom: 80px; }
+  .bx-cp-role { flex-direction: column; align-items: stretch; gap: 20px; padding: 24px 22px; border-radius: 18px; }
+  .bx-cp-role b { font-size: 22px; }
+  .bx-cp-role .sum { font-size: 15px; }
+  .bx-cp-role .go { justify-content: center; }
+  .bx-cp-cta { padding: 28px 24px; border-radius: 20px; }
+  .bx-cp-cta .bx-btn { width: 100%; }
+}
 
 /* ==== v98 (20 Nov'26): "WRITE TO US" ON A PHONE, TIGHTER =====================================================
    The user: "perfect for the laptop, but on phone ... just a little bit better". The phone's sheet ran ~1.7 screens:
