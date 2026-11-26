@@ -156,6 +156,7 @@ export function useStackedTables() {
  *  rising over the band's foot as a sheet with rounded top corners (`sheet` = the colour of what
  *  follows, so the lip and the page are one surface). One band for Market Insights, News, Regulations
  *  and the Newsletter: the title says which page it is, nothing else competes with it. */
+const SHOW_CRUMBS = false
 export function PageBand({ crumb, title, sub, sheet = 'var(--bg)', photo, children }) {   // --bg: the page's own ground (white; the dark theme's near-black)
   // flags.BAND: 'light' (the default) lays the page's own photograph under a white wash, 'photo' under a
   // navy one (its credit on it, as the licence asks); 'navy' and 'slate' draw the band without one
@@ -165,7 +166,9 @@ export function PageBand({ crumb, title, sub, sheet = 'var(--bg)', photo, childr
     <section className={`bx-band is-${BAND}${PAGE_PHOTOS ? '' : ' flat'}`} style={{ '--sheet': sheet }}>
       {pic && <div className="bx-band-bg" aria-hidden="true"><Photo p={photo} eager sizes="100vw" /></div>}
       <div className="wrap bx-band-in">
-        {crumb && <nav className="bx-crumbs" aria-label="Breadcrumb"><a href="#/">Home</a><ChevronRight /><span>{crumb}</span></nav>}
+        {/* NO BREADCRUMB (26 Nov'26, the user: "Home > Regulations" above the title "gives an AI look") - `crumb` is
+            still passed by every page, so SHOW_CRUMBS brings it back */}
+        {SHOW_CRUMBS && crumb && <nav className="bx-crumbs" aria-label="Breadcrumb"><a href="#/">Home</a><ChevronRight /><span>{crumb}</span></nav>}
         <h1>{title}</h1>
         {sub && <div className="bx-band-sub">{sub}</div>}
         {children}

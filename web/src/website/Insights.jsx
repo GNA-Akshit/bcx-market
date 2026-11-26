@@ -2175,8 +2175,9 @@ export default function Insights({ data, module, item = null }) {
       {/* THE NAVY BAND (5 Nov'26, flags.BANDS): the photo head under a fade read as unfinished; the
           title now sits large on a navy band and the modules' card rises out of its foot */}
       {BANDS ? (
-        <PageBand crumb="Market Insights" title={<>Market <em>Insights</em></>} sheet="var(--bg-soft)" photo={hero}
-          sub={<span className="bx-band-pill">Last updated <b>{day(data.data_as_of)}</b></span>} />
+        // no "Last updated" pill under the title (26 Nov'26, the user: it "gives an AI look") - every module card
+        // says its own "As of" date
+        <PageBand crumb="Market Insights" title={<>Market <em>Insights</em></>} sheet="var(--bg-soft)" photo={hero} />
       ) : (
       <section className="bx-in-head">
         <div className="bg" aria-hidden="true"><Photo p={hero} eager sizes="100vw" /></div>
