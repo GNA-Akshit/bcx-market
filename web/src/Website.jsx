@@ -55,7 +55,8 @@ import { IndustryOpener } from './website/Industry.jsx'
 const SHOW_CHAIN = !HOME_REGULATIONS
 import { LettersShowcase, Reader } from './website/Newsletters.jsx'
 import { Coverage, Footer } from './website/About.jsx'
-import { BAND, BANDS, CAREERS_PORTAL, CONTACT_FORM, DATA_CENTRE, HOME_REGULATIONS, NEWSLETTER, PHONE_COMPACT } from './website/flags.js'
+import { BAND, BANDS, CAREERS_PORTAL, CONTACT_FORM, DATA_CENTRE, HOME_EVENTS, HOME_REGULATIONS, NEWSLETTER, PHONE_COMPACT } from './website/flags.js'
+import EventReel from './website/EventReel.jsx'      // BCX at the India Coal Conference 2026 (flags.HOME_EVENTS, live 26 Nov'26)
 import Jobs from './website/Jobs.jsx'          // careers (LOCAL ONLY - flags.CAREERS_PORTAL)
 import { useTheme } from './website/theme.js'               // the live theme (pass 64): a switch re-renders the root, no reload
 import ThemeSwitch from './website/ThemeSwitch.jsx'      // the visitor's light / dark switch, bottom left (flags.THEME)
@@ -180,7 +181,8 @@ const HomeMain = memo(function HomeMain({ data, by, issueList, goSection, openEx
       <div className="bx-zone">
         {/* opened from an industry card's panel, the series page REPLACES the panel's own
             history entry, so Back returns to the card instead of re-opening the panel */}
-        {SHOW_CHAIN ? <Chain data={data} onOpen={id => openExplorer(id, { replace: window.history.state?.bxSheet === true })} />
+        {HOME_EVENTS ? <EventReel />
+          : SHOW_CHAIN ? <Chain data={data} onOpen={id => openExplorer(id, { replace: window.history.state?.bxSheet === true })} />
           : <LatestRegulations />}
         {NEWSLETTER && <LettersShowcase issues={issueList} onOpen={openIssue} onArchive={() => openIssue(null)} />}
       </div>

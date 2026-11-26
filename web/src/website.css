@@ -5313,3 +5313,73 @@ html { touch-action: manipulation; }
   .bx-cform .side .office .addr { font-size: 12.5px; line-height: 1.5; }
   .bx-cform .side .office .addr b { font-size: 12.5px; }
 }
+
+/* ==== v102 (26 Nov'26, LIVE - flags.HOME_EVENTS): THE EVENTS SECTION (website/EventReel.jsx) ====================
+   BCX at the 8th Annual India Coal Conference, in the coal chain's place. The label and title beside the paragraph, then
+   the TICKER the user picked (option B of seven): the photographs drift left inside a window the width of the page's
+   column - clipped square at its edges, never faded into the page - the arrows coming up on hover, on the column's edges.
+   A photograph opens full size in the viewer. */
+.bx-events-hd { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 18px 72px; align-items: end; margin-bottom: 40px; }
+.bx-events-hd .t { display: grid; justify-items: start; gap: 14px; }
+.bx-events-hd .h-sec { margin: 0; }
+.bx-events-hd .body { margin: 0; max-width: 64ch; font-size: 16px; line-height: 1.7; color: var(--ink-2); }
+.bx-tick { position: relative; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.bx-tick-win { overflow: hidden; border-radius: 14px; }
+.bx-tick ul { display: flex; gap: 16px; width: max-content; margin: 0; padding: 0; list-style: none; will-change: transform; }
+.bx-tick li { flex: none; width: 520px; }
+.bx-tick-tile { position: relative; display: block; width: 100%; padding: 0; border: 0; border-radius: 14px; overflow: hidden;
+  background: var(--bg-soft); cursor: zoom-in; }
+.bx-tick-tile img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; pointer-events: none;
+  transition: transform .7s cubic-bezier(.2, .7, .2, 1); }
+.bx-tick-tile::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(16, 24, 40, .08);
+  pointer-events: none; }
+.bx-tick-tile:hover img { transform: scale(1.025); }
+.bx-tick-tile:focus-visible { outline: 2px solid var(--brand); outline-offset: -3px; }
+/* the arrows: a white disc on the light page (a dark one on the dark page - website-dark.css), half over the column's edge */
+.bx-tick-arr { position: absolute; z-index: 3; top: 50%; display: grid; place-items: center; width: 48px; height: 48px; padding: 0;
+  transform: translateY(-50%); border: 1px solid var(--line); border-radius: 50%; background: rgba(255, 255, 255, .96); color: var(--ink);
+  box-shadow: 0 6px 18px -8px rgba(16, 24, 40, .35); cursor: pointer; opacity: 0; transition: opacity .2s ease, background .2s ease; }
+.bx-tick-arr svg { width: 22px; height: 22px; }
+.bx-tick-arr.prev { left: -24px; }
+.bx-tick-arr.next { right: -24px; }
+.bx-tick:hover .bx-tick-arr, .bx-tick:focus-within .bx-tick-arr { opacity: 1; }
+.bx-tick-arr:hover { background: #fff; }
+.bx-tick-arr:focus-visible { opacity: 1; outline: 2px solid var(--brand); outline-offset: 2px; }
+@media (hover: none) { .bx-tick-arr { opacity: 1; } }
+
+/* the viewer: the photograph on a dark ground, arrows at the screen's two edges, the count under it */
+.bx-viewer { position: fixed; inset: 0; z-index: 400; display: grid; place-items: center; padding: 72px 112px;
+  background: rgba(9, 11, 14, .94); animation: bx-ev-in .2s ease; }
+@keyframes bx-ev-in { from { opacity: 0; } }
+.bx-viewer figure { margin: 0; display: grid; place-items: center; max-width: 100%; max-height: 100%; }
+.bx-viewer img { display: block; max-width: min(1500px, 100%); max-height: calc(100vh - 144px); width: auto; height: auto; border-radius: 6px;
+  animation: bx-ev-in .25s ease; }
+.bx-viewer-arr, .bx-viewer-x { position: fixed; display: grid; place-items: center; padding: 0; border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 50%; background: rgba(255, 255, 255, .06); color: #fff; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
+.bx-viewer-arr { top: 50%; width: 54px; height: 54px; transform: translateY(-50%); }
+.bx-viewer-arr svg { width: 24px; height: 24px; }
+.bx-viewer-arr.prev { left: 28px; }
+.bx-viewer-arr.next { right: 28px; }
+.bx-viewer-x { top: 22px; right: 28px; width: 44px; height: 44px; }
+.bx-viewer-x svg { width: 20px; height: 20px; }
+.bx-viewer-arr:hover, .bx-viewer-x:hover { background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .34); }
+.bx-viewer :focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+.bx-viewer-n { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); font-size: 13px; letter-spacing: .08em;
+  font-variant-numeric: tabular-nums; color: rgba(255, 255, 255, .7); }
+@media (max-width: 1000px) {
+  .bx-events-hd { grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; margin-bottom: 28px; }
+}
+@media (max-width: 760px) {
+  .bx-tick ul { gap: 12px; }
+  .bx-tick li { width: 78vw; }
+  .bx-tick-win, .bx-tick-tile { border-radius: 10px; }
+  .bx-tick-arr { width: 40px; height: 40px; }
+  .bx-tick-arr.prev { left: 8px; } .bx-tick-arr.next { right: 8px; }
+  .bx-events-hd .body { font-size: 15px; }
+  .bx-viewer { padding: 64px 12px 96px; }
+  .bx-viewer img { max-height: calc(100vh - 180px); }
+  .bx-viewer-arr { top: auto; bottom: 18px; transform: none; width: 46px; height: 46px; }
+  .bx-viewer-arr.prev { left: 16px; } .bx-viewer-arr.next { right: 16px; }
+  .bx-viewer-x { top: 14px; right: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .bx-tick-tile img, .bx-viewer, .bx-viewer img { transition: none; animation: none; } }

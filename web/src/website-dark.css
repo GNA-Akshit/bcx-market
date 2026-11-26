@@ -419,3 +419,8 @@ html:has(.bx.dk), html:has(.bx.dk) body { background: #0f1114; color-scheme: dar
 .bx.dk .bx-cp-cta { color: #0f1b2d; background: linear-gradient(100deg, #cbd1d8 0%, #d2d6dc 45%, #dbd6d1 75%, #e3d5ca 100%); box-shadow: none; }
 .bx.dk .bx-cp-cta h3 { color: #0f1b2d; -webkit-text-fill-color: #0f1b2d; }
 .bx.dk .bx-cp-cta p { color: #364357; }
+
+/* the events ticker (v102): a light hairline round each photograph, and dark arrows, on the dark page */
+.bx.dk .bx-tick-tile::after { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
+.bx.dk .bx-tick-arr { background: rgba(24, 27, 31, .96); color: #f2f4f7; border-color: rgba(255, 255, 255, .14); }
+.bx.dk .bx-tick-arr:hover { background: #22262b; }

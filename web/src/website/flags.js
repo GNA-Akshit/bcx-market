@@ -27,6 +27,11 @@ export const CONTACT_FORM = true
 // OFF in every build that ships - there the coal chain stays as it is live:
 //   HOME_REGULATIONS - "What's new in coal regulation" in the coal chain's place (Legal.LatestRegulations).
 export const HOME_REGULATIONS = import.meta.env.DEV
+// HOME_EVENTS - BCX at the India Coal Conference 2026, a ticker of BCX's own photographs, in the coal chain's place
+// (26 Nov'26, the user: the chain gets "a lot of reviews that this section is useless"). LIVE since 26 Nov'26 (the
+// user's word), in every build; it outranks HOME_REGULATIONS. The chain's code is kept: `false` brings the CHAIN back -
+// not the regulations (the user's word).
+export const HOME_EVENTS = true
 // VISION_ONCE - the vision statement lit all at once when it comes into view (ui.FillText), not filled word by word with
 // the scroll. SHIPPED 19 Nov'26 (pass 95, the user: "deploy … the text highlighting way we changed in the Our vision
 // section"); `false` brings the scroll-linked fill back.
