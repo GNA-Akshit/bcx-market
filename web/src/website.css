@@ -5093,6 +5093,7 @@ html { touch-action: manipulation; }
 .bx-cform.done { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 70px 40px 60px; text-align: center; }
 .bx-cform.done .ok { display: grid; place-items: center; width: 56px; height: 56px; margin-bottom: 6px; border-radius: 50%; background: var(--up-wash); color: var(--up); }
 .bx-cform.done .ok svg { width: 28px; height: 28px; }
+.bx-cform.done .ok.wait { background: var(--brand-wash); color: var(--brand-ink); }   /* already applied: under review */
 .bx-cform.done h2 { font-size: 26px; }
 .bx-cform.done p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--ink-3); }
 .bx-cform.done .ref b { color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -5312,6 +5313,33 @@ html { touch-action: manipulation; }
   .bx-cform .side .office .eyebrow { display: none; }
   .bx-cform .side .office .addr { font-size: 12.5px; line-height: 1.5; }
   .bx-cform .side .office .addr b { font-size: 12.5px; }
+}
+
+/* ==== v101 (23 Nov'26, LOCAL ONLY - flags.CAREERS_PORTAL): THE KIND OF WORK, AND THE ROLE'S TITLE IN ITS PAGE ===========
+   The openings filter by category (careers.CATEGORIES) - a count and one labelled Team dropdown; a role's own page keeps the
+   band as "Careers at BCX" and opens the description on the title, large, on an orange rule. */
+.bx-cp-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 18px; padding: 0 0 14px;
+  border-bottom: 1px solid var(--line); }
+.bx-cp-count { margin: 0; font-size: 15px; color: var(--ink-3); }
+.bx-cp-count b { font-weight: 700; color: var(--ink); }
+.bx-cp-filter { display: inline-flex; align-items: center; gap: 12px; margin: 0; }
+.bx-cp-filter > span:first-child { font-size: 13px; font-weight: 600; letter-spacing: .02em; color: var(--ink-3); }
+.bx-cp-filter .sel { position: relative; display: inline-flex; }
+.bx-cp-filter select { appearance: none; -webkit-appearance: none; min-width: 240px; height: 42px; padding: 0 40px 0 14px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--card, #fff); font: 500 14.5px/1 var(--f-body, inherit);
+  color: var(--ink); cursor: pointer; transition: border-color .15s ease, box-shadow .15s ease; }
+.bx-cp-filter select:hover { border-color: var(--ink-3); }
+.bx-cp-filter select:focus-visible { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-wash); }
+.bx-cp-filter svg { position: absolute; right: 12px; top: 50%; width: 18px; height: 18px; transform: translateY(-50%); color: var(--ink-3); pointer-events: none; }
+.bx-role .bx-role-title { margin: 0 0 22px; padding: 4px 0 4px 20px; border-left: 4px solid var(--brand); }
+.bx-role .bx-role-title .k { display: block; margin-bottom: 8px; font-size: 12.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--brand-ink); }
+.bx-role .bx-role-title h1 { font: 750 clamp(30px, 3.4vw, 46px)/1.12 var(--f-display); letter-spacing: -.025em; color: var(--ink); }
+@media (max-width: 600px) {
+  .bx-cp-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .bx-cp-filter { justify-content: space-between; }
+  .bx-cp-filter .sel, .bx-cp-filter select { flex: 1; min-width: 0; width: 100%; font-size: 16px; }
+  .bx-role .bx-role-title { padding-left: 14px; }
+  .bx-role .bx-role-title h1 { font-size: 28px; }
 }
 
 /* ==== v102 (26 Nov'26, LIVE - flags.HOME_EVENTS): THE EVENTS SECTION (website/EventReel.jsx) ====================

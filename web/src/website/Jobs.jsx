@@ -5,14 +5,13 @@
 // the CV against the role's rubric (libs/website/ats.py), stores it and mails the applicant a thank-you. Nothing is
 // mailed to HR: HR reads the applications, ranked, in the HR portal (frontend/hr/).
 import { useEffect, useRef, useState } from 'react'
-import { ArrowLeft, ArrowRight, Briefcase, Check, ClipboardCheck, Clock3, Download, ExternalLink, FileText, Mail, MapPin,
-  MessagesSquare, Send, Upload } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Briefcase, Check, ChevronDown, Clock3, Download, ExternalLink, FileText, Mail, Upload } from 'lucide-react'
 import { apiUrl } from './api.js'
 import { CAREERS, CONTACT } from './content.js'
 import { openContact } from './ContactForm.jsx'
 import { CONTACT_FORM } from './flags.js'
 import { PHOTOS } from './media.jsx'
-import { HRail, PageBand, Seg, Sheet, usePhone } from './ui.jsx'
+import { HRail, PageBand, Sheet, usePhone } from './ui.jsx'
 
 const NOTICE = ['Immediate', '15 days', '30 days', '60 days', '90 days']
 const MAX = { name: 80, email: 254, phone: 20, location: 80, current_company: 120, current_role: 120, linkedin: 300,
@@ -42,24 +41,20 @@ export default function Jobs({ slug }) {
   return slug ? <Role key={slug} slug={slug} /> : <JobList />
 }
 
-// what happens after an application - the same promise the thank-you mail makes (libs/website/careers.ack_html)
-const STEPS = [
-  [Send, 'Apply online', 'Send your details and your CV from the role’s page. A confirmation reaches your inbox straight away.'],
-  [ClipboardCheck, 'We review your application', 'Our team reads every application against what the role needs.'],
-  [MessagesSquare, 'We get in touch', 'If your profile matches the role, a member of our team will contact you.'],
-]
-
 /** THE CAREERS PAGE (19 Nov'26, pass 97 - LOCAL ONLY): Careers is a page of its own, in the header beside the other
  *  pages (the user: the openings were reached only through the home page's Careers section). It opens on the open
- *  positions - what a visitor comes for - then why join BCX (the approved copy, content.CAREERS), what happens after
- *  an application, and a way to write in when no role fits; the page ends on that card, clear of the footer. */
+ *  positions - what a visitor comes for - then why join BCX (the approved copy, content.CAREERS) and a way to write in
+ *  when no role fits; the page ends on that card, clear of the footer.
+ *  23 Nov'26 (the user): the openings are FILTERED BY THE KIND OF WORK (a role's `category`, careers.CATEGORIES - "when
+ *  we have more roles … segregations based on genre of job"); no department or place line on a card; no "new roles
+ *  will be posted here" note; no "How we hire / After you apply" ("it is obvious how people hire"). */
 function JobList() {
   const { data, error } = useApi('/api/website/careers/jobs')
   const jobs = data?.jobs || []
   const phone = usePhone()
-  const [dept, setDept] = useState('all')
-  const depts = [...new Set(jobs.map(j => j.team).filter(Boolean))]
-  const shown = dept === 'all' ? jobs : jobs.filter(j => j.team === dept)
+  const [cat, setCat] = useState('all')
+  const cats = [...new Set(jobs.map(j => j.category).filter(Boolean))]
+  const shown = cat === 'all' ? jobs : jobs.filter(j => j.category === cat)
   const write = CONTACT_FORM
     ? <button type="button" className="bx-btn white" onClick={() => openContact('careers')}><Mail aria-hidden="true" /> Write to us</button>
     : <a className="bx-btn white" href={`mailto:${CONTACT.email}?subject=Careers%20at%20BCX`}><Mail aria-hidden="true" /> Write to us</a>
@@ -74,24 +69,37 @@ function JobList() {
               <span className="eyebrow">Open positions</span>
               <h2 className="h-sec" id="cp-open">Roles we are hiring for<em>.</em></h2>
             </div>
-            {depts.length > 1 && (
-              <Seg label="Department" value={dept} onChange={setDept}
-                options={[['all', `All (${jobs.length})`], ...depts.map(d => [d, d])]} />
-            )}
           </div>
+          {/* the kind of work (careers.CATEGORIES): a job board's toolbar - how many roles are open, then ONE labelled
+              dropdown of the teams that have one (pills read as "unprofessional", the user, 23 Nov'26) */}
+          {jobs.length > 0 && (
+            <div className="bx-cp-bar">
+              <p className="bx-cp-count" aria-live="polite">
+                <b>{shown.length}</b> open position{shown.length === 1 ? '' : 's'}{cat !== 'all' && <> in {cat}</>}
+              </p>
+              <label className="bx-cp-filter" htmlFor="cp-team">
+                <span>Team</span>
+                <span className="sel">
+                  <select id="cp-team" value={cat} onChange={e => setCat(e.target.value)}>
+                    <option value="all">All teams ({jobs.length})</option>
+                    {cats.map(c => <option key={c} value={c}>{c} ({jobs.filter(j => j.category === c).length})</option>)}
+                  </select>
+                  <ChevronDown aria-hidden="true" />
+                </span>
+              </label>
+            </div>
+          )}
           {!data && !error && <div className="bx-jobs-skel" aria-hidden="true"><i /><i /></div>}
           {error && <p className="bx-cp-empty">The openings could not be loaded just now. Please try again in a moment.</p>}
-          {data && !jobs.length && <p className="bx-cp-empty">There are no open positions right now. {CAREERS.note}</p>}
+          {data && !jobs.length && <p className="bx-cp-empty">There are no open positions right now.</p>}
           <ul className="bx-cp-roles">
             {shown.map(j => (
               <li key={j.slug}>
                 <a className="bx-cp-role" href={`#/jobs/${j.slug}`}>
                   <span className="tx">
-                    {j.team && <span className="dept">{j.team}</span>}
                     <b>{j.title}</b>
                     {j.summary && <span className="sum">{j.summary}</span>}
                     <span className="facts">
-                      {j.location && <span><MapPin aria-hidden="true" />{j.location}</span>}
                       {j.employment && <span><Briefcase aria-hidden="true" />{j.employment}</span>}
                       {j.experience && <span><Clock3 aria-hidden="true" />{j.experience}</span>}
                     </span>
@@ -101,7 +109,6 @@ function JobList() {
               </li>
             ))}
           </ul>
-          {data && jobs.length > 0 && <p className="bx-cp-note">{CAREERS.note}</p>}
         </div>
       </section>
 
@@ -122,14 +129,8 @@ function JobList() {
         </div>
       </section>
 
-      <section className="bx-cp-sec" aria-labelledby="cp-steps">
+      <section className="bx-cp-sec" aria-label="Write to us">
         <div className="wrap">
-          <div className="bx-cp-hd"><div><span className="eyebrow">How we hire</span><h2 className="h-sec" id="cp-steps">After you apply<em>.</em></h2></div></div>
-          <ol className="bx-cp-steps">
-            {STEPS.map(([I, t, p]) => (
-              <li key={t}><span className="ic"><I aria-hidden="true" /></span><b>{t}</b><span>{p}</span></li>
-            ))}
-          </ol>
           <div className="bx-cp-cta">
             <div>
               <h3>Don’t see the right role?</h3>
@@ -148,6 +149,18 @@ function Role({ slug }) {
   const [open, setOpen] = useState(false)
   const [n, setN] = useState(0)
   const j = data?.job
+  // THE FORM'S TOKEN (26 Nov'26, careers.form_token): the role's page hands one out and the application must carry it,
+  // so a script that never opened the page cannot post applications. It lasts 6 hours; a page left open longer
+  // fetches a new one when the form is sent
+  const tok = useRef({ v: null, at: 0 })
+  useEffect(() => { if (data?.form_token) tok.current = { v: data.form_token, at: Date.now() } }, [data])
+  const formToken = async () => {
+    if (tok.current.v && Date.now() - tok.current.at < 5 * 3600e3) return tok.current.v
+    const r = await fetch(apiUrl(`/api/website/careers/jobs/${encodeURIComponent(slug)}`), { credentials: 'omit' })
+    const d = await r.json().catch(() => ({}))
+    tok.current = { v: d.form_token || null, at: Date.now() }
+    return tok.current.v
+  }
   if (error) {
     return (
       <div className="bx-careers-pg v-band">
@@ -156,13 +169,18 @@ function Role({ slug }) {
       </div>
     )
   }
+  // THE ROLE'S TITLE IS IN THE PAGE, NOT THE BAND (23 Nov'26, the user: as the band's heading it read as the page's
+  // name, not a job): the band stays "Careers at BCX", and the title opens the description - large, on an accent rule
   return (
     <div className="bx-careers-pg v-band">
-      <PageBand crumb="Careers" title={j ? j.title : 'Careers at BCX'} photo={PHOTOS.mineDragline}
-        sub={j ? <span className="bx-band-pill">{[j.team, j.location].filter(Boolean).join(' · ')}</span> : null} />
+      <PageBand crumb="Careers" title={<>Careers at <em>BCX</em></>} photo={PHOTOS.mineDragline} />
       <section className="wrap bx-role">
         <article className="jd">
           <a className="back" href="#/jobs"><ArrowLeft aria-hidden="true" /> All open positions</a>
+          <header className="bx-role-title">
+            <span className="k">Open position</span>
+            <h1>{j ? j.title : ' '}</h1>
+          </header>
           {j?.summary && <p className="lede">{j.summary}</p>}
           {(j?.sections || []).map(s => (
             <section key={s.title}>
@@ -210,7 +228,7 @@ function Role({ slug }) {
         </aside>
       </section>
       <Sheet open={open} onClose={() => setOpen(false)} label={j ? `Apply: ${j.title}` : 'Apply'} center>
-        {close => j && <ApplyForm key={n} job={j} close={close} />}
+        {close => j && <ApplyForm key={n} job={j} close={close} formToken={formToken} />}
       </Sheet>
     </div>
   )
@@ -247,7 +265,7 @@ function Field({ id, label, optional = false, error, children, hint }) {
   )
 }
 
-function ApplyForm({ job, close }) {
+function ApplyForm({ job, close, formToken }) {
   const [v, setV] = useState(EMPTY)
   const [file, setFile] = useState(null)
   const [consent, setConsent] = useState(false)
@@ -270,12 +288,14 @@ function ApplyForm({ job, close }) {
     setErrors(errs)
     if (Object.keys(errs).length) { document.getElementById(`ap-${Object.keys(errs)[0]}`)?.focus(); return }
     setState({ step: 'sending' })
+    const ft = await formToken().catch(() => null)
     const fd = new FormData()
     Object.entries(v).forEach(([k, val]) => fd.append(k, val.trim()))
     fd.append('job', job.slug)
     fd.append('consent', 'on')
     fd.append('website', hp)
     fd.append('elapsed', String(Date.now() - opened.current))
+    fd.append('ft', ft || '')
     fd.append('cv', file)
     const ctl = new AbortController()
     const timer = setTimeout(() => ctl.abort(), 45000)
@@ -284,9 +304,11 @@ function ApplyForm({ job, close }) {
       const d = await r.json().catch(() => ({}))
       if (r.ok && d.ok) setState({ step: 'sent', ref: d.ref || null })
       else if (r.status === 400 && d.errors) { setErrors(d.errors); setState({ step: 'form' }) }
-      else if (r.status === 409) setState({ step: 'failed', why: 'You have already applied for this role with this email address.' })
-      else if (r.status === 429) setState({ step: 'failed', why: 'Too many applications have come from your connection today. Please try again tomorrow.' })
+      else if (r.status === 409) setState({ step: 'already' })
+      else if (r.status === 429 && d.error === 'reused') setState({ step: 'failed', why: 'This CV has already been sent with other email addresses. Please apply with your own email address.' })
+      else if (r.status === 429) setState({ step: 'failed', why: 'You have sent several applications today. Please try again tomorrow.' })
       else if (r.status === 413) setState({ step: 'failed', why: 'Your CV is too large to send. Please attach a file under 5 MB.' })
+      else if (r.status === 503 && d.error === 'busy') setState({ step: 'failed', why: 'We are receiving a lot of applications right now. Please try again in a few minutes.' })
       else setState({ step: 'failed', why: 'We could not send your application just now. Please try again in a moment.' })
     } catch {
       setState({ step: 'failed', why: 'We could not reach our server. Please check your connection and try again.' })
@@ -302,6 +324,18 @@ function ApplyForm({ job, close }) {
         <h2>Thank you, {v.name.trim().split(/\s+/)[0]}.</h2>
         <p>Your application for <b>{job.title}</b> has reached us.<br />A confirmation is on its way to <b>{v.email.trim()}</b>.</p>
         {state.ref && <p className="ref">Your reference: <b>{state.ref}</b></p>}
+        <button type="button" className="bx-btn primary" onClick={close}>Close</button>
+      </div>
+    )
+  }
+  // THE SAME ROLE TWICE (26 Nov'26, the user: "just a short message that your application is under review"): not an
+  // error - the first application stands, and nothing new was stored
+  if (state.step === 'already') {
+    return (
+      <div className="bx-cform done" aria-live="polite">
+        <span className="ok wait" aria-hidden="true"><Clock3 /></span>
+        <h2>You have already applied</h2>
+        <p>We have your application for <b>{job.title}</b> from <b>{v.email.trim()}</b>.<br />It is under review, and we will be in touch.</p>
         <button type="button" className="bx-btn primary" onClick={close}>Close</button>
       </div>
     )

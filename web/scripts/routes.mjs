@@ -22,6 +22,9 @@ const ROUTES = [
   'about', 'coverage', 'vision', 'principles', 'careers', 'industry', 'chain', 'contact',
   // the pages
   'news', 'legal', 'legal/regulations',
+  // careers (live since 26 Nov'26): the openings, then each published role's own address - a NEW ROLE = A NEW LINE
+  // (an unlisted role still opens, from 404.html, but with GitHub's 404 status)
+  'jobs', 'jobs/research-strategy-manager',
   // Market Insights, module by module, and Plant stocks by status (the Overview's ring links there)
   'insights', 'insights/overview', 'insights/supply', 'insights/map', 'insights/mines', 'insights/stocks',
   'insights/power', 'insights/auction', 'insights/sources',
