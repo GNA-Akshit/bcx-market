@@ -92,7 +92,6 @@ export const CAREERS = {
     ['Collaborate with industry experts', 'Collaborate with experts across technology and energy markets'],
     ['Innovate and grow', 'Grow in an environment that values innovation, ownership, and continuous learning'],
   ],
-  note: 'As we continue to build our platform, new career opportunities will be posted here.',
 }
 
 // LATEST REGULATIONS (#/legal/regulations) — the law BCX works under, as its issuers publish
@@ -140,7 +139,7 @@ export const REG_SOURCES = [
 
 export const CONTACT = {
   title: 'We’d love to hear from you.',
-  lede: 'Reach out to us for any inquiries regarding partnerships or platform access.',
+  lede: 'Reach out to us for any inquiries regarding BCX.',      // 27 Nov'26, the user: there is no platform yet
   company: 'Bharat Coal Exchange Private Limited',
   // the office, in full (16 Nov'26, the user's)
   address: '7007, The Palm Spring Plaza, Golf Course Rd, DLF Phase 5, Sector 54, Gurugram, Haryana 122009',

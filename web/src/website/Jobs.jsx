@@ -7,11 +7,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Briefcase, Check, ChevronDown, Clock3, Download, ExternalLink, FileText, Mail, Upload } from 'lucide-react'
 import { apiUrl } from './api.js'
-import { CAREERS, CONTACT } from './content.js'
+import { CONTACT } from './content.js'
 import { openContact } from './ContactForm.jsx'
 import { CONTACT_FORM } from './flags.js'
 import { PHOTOS } from './media.jsx'
-import { HRail, PageBand, Sheet, usePhone } from './ui.jsx'
+import { PageBand, Sheet } from './ui.jsx'
 
 const NOTICE = ['Immediate', '15 days', '30 days', '60 days', '90 days']
 const MAX = { name: 80, email: 254, phone: 20, location: 80, current_company: 120, current_role: 120, linkedin: 300,
@@ -43,15 +43,14 @@ export default function Jobs({ slug }) {
 
 /** THE CAREERS PAGE (19 Nov'26, pass 97 - LOCAL ONLY): Careers is a page of its own, in the header beside the other
  *  pages (the user: the openings were reached only through the home page's Careers section). It opens on the open
- *  positions - what a visitor comes for - then why join BCX (the approved copy, content.CAREERS) and a way to write in
- *  when no role fits; the page ends on that card, clear of the footer.
+ *  positions - what a visitor comes for - then a way to write in when no role fits; the page ends on that card, clear
+ *  of the footer. (Its "Why join BCX" went 27 Nov'26: the home page's Careers section says it.)
  *  23 Nov'26 (the user): the openings are FILTERED BY THE KIND OF WORK (a role's `category`, careers.CATEGORIES - "when
  *  we have more roles … segregations based on genre of job"); no department or place line on a card; no "new roles
  *  will be posted here" note; no "How we hire / After you apply" ("it is obvious how people hire"). */
 function JobList() {
   const { data, error } = useApi('/api/website/careers/jobs')
   const jobs = data?.jobs || []
-  const phone = usePhone()
   const [cat, setCat] = useState('all')
   const cats = [...new Set(jobs.map(j => j.category).filter(Boolean))]
   const shown = cat === 'all' ? jobs : jobs.filter(j => j.category === cat)
@@ -112,23 +111,7 @@ function JobList() {
         </div>
       </section>
 
-      <section className="bx-cp-sec soft" aria-labelledby="cp-why">
-        <div className="wrap bx-cp-why">
-          <div className="tx">
-            <span className="eyebrow">Why join BCX</span>
-            <h2 className="h-sec" id="cp-why">{CAREERS.title}<em>.</em></h2>
-            <p className="lede">{CAREERS.intro}</p>
-          </div>
-          {phone ? (
-            <HRail bleed label="Why join BCX">
-              {CAREERS.reasons.map(([t, p]) => <div key={t} className="bx-why-card"><b>{t}</b><span>{p}</span></div>)}
-            </HRail>
-          ) : (
-            <ul className="cards">{CAREERS.reasons.map(([t, p]) => <li key={t}><b>{t}</b><span>{p}</span></li>)}</ul>
-          )}
-        </div>
-      </section>
-
+      {/* no "Why join BCX" here (27 Nov'26, the user): the home page's Careers section already says it */}
       <section className="bx-cp-sec" aria-label="Write to us">
         <div className="wrap">
           <div className="bx-cp-cta">

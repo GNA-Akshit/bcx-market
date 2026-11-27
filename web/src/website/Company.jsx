@@ -343,7 +343,6 @@ export function Careers() {
           <span className="eyebrow">Careers</span>
           <h2 className="h-sec">{CAREERS.title}<em>.</em></h2>
           <p className="lede">{CAREERS.intro}</p>
-          <p className="note">{CAREERS.note}</p>
           {/* the form, open on Careers (18 Nov'26 — the VP: a form, not a mailto that opens Outlook); local only
               (flags.CONTACT_FORM) — a build that ships keeps the mailto */}
           {/* the openings (LOCAL ONLY - flags.CAREERS_PORTAL): the page leads, writing to us follows */}

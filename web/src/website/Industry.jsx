@@ -59,7 +59,6 @@ function MarketCard({ data }) {
 }
 
 export function IndustryOpener({ data }) {
-  const sources = new Set((data.series || []).map(s => s.source.split('—')[0].trim())).size
   return (
     <section className={`bx-industry${PAGE_PHOTOS ? '' : ' flat'}`} id="industry">
       {/* PAGE_PHOTOS off (19 Nov'26): no photograph, a still gradient (website-bands.css `.flat`) */}
@@ -71,11 +70,7 @@ export function IndustryOpener({ data }) {
         <div className="tx bx-reveal">
           <span className="bx-badge"><Database /> Market Snapshot</span>
           <h2>India&rsquo;s coal market, <em>in public data.</em></h2>
-          <p className="facts">
-            <span><b>{sources}</b> public sources</span><i aria-hidden="true" />
-            <span><b>Every morning</b> refreshed</span><i aria-hidden="true" />
-            <span><b>As published</b> by each source</span>
-          </p>
+          {/* the three facts (sources · every morning · as published) are gone - 27 Nov'26, the user */}
           <a className="bx-btn white" href="#/insights">Open Market Insights <ArrowRight /></a>
         </div>
         <div className="bx-reveal"><MarketCard data={data} /></div>
