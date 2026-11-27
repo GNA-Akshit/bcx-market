@@ -18,11 +18,16 @@ import { ArrowRight, ArrowUpRight, BarChart3, BookOpen, CircleCheck, Clock3, Fil
 import BcxLogo from './BrandLogo.jsx'      // the bcx.market logo (27 Oct'26)
 import { CONTACT } from './content.js'
 import { LEGAL, SHOW_REGISTER } from './Legal.jsx'
-import { DATA_CENTRE, HOME_REGULATIONS, NEWSLETTER } from './flags.js'
+import { DATA_CENTRE, HOME_EVENTS, HOME_REGULATIONS, NEWSLETTER } from './flags.js'
 import { HRail, usePhone } from './ui.jsx'
 import { publishers } from './Sources.jsx'
 import { useVisits } from './api.js'
 import LinkedInIcon from './LinkedIn.jsx'
+
+// THE COAL CHAIN ("mine to plant") IS ON THE HOME PAGE only when neither the events nor the latest regulations take its
+// place (Website.jsx) - every link to it must ask this, or it points at nothing (27 Nov'26: the footer's "Mine to plant"
+// and the Logistics card still did, a day after the events replaced it)
+const CHAIN_ON_HOME = !HOME_EVENTS && !HOME_REGULATIONS
 
 // the footer's "Data sources" column — switched OFF 27 Oct'26 (the user's call), code kept
 const SHOW_FOOTER_SOURCES = false
@@ -84,7 +89,8 @@ const AREAS = [
     'Follow published coal benchmarks, e-auction outcomes and imports, as their sources report them.'],
   [Zap, 'Coal–power linkages', 'Generation · Demand', '#/insights/power',
     'Understand thermal generation patterns and the electricity-sector context of coal consumption.'],
-  [TrainFront, 'Logistics information', 'Rail · Road · Ports', '#/chain',
+  // the chain's section where it is on the home page; otherwise Production & offtake, which carries the rail rakes
+  [TrainFront, 'Logistics information', 'Rail · Road · Ports', CHAIN_ON_HOME ? '#/chain' : '#/insights/supply',
     'Rail, road, pithead and port-linked supply, from the mine to the plant.'],
   // Research & reports is off (26 Oct'26): the daily coal letter this describes is the newsletter
   // with the newsletter off (flags.NEWSLETTER) the card opens Regulations
@@ -173,8 +179,8 @@ export function Footer({ data, onNav, onLetters, onExplore, showVisits = false }
               <li><a href="#/insights">Market Insights</a></li>
               {DATA_CENTRE && <li><button className="lnk" onClick={() => onExplore()}>Data centre</button></li>}
               {NEWSLETTER && <li><button className="lnk" onClick={onLetters}>Newsletter</button></li>}
-              {/* the coal chain's link, where the chain still is (a build that ships - flags.HOME_REGULATIONS) */}
-              {!HOME_REGULATIONS && <li><button className="lnk" onClick={() => onNav('chain')}>Mine to plant</button></li>}
+              {/* the coal chain's link, only where the chain is on the home page (CHAIN_ON_HOME) */}
+              {CHAIN_ON_HOME && <li><button className="lnk" onClick={() => onNav('chain')}>Mine to plant</button></li>}
               {/* FOUR COLUMNS, NOT FIVE (27 Oct'26): with BCX's register hidden the Regulations column
                   held one link, so the link moved here; the column comes back with the register */}
               {!SHOW_REGISTER && <li><a href="#/legal/regulations">Latest regulations</a></li>}
